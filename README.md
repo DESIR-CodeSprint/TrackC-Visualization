@@ -44,6 +44,12 @@ The substantial and technical skills prerequisites depend on the choice of the p
 ## Technical preparation
 TBD
 
+## Links
+- [VisNow project](https://gitlab.com/ICM-VisLab/VisNow)
+- [JSciC project](https://gitlab.com/ICM-VisLab/JSciC)
+- [JLargeArrays project](https://gitlab.com/ICM-VisLab/JLargeArrays)
+- [BibSonomy REST API](https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/REST%20API)
+
 
 ## Contact
 - Bartosz Borucki (<b.borucki@icm.edu.pl>)
