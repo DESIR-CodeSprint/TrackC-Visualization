@@ -45,6 +45,7 @@ The substantial and technical skills prerequisites depend on the choice of the p
 TBD
 
 ## Links
+- [VisNow page](https://visnow.icm.edu.pl/)
 - [VisNow project](https://gitlab.com/ICM-VisLab/VisNow)
 - [JSciC project](https://gitlab.com/ICM-VisLab/JSciC)
 - [JLargeArrays project](https://gitlab.com/ICM-VisLab/JLargeArrays)
