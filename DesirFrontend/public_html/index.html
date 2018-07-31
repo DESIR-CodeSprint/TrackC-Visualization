@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+    <head>
+        <title>DESIR Graph Visualization</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+        <script src="js/controller.js"></script>
+        <script src="js/interactions.js"></script>
+        <script src="js/three.js"></script>
+        <script src="js/Detector.js"></script>
+        <script src="js/controls/OrbitControls.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+    </head>
+
+    <body ng-app="desirApp">
+        <div id="mySidenav" class="sidenav">
+            <img id="logo" src="img/DESIR_logo_01.png" alt="logo" width="300"/>
+            <h2>
+                MyObject:
+            </h2>
+            <form ng-controller="RetrieveMyObjectController" ng-submit="retrieveMyObject()">
+                <label for="myobjectID">MyObjectID:</label>
+                <select id="myobjectID" name="myobjectID" ng-model="dataobject.id">
+                    <option value="Test1">Test1</option>
+                    <option value="Test2">Test2</option>  
+                    <option value="TestJSON">TestJSON</option>  
+                    <option value="TestQuery">TestQuery</option>  
+                </select>
+                <label for="text">Text:</label>
+                <input type="text" id="text" name="text" ng-model="dataobject.text">
+                <br/><br/>
+                <input type="submit" id="submit" value="Submit" />
+            </form>
+        </div>
+
+
+        <div id="main">
+            <div id="ObjectInfo">
+                <p>MyObject ID:&nbsp;<span id="id_display"></span><span id="seq_display"></span>
+                </p>
+            </div>
+            <div id="Container3D">
+            </div>
+            <div id="MouseInfo">
+                <p>Mouse:&nbsp;<span id="mouse_pos"></span>
+                </p>
+            </div>
+        </div>
+    </body>
+</html>
