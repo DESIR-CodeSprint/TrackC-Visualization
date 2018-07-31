@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module name="bibsonomy reader" class="ReadBibSonomy">
+    <reader datatype="Bibliographic data from JSON files"/>
+    <description value="Reads bibliographic data exported as JSON files from BibSonomy."/>
+    <outputs>
+         <output name="outField" type="pl.edu.icm.visnow.lib.types.VNIrregularField">
+        </output>
+        <geometryOutput/>
+    </outputs>
+</module>
+

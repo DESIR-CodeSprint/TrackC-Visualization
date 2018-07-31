@@ -1,0 +1,5 @@
+
+<library name="DESIR">
+    <core package="pl.edu.icm.desir.ReadBibSonomy"/>
+    <core package="pl.edu.icm.desir.ForcePlacement"/>
+</library>
