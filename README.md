@@ -29,7 +29,8 @@ The goal of this track is to create certain blocks or functioanlities of the web
 7) 3D user interaction for additional information
 8) 3D user interaction for visual data filtering
 9) Introduce 2D visualization for additional data analytics
-10) Conceptualize and implement usage scenarios
+10) Introduce geospatial data from affiliations (if data available) and visualize collaborations on map
+11) Conceptualize and implement usage scenarios
 
 
 ## Prerequisites 
