@@ -42,7 +42,14 @@ The substantial and technical skills prerequisites depend on the choice of the p
 
 
 ## Technical preparation
-TBD
+To run all steps of our track and work with codes the following components are required:
+- 64-bit Windows, Mac OS or Linux operating system. 
+- VisNow v1.3-RC2 - installers can be downloaded [here](https://visnow.icm.edu.pl/).
+- VisNow Plugin DESIR - download [here](https://visnow.icm.edu.pl/index.php/downloads/plugins) and follow the installation instruction.
+- Java JDK 8 64-bit - we sugest downloading from Oracle website [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). 
+- NetBeans IDE v8.2 for Java EE - download [here](https://netbeans.org/downloads/). Note that all provided projects are in NetBeans project format. If you wish to use another Java IDE you need to convert the projects by yourself. NetBeans for Java EE bundles also GlassFish and Apache Tomcat servers for local running of web apps. 
+- [BibSonomy](https://www.bibsonomy.org) account and API key will be required for API querying.
+- Project templates for DesirFrontend and DesirBackend from this Git repository. You can pull it directly from NetBeans through Team->Git->Clone and providing URL: https://github.com/DESIR-CodeSprint/TrackC-Visualization.git 
 
 ## Links
 - [VisNow page](https://visnow.icm.edu.pl/)
