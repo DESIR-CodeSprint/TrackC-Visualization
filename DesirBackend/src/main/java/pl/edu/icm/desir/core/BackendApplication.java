@@ -11,3 +11,11 @@ public class BackendApplication {
     }
     
 }
+
+
+/*
+Once run backend application might be tested in the browser by using the following link:
+
+http://localhost:8080/dataobject?id=Test1&text=
+
+*/
