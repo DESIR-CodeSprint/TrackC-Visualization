@@ -57,6 +57,7 @@ To run all steps of our track and work with codes the following components are r
 - [JSciC project](https://gitlab.com/ICM-VisLab/JSciC)
 - [JSciC API javadoc](http://javadoc.io/doc/pl.edu.icm/JSciC/1.0)
 - [JLargeArrays project](https://gitlab.com/ICM-VisLab/JLargeArrays)
+- [JLargeArrays API javadoc](http://javadoc.io/doc/pl.edu.icm/JLargeArrays/1.6)
 - [BibSonomy REST API](https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/REST%20API)
 
 
