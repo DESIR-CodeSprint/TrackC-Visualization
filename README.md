@@ -55,6 +55,7 @@ To run all steps of our track and work with codes the following components are r
 - [VisNow page](https://visnow.icm.edu.pl/)
 - [VisNow project](https://gitlab.com/ICM-VisLab/VisNow)
 - [JSciC project](https://gitlab.com/ICM-VisLab/JSciC)
+- [JSciC API javadoc](http://javadoc.io/doc/pl.edu.icm/JSciC/1.0)
 - [JLargeArrays project](https://gitlab.com/ICM-VisLab/JLargeArrays)
 - [BibSonomy REST API](https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/REST%20API)
 
