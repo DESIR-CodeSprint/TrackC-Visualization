@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module name="module 1" class="FirstNewClass">
+
+    <inputs>
+        <input name="inField" type="pl.edu.icm.visnow.lib.types.VNIrregularField" modifiers="TRIGGERING">
+            <acceptor>
+                <param name="IRREGULAR" value="true"/>
+                <param name="CELLSETS" value="true"/>
+            </acceptor>
+        </input>
+        <input></input>
+    </inputs>
+    <outputs>
+        <output name="outField" type="pl.edu.icm.visnow.lib.types.VNIrregularField">
+            <schema>
+                <param name="IRREGULAR" value="true"/>
+            </schema>
+        </output>
+        <geometryOutput/>
+    </outputs>
+    <parameters>
+    </parameters>
+    <description value="this my first VisNow module"/>
+</module>
