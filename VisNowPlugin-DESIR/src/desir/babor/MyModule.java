@@ -45,7 +45,10 @@ public class MyModule extends OutFieldVisualizationModule
             2,3,
             3,4
         };
-        CellArray ca = new CellArray(CellType.SEGMENT, segments, null, null);
+        int[] dataIndices = new int[] {
+            0,1,2,3,4
+        };
+        CellArray ca = new CellArray(CellType.SEGMENT, segments, null, dataIndices);
         CellSet cs = new CellSet("my cellset");
         cs.addCells(ca);
         myfield.addCellSet(cs);
@@ -61,8 +64,30 @@ public class MyModule extends OutFieldVisualizationModule
         DataArray da = DataArray.create(data, 1, "numbers");
         myfield.addComponent(da);
         
+        //create author names
+        String[] names = new String[]{
+            "Author Name 1",
+            "Author Name 2",
+            "Author Name 3",
+            "Author Name 4",
+            "Author Name 5"
+        };
+        DataArray da_names = DataArray.create(names, 1, "names");
+        myfield.addComponent(da_names);
         
-        System.out.println("HELLO WORLD!");
+        
+        int[] coworks = new int[] {
+            1,
+            1,
+            2,
+            1,
+            5
+        };
+        DataArray da_coworks = DataArray.create(coworks, 1, "N coworks");
+        cs.addComponent(da_coworks);
+        
+
+        
         
         outField = myfield;
         outIrregularField = myfield;
