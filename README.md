@@ -62,7 +62,14 @@ To run all steps of our track and work with codes the following components are r
 - [BibSonomy REST API](https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/REST%20API)
 - [Track C Etherpad](https://etherpad.gwdg.de/p/Code_Sprint_Track_C)
 - [Track C Googledocs](https://docs.google.com/document/d/1EIHUoUggaXYwdUYwc_Cn4xnPZnMWuLNYRYUTsPUmd6s/edit?usp=sharing)
-
+- [D3.js library for 2D web visualization](https://d3js.org)
+- [Vega and Vega-lite for 2D web visualization](https://vega.github.io)
+- [Comac Navigator](http://devel.comac.ceon.pl/comac-navigator-latest/?graph=6b4f66cc) as example of simple 2D graph layout
+- [Gephi - 3D graph visualization tool for desktop](https://gephi.org)
+- [Gephi video](https://player.vimeo.com/video/9726202)
+- [Walrus - 3D graph visualization tool for desktop](https://www.caida.org/tools/visualization/walrus/)
+- [WebGL](https://www.khronos.org/webgl/)
+- [three.js](https://threejs.org)
 
 ## Contact
 - Bartosz Borucki (<b.borucki@icm.edu.pl>)
