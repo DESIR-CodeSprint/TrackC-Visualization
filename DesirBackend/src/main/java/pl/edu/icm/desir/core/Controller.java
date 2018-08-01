@@ -33,7 +33,7 @@ public class Controller
             case "Test2":
                 return createTest2(id, text);
             case "TestJSON":
-                return createTestJson(id, text, false);
+                return createTestJson(id, text, true);
             case "TestQuery":
                 return createTestQuery(id, text);
         }
@@ -57,13 +57,13 @@ public class Controller
             IrregularField outField = ReadBibSonomyCore.generateCoauthorshipFromFile(System.getProperty("user.dir") + File.separator + "posts.json");
 
 //TBD - graph placement
-//
+
 //            if(doPlacement)
 //                outField = PlacementCore.optimizePlacement(outField,  
 //                                                           (float).7, 1, 100,
 //                                                           1, 4, (float).001, 0, 
 //                                                           null);
-            
+//            
             
             //coords
             float[] coords = outField.getCurrentCoords().getData();
@@ -116,22 +116,23 @@ public class Controller
             0.0f, -1.0f, 0.5f,
             1.0f, 0.0f, 1.0f,};
         String[] nodeData = new String[]{
-            "A",
-            "B",
-            "C",
-            "D",
-            "E",};
+            "Branden Kutz",
+            "Eboni Mantle",
+            "Alysa Haigler",
+            "Keena Dragoo",
+            "Barbra Staller"
+        };
 
         int[] segments = new int[]{
             0, 1,
             2, 1,
             3, 4,
             3, 1,};
-        String[] segmentData = new String[]{
-            "A<->B",
-            "C<->B",
-            "D<->E",
-            "E<->A",};
+        String[] segmentData = new String[segments.length/2];
+        for (int i = 0; i < segmentData.length; i++) {
+            segmentData[i] = nodeData[segments[2*i]]+" <---> "+nodeData[segments[2*i+1]];
+        }
+        
 
         DataBlock db = new DataBlock(id, text);
         db.setCoords(coords, false);
