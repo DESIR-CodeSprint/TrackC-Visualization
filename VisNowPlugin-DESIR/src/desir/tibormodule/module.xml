@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module name="Tibor module" class="TiborModule">
+
+    <description value="Tibor's first module."/>
+
+    <inputs>
+         <input name="TiborInField" type="pl.edu.icm.visnow.lib.types.VNIRegularField" modifiers="TRIGGERING">
+        </input>
+    </inputs>
+        
+    <outputs>
+         <output name="TiborOutField" type="pl.edu.icm.visnow.lib.types.VNIrregularField">
+        </output>
+        
+        <geometryOutput/>
+    </outputs>
+</module>
+
