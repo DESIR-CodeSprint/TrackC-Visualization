@@ -3,7 +3,7 @@
 <module name="my first module" class="MyModule">
 
     <inputs>
-        <input name="inField" type="pl.edu.icm.visnow.lib.types.VNRegularField" modifiers="TRIGGERING">
+        <input name="MyInput" type="pl.edu.icm.visnow.lib.types.VNIrregularField" modifiers="NECESSARY:TRIGGERING">
         </input>
     </inputs>
     

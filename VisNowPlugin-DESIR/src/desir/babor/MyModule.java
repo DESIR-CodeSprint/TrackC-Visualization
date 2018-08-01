@@ -22,6 +22,46 @@ public class MyModule extends OutFieldVisualizationModule
     @Override
     public void onActive()
     {
+        VNIrregularField in = (VNIrregularField) getInputFirstValue("MyInput");
+        if(in == null)
+            return;
+        IrregularField inField = in.getField();
+ 
+        //get number of nodes
+        int input_nnodes = (int) inField.getNNodes();
+        //get first data ccomponent on nodes
+        DataArray input_dataarray0 = inField.getComponent(0);
+        //get segment cells from first cellset
+        CellArray input_segments0 = inField.getCellSet(0).getCellArray(CellType.SEGMENT);
+        //get segments from cellarray
+        int[] input_segments = input_segments0.getNodes();
+        //get first component from cells
+        DataArray input_cell_dataarray0 = inField.getCellSet(0).getComponent(0);
+        //get coordinates
+        FloatLargeArray input_coords_LA = inField.getCurrentCoords();
+        
+        //example to iterate ove large array
+        for (long i = 0; i < input_coords_LA.length(); i++) {
+            float v = input_coords_LA.get(i);
+            input_coords_LA.set(i, v+1.0f);
+        }
+        
+        //example of iterating on standard array
+        float[] input_coords = input_coords_LA.getData();
+        for (int i = 0; i < input_coords.length; i++) {
+            input_coords[i] = input_coords[i]-1.0f; 
+            
+        }
+        
+        //here you can do something with input data and create output
+        
+        
+        
+        
+        
+        
+        
+        
         //create field with 5 nodes
         int nNodes = 5;
         IrregularField myfield = new IrregularField(nNodes);
@@ -66,9 +106,9 @@ public class MyModule extends OutFieldVisualizationModule
         
         //create author names
         String[] names = new String[]{
-            "Author Name 1",
-            "Author Name 2",
-            "Author Name 3",
+            "Author Name 1111",
+            "Author Name 222",
+            "Author Name 33",
             "Author Name 4",
             "Author Name 5"
         };
