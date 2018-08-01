@@ -60,6 +60,7 @@ To run all steps of our track and work with codes the following components are r
 - [JLargeArrays project](https://gitlab.com/ICM-VisLab/JLargeArrays)
 - [JLargeArrays API javadoc](http://javadoc.io/doc/pl.edu.icm/JLargeArrays/1.6)
 - [BibSonomy REST API](https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/REST%20API)
+- [Track C Etherpad](https://etherpad.gwdg.de/p/Code_Sprint_Track_C)
 
 
 ## Contact
