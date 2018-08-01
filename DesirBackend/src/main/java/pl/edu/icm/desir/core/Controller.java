@@ -23,6 +23,7 @@ public class Controller
 
     @CrossOrigin(origins = "http://localhost:8383")
     @GetMapping("/dataobject")
+    // executed in the backend, when a query comes
     public DataBlock getDataBlock(@RequestParam String id, @RequestParam(required = false, defaultValue = "") String text)
     {
         System.out.println("==== in controller - data block request: id=" + id + " text=" + text);
