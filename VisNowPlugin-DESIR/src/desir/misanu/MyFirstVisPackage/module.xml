@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module name="my first module" class="MyModule">
+
+    <inputs>
+        <input name="inField" type="pl.edu.icm.visnow.lib.types.VNRegularField" modifiers="TRIGGERING"/>
+    </inputs>
+    <outputs>
+        <output name="outField" type="pl.edu.icm.visnow.lib.types.VNIrregularField"/>
+        <geometryOutput/>
+    </outputs>
+    <parameters>
+    </parameters>
+    <description value="my first module"/>
+</module>
