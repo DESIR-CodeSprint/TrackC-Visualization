@@ -53,12 +53,12 @@ To run all steps of our track and work with codes the following components are r
 - Project templates for DesirFrontend and DesirBackend from this Git repository. You can pull it directly from NetBeans through Team->Git->Clone and providing URL: https://github.com/DESIR-CodeSprint/TrackC-Visualization.git 
 
 ## Links
-- [VisNow page](https://visnow.icm.edu.pl/)
 - [VisNow project](https://gitlab.com/ICM-VisLab/VisNow)
-- [JSciC project](https://gitlab.com/ICM-VisLab/JSciC)
-- [JSciC API javadoc](http://javadoc.io/doc/pl.edu.icm/JSciC/1.0)
 - [JLargeArrays project](https://gitlab.com/ICM-VisLab/JLargeArrays)
 - [JLargeArrays API javadoc](http://javadoc.io/doc/pl.edu.icm/JLargeArrays/1.6)
+- [JSciC project](https://gitlab.com/ICM-VisLab/JSciC)
+- [JSciC API javadoc](http://javadoc.io/doc/pl.edu.icm/JSciC/1.0)
+- [VisNow page](https://visnow.icm.edu.pl/)
 - [BibSonomy REST API](https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/REST%20API)
 - [Track C Etherpad](https://etherpad.gwdg.de/p/Code_Sprint_Track_C)
 - [Track C Googledocs](https://docs.google.com/document/d/1EIHUoUggaXYwdUYwc_Cn4xnPZnMWuLNYRYUTsPUmd6s/edit?usp=sharing)
