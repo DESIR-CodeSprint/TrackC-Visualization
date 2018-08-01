@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<module name="module 1" class="FirstNewClass">
+<module name="module 1" class="LexicalEntry">
 
     <inputs>
         <input name="inField" type="pl.edu.icm.visnow.lib.types.VNIrregularField" modifiers="TRIGGERING">

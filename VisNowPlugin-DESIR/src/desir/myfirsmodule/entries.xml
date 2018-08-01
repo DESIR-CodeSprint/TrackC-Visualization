@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml"
+	schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Title</title>
+         </titleStmt>
+         <publicationStmt>
+            <p>Publication Information</p>
+         </publicationStmt>
+         <sourceDesc>
+            <p>Information about the source</p>
+         </sourceDesc>
+      </fileDesc>
+   </teiHeader>
+   <text>
+      <body>
+         <p>Some text here.</p>
+         <entry xml:id="can" xml:lang="en">
+            <form type="lemma">
+               <orth>can</orth>
+               <gramGrp>
+                  <pos>noun</pos>
+               </gramGrp>
+            </form>
+            <sense xml:id="can_sense1" corresp="canette">
+               <gramGrp>
+                  <pos>noun</pos>
+               </gramGrp>
+               <xr>canette</xr></sense>
+            <sense xml:id="can_sense2" corresp="pouvoir">
+               <gramGrp>
+                  <pos>verb</pos>
+               </gramGrp>
+               <xr>pouvoir</xr>
+            </sense>
+         </entry>
+         <entry xml:id="canette" xml:lang="fr">
+            <form type="lemma">
+               <orth>bouteille</orth>
+            </form>
+            <sense xml:id="canette_sense1" corresp="can_sense1">
+               <gramGrp><pos>nom</pos></gramGrp>
+               <xr>bouteille metallique</xr></sense>
+         </entry>
+         <entry xml:id="pouvoir" xml:lang="fr">
+            <form type="lemma">
+               <orth>pouvoir</orth>
+            </form>
+            <sense xml:id="pouvoir_sense1" corresp="can_sense2">
+               <gramGrp>
+                  <pos>verbe</pos>
+               </gramGrp>
+               <xr>être capable</xr>
+            </sense>
+         </entry>
+      </body>
+   </text>
+</TEI>
