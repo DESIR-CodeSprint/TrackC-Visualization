@@ -2,4 +2,5 @@
 <library name="DESIR">
     <core package="pl.edu.icm.desir.ReadBibSonomy"/>
     <core package="pl.edu.icm.desir.ForcePlacement"/>
+    <core package="desir.babor"/>
 </library>
