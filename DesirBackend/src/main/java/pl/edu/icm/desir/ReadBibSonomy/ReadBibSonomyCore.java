@@ -147,6 +147,17 @@ public class ReadBibSonomyCore {
         return generateFieldFromPosts(bposts);
     }
 
+    public static IrregularField generatePublicationsFromFile(String filePath) throws IOException {
+        final List<Post<? extends Resource>> posts = parseDocument(filePath);
+        final List<Post<BibTex>> bposts = new ArrayList<>(posts.size());
+        for (final Post<? extends Resource> post : posts) {
+            bposts.add((Post<BibTex>) post);
+        }
+        return generateFieldFromPostsForPublication(bposts);
+    }
+    
+    
+    
     private static List<Post<? extends Resource>> parseDocument(final String fileName) throws IOException {
         final RenderingFormat renderingFormat;
         final UrlRenderer urlRenderer = new UrlRenderer("");
@@ -286,7 +297,7 @@ System.out.println("*** Parsing author: " + myAuthor);
 
 
 
-    private static IrregularField generateFieldFromPosts2(List<Post<BibTex>> posts) {
+    private static IrregularField generateFieldFromPostsForPublication(List<Post<BibTex>> posts) {
         Set<PersonName> s_authors = new HashSet<>();
         List<Coauthorship> edges = new ArrayList<>();
 

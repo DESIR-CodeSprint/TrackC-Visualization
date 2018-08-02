@@ -13,6 +13,7 @@ import pl.edu.icm.desir.ForcePlacement.PlacementCore;
 import pl.edu.icm.desir.ReadBibSonomy.Author;
 import pl.edu.icm.desir.ReadBibSonomy.Coauthorship;
 import pl.edu.icm.desir.ReadBibSonomy.ReadBibSonomyCore;
+import pl.edu.icm.jlargearrays.IntLargeArray;
 import pl.edu.icm.jlargearrays.ObjectLargeArray;
 import pl.edu.icm.jscic.IrregularField;
 import pl.edu.icm.jscic.cells.CellType;
@@ -36,10 +37,10 @@ public class Controller
                 return createTestJson(id, text, false);
             case "TestQuery":
                 return createTestQuery(id, text);
-            case "TestYearJSON":
-                return createTestYearJson(id, text);
-            case "smallTestYearJSON":
-                return createSmallTestYearJson(id, text);
+            case "TestPublicationJSON":
+                return createTestPublicationJson(id, text, "posts.json");
+            case "SmallTestPublicationJSON":
+                return createTestPublicationJson(id, text,  "posts-small.json");
         }
 
         return null;
@@ -110,12 +111,12 @@ public class Controller
 
     }
 
-        private static DataBlock createTestYearJson(String id, String text)
+        private static DataBlock createTestPublicationJson(String id, String text, String strFilename)
     {
         try {
-            Logger.getLogger(Controller.class.getName()).log(Level.INFO, "Opening file: " + System.getProperty("user.dir") + File.separator + "posts-small.json");
+            Logger.getLogger(Controller.class.getName()).log(Level.INFO, "Opening file: " + System.getProperty("user.dir") + File.separator + strFilename);
 
-            IrregularField outField = ReadBibSonomyCore.generateCoauthorshipFromFile2(System.getProperty("user.dir") + File.separator + "posts-small.json");
+            IrregularField outField = ReadBibSonomyCore.generatePublicationsFromFile(System.getProperty("user.dir") + File.separator + strFilename);
 
 
             //author data
@@ -131,10 +132,10 @@ System.out.println(" === Controller === : parsing author: " + a.getAuthorName().
 
             //publications data
             int iPublications = (int) outField.getNNodes();
-            String[] publicationsData = new String[iPublications];
-            ObjectLargeArray publicationData = (ObjectLargeArray) outField.getComponent("publications").getRawArray();
+            int[] publicationsData = new int[iPublications];
+            IntLargeArray publicationData = (IntLargeArray) outField.getComponent("publications").getRawArray();
             for (int i = 0; i < iPublications; i++) {
-                String iPub = (String) publicationData.get(i);
+                int iPub = publicationData.getInt(i);
 System.out.println(" === Controller === : parsing publications: " + iPub);
                 publicationsData[i] = iPub;
             }            
@@ -156,7 +157,7 @@ System.out.println(" === Controller === : parsing publications: " + iPub);
             //create data block
             DataBlock db = new DataBlock(id, text);
             db.setNodeData(nodeData);
-            db.setSegmentData(publicationsData);
+            db.setSegments(publicationsData);
 
             return db;
 
