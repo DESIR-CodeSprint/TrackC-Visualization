@@ -1,4 +1,6 @@
 
+/* global THREE */
+
 var app = angular.module('desirApp', []);
 
 var scene;
@@ -15,6 +17,14 @@ var currentIntersectedLine;
 var mouse;
 var pointSphere;
 var pointSize = 0.1;
+
+var Xscope;
+var Xcamera;
+var Xrenderer;
+var Xscene;
+var nWeights;
+var egoPoint;
+var adjNodes = [];
 
 window.onload = function () {
     if (!Detector.webgl)
@@ -50,11 +60,196 @@ window.onload = function () {
     //mouse coordinates
     mouse = new THREE.Vector2();
     container3D.addEventListener('mousemove', onDocumentMouseMove, false);
-
+    
+    container3D.addEventListener('click', onDocumentMouseClick, false);
 
     container3D.appendChild(renderer.domElement);
+    
+    // additional information visualization
+    
+    Xcontainer3D = document.getElementById('AdditionalInfoVis');
+
+    Xscene = new THREE.Scene();
+    Xscene.background = new THREE.Color(0xFFFFFF);
+    Xcamera = new THREE.PerspectiveCamera(25, width / height, 0.1, 1000);
+
+    Xrenderer = new THREE.WebGLRenderer({antialias: true});
+    Xrenderer.setSize(400, 400);
+    Xrenderer.setPixelRatio(window.devicePixelRatio);
+
+    // LIGHTS
+    Xscene.add(ambientLight);
+    Xscene.add(directionalLight);
+
+    Xcontainer3D.appendChild(Xrenderer.domElement);
+    
     render();
 };
+
+function onDocumentMouseClick(event) {
+    event.preventDefault();
+
+    let canvasBounds = renderer.context.canvas.getBoundingClientRect();
+    mouse.x = ( ( event.clientX - canvasBounds.left ) / ( canvasBounds.right - canvasBounds.left ) ) * 2 - 1;
+    mouse.y = - ( ( event.clientY - canvasBounds.top ) / ( canvasBounds.bottom - canvasBounds.top) ) * 2 + 1;
+    
+    var addInfo = document.getElementById("add_info");
+    
+    raycaster.setFromCamera(mouse, camera); 
+ 
+    // find intersections with points
+    var intersects = raycaster.intersectObject(pointsObject);
+    
+    var ok = false;
+    var imin;
+    var p;
+    var pp;
+
+    //nie koniecznie [0], pÄ™tla po wszystkich i min odlegÅ‚oÅ›ci
+    if(intersects.length > 0) {
+        //distance
+        var geometry = pointsObject.geometry;
+        var attributes = geometry.attributes;
+        var coords = attributes.position.array;
+        var minD = 2*pointSize;
+        //TBD check only N=?10 first points sorted by distance from camera
+        for (var i = 0; i < intersects.length; i++) {
+            var ip = intersects[i].point;
+            p = new THREE.Vector3(coords[3*intersects[i].index],coords[3*intersects[i].index+1],coords[3*intersects[i].index+2]);
+            var d = ip.distanceTo(p);
+            if(d < minD) {
+                minD = d;
+                imin = i;
+                pp = p;
+            }
+        }
+        if(minD < pointSize/4)
+            ok = true; 
+    } 
+    if (ok) {
+        // find point pps pid in points
+        points = pointsObject.geometry.attributes.position.array;
+        var pid;
+        
+        for(i = 0; i < points.length/3; i++) {
+            if(points[3*i] == pp.x && points[3*i + 1] == pp.y && points[3*i + 2] == pp.z){
+                pid = i;
+                break;
+            }
+        } 
+                
+        /*var egoGeometry = new THREE.SphereGeometry( pointSize*nWeights[pid], 32, 32 );
+        var egoMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+        egoPoint = new THREE.Mesh( egoGeometry, egoMaterial );
+        egoPoint.visible = true;
+        Xscene.add( egoPoint );*/
+
+        // find adjacent edges
+        segments = Xscope.dataobject.segments;
+        var segmentsOfIMin = Array();
+        for (i = 0; i < segments.length/2; i++) {
+            if(segments[2*i] == pid || segments[2*i + 1] == pid){
+                segmentsOfIMin.push(i);
+            }
+        } 
+        
+        // TODO: check is change of dataobject is submitted
+        var eWeights;
+        if(Xscope.dataobject.id == "Test1") {
+            eWeights = [1,4,3,2];
+        }
+        else{
+            // TODO: define eWeights for all dataobjects (e.g. # of publications)
+            eWeights = new Array(segments.length/2).fill(1);
+        }
+        
+        // compute importance of nodes (sum of edge-weights -> # of publications)
+        nWeights = Array(points.length/3);        
+        for(i = 0; i < points.length/3; i++){
+            nWeights[i] = 0;
+            for(j = 0; j < segments.length/2; j++){
+                if(segments[2*j] == i || segments[2*j + 1] == i) {
+                    nWeights[i] += eWeights[j];
+                }
+            }
+        }
+        
+        // number and description of adjacent edges
+        adjacent = "";
+        for(x of segmentsOfIMin) {
+            adjacent += "<br>" + x + " (" +  Xscope.dataobject.segmentData[x] + ", " + eWeights[x] + ")";
+        }
+
+        addInfo.innerHTML = "<br>node: " + pid + " (" + nWeights[pid] + ") <br>name: " + Xscope.dataobject.nodeData[pid] + "<br>coords; " + points[3*intersects[imin].index] + " " + points[3*intersects[imin].index + 1] + " " + points[3*intersects[imin].index +2] + "<br>adjacent edges: " + adjacent;  
+            
+        // visualize additional information
+        if(egoPoint !== undefined)
+            Xscene.remove(egoPoint);
+        
+            for(x in adjNodes){
+                Xscene.remove(adjNodes[x]);
+            }
+        
+        adjNodes = [];
+        
+        // normalize size with max nWeights-value
+        maxNWeight = nWeights[0];
+        for(x in nWeights){
+            if(nWeights[x] > maxNWeight){
+                maxNWeight = nWeights[x];
+            }
+        }
+        
+        maxEWeight = eWeights[0];
+        for(x in eWeights){
+            if(eWeights[x] > maxEWeight){
+                maxEWeight = eWeights[x];
+            }
+        }
+        
+        // add ego node
+        var egoGeometry = new THREE.SphereGeometry( pointSize*(nWeights[pid]/maxNWeight)*1.2, 32, 32 );
+        var egoMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+        egoPoint = new THREE.Mesh( egoGeometry, egoMaterial );
+        egoPoint.visible = true;
+        Xscene.add( egoPoint )
+
+        // calculate phi for adjacent nodes -> usage of sphericals
+        phi = (360/segmentsOfIMin.length)/360;
+        thisphi = 0;
+        
+        // add adjacent nodes
+        for(x in segmentsOfIMin){
+            // strong edges are short, weak esges are long 
+            radius = (2 - eWeights[segmentsOfIMin[x]]/maxEWeight);
+            thisphi += phi;
+            adjacentSphericalPosition = new THREE.Spherical(radius, thisphi, 0);
+            hlpVec = new THREE.Vector3();
+            hlpVec.setFromSpherical(adjacentSphericalPosition);
+            adjacentVectorPosition = new THREE.Vector3().set(hlpVec.getComponent(1), hlpVec.getComponent(2), 0);
+
+            curE = segmentsOfIMin[x];
+            if(segments[2*curE] == pid) {
+                n = segments[2*curE + 1];
+            }
+            else{
+                n = segments[2*curE];
+            }
+
+            adjacentNode = new THREE.SphereGeometry(pointSize*(nWeights[n]/maxNWeight)*1.2, 10, 10);
+            adjacentMaterial = new THREE.MeshBasicMaterial( { color: 0x888888 } );
+            adjacentPoint = new THREE.Mesh( adjacentNode, adjacentMaterial );
+            adjacentPoint.position.copy(adjacentVectorPosition);
+            adjacentPoint.visible = true;
+            adjNodes.push(adjacentPoint);
+            Xscene.add( adjacentPoint );
+        }
+        
+    }
+    
+    render();
+}
+
 
 function onDocumentMouseMove(event) {
     event.preventDefault();
@@ -130,7 +325,7 @@ function onDocumentMouseMove(event) {
     render();
 }
 
-function draw3D($scope) {
+function draw3D($scope) {   
     if(pointsObject !== undefined)
         scene.remove(pointsObject);
     if(lineObjects !== undefined) {
@@ -190,6 +385,9 @@ function draw3D($scope) {
         scene.add(lineObject);
     }
 
+    // visualize additional information
+    Xcamera.position.set(bbcenter.x, bbcenter.y, cameraZ);
+
     render();
 }
 
@@ -198,6 +396,7 @@ function render() {
     directionalLight.position.set(camera.position.x, camera.position.y, camera.position.z).normalize();
     //do rendering
     renderer.render(scene, camera);
+    Xrenderer.render(Xscene, Xcamera);
 }
 
 app.controller('RetrieveMyObjectController', ['$scope', '$http', '$q', function ($scope, $http, $q) {
@@ -217,8 +416,8 @@ app.controller('RetrieveMyObjectController', ['$scope', '$http', '$q', function 
                         var showSEQ = document.getElementById("seq_display");
                         showSEQ.innerHTML = ";  Text: " + $scope.dataobject.text;
 
+                        Xscope = $scope;
                         draw3D($scope);
-
                     });
         };
 
