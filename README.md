@@ -15,8 +15,9 @@ The goal of this track is to create certain blocks or functioanlities of the web
 5) Example: web-based co-authorship graph visualization 
 6) Code sprint projects overview
 7) Tech-talk: VisNow data model and API
-8) Tech-talk: overview of web application template
-9) Tech-talk: visualization with WebGL and three.js
+8) Tech-talk: VisNow module creation
+9) Tech-talk: overview of web application template
+10) Tech-talk: visualization with WebGL and three.js
 
 
 ## Track projects choice
@@ -70,6 +71,8 @@ To run all steps of our track and work with codes the following components are r
 - [Walrus - 3D graph visualization tool for desktop](https://www.caida.org/tools/visualization/walrus/)
 - [WebGL](https://www.khronos.org/webgl/)
 - [three.js](https://threejs.org)
+- 
+- [Results presentation](https://docs.google.com/presentation/d/1cLppQT_KmbYA3zJx6tZt3l1WSvj6tcASykrnU8ogPv0/edit?usp=sharing)
 
 ## Contact
 - Bartosz Borucki (<b.borucki@icm.edu.pl>)
