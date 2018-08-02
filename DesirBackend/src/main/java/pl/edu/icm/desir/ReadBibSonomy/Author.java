@@ -30,7 +30,7 @@ import pl.edu.icm.jscic.dataarrays.DataObjectInterface;
  * @author Piotr Wendykier (piotrw@icm.edu.pl) Warsaw University,
  * Interdisciplinary Centre for Mathematical and Computational Modelling
  */
-public class Author implements DataObjectInterface, Serializable
+public class Author implements DataObjectInterface, Serializable, Comparable
 {
 
     private static final long serialVersionUID = -2678685506431958754L;
@@ -57,5 +57,10 @@ public class Author implements DataObjectInterface, Serializable
     public float toFloat()
     {
         return name.hashCode();
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return this.toString().compareTo(( (Author)o ).toString());
     }
 }

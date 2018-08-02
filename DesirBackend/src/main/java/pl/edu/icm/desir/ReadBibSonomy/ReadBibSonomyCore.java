@@ -26,9 +26,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import static jdk.nashorn.internal.objects.NativeArray.map;
+import static jdk.nashorn.internal.objects.NativeDebug.map;
 import org.bibsonomy.common.enums.Filter;
 import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.common.enums.SearchType;
@@ -69,51 +74,53 @@ import pl.edu.icm.desir.ForcePlacement.IntVectorHeapSort;
  * @author Piotr Wendykier (piotrw@icm.edu.pl) Warsaw University,
  * Interdisciplinary Centre for Mathematical and Computational Modelling
  */
-public class ReadBibSonomyCore
-{
+public class ReadBibSonomyCore {
 
     /**
-     * Generates a field that represents a coauthorship graph from BibSonomy posts using REST API.
+     * Generates a field that represents a coauthorship graph from BibSonomy
+     * posts using REST API.
      *
-     * @param login    user login
-     * @param apikey   API key corresponding to the user login
+     * @param login user login
+     * @param apikey API key corresponding to the user login
      * @param userName user name for the GroupingEntity.USER
-     * @param tags     list of tags by which to retrieve posts
+     * @param tags list of tags by which to retrieve posts
      *
      * @return field that represents a coauthorship
      */
-    public static IrregularField generateCoauthorshipUsingREST(String login, String apikey, String userName, List<String> tags)
-    {
+    public static IrregularField generateCoauthorshipUsingREST(String login, String apikey, String userName, List<String> tags) {
         return generateCoauthorshipUsingREST(login, apikey, GroupingEntity.USER, userName, tags, "", null, null, null, Order.ADDED, null, null, 0, 1000);
     }
 
     /**
-     * Generates a field that represents a coauthorship graph from BibSonomy posts using REST API.
+     * Generates a field that represents a coauthorship graph from BibSonomy
+     * posts using REST API.
      *
-     * @param login        user login
-     * @param apikey       API key corresponding to the user login
-     * @param grouping     grouping tells whom posts are to be shown: the posts of a
-     *                     user, of a group or of the viewables.
-     * @param groupingName name of the grouping. if grouping is user, then its the
-     *                     username. if grouping is set to {@link GroupingEntity#ALL},
-     *                     then its an empty string!
-     * @param tags         list of tags by which to retrieve posts
-     * @param hash         hash value of a resource, if one would like to get a list of
-     *                     all posts belonging to a given resource. if unused, its empty
-     *                     but not null.
-     * @param search       free text search
-     * @param searchType   whether to search locally or using an index shared by several systems
-     * @param filters      filter for the retrieved posts
-     * @param order        a flag indicating the way of sorting
-     * @param startDate    if given, only posts that have been created after (inclusive) startDate are returned
-     * @param endDate      if given, only posts that have been created before (inclusive) endDate are returned
-     * @param start        inclusive start index of the view window
-     * @param end          exclusive end index of the view window
+     * @param login user login
+     * @param apikey API key corresponding to the user login
+     * @param grouping grouping tells whom posts are to be shown: the posts of a
+     * user, of a group or of the viewables.
+     * @param groupingName name of the grouping. if grouping is user, then its
+     * the username. if grouping is set to {@link GroupingEntity#ALL}, then its
+     * an empty string!
+     * @param tags list of tags by which to retrieve posts
+     * @param hash hash value of a resource, if one would like to get a list of
+     * all posts belonging to a given resource. if unused, its empty but not
+     * null.
+     * @param search free text search
+     * @param searchType whether to search locally or using an index shared by
+     * several systems
+     * @param filters filter for the retrieved posts
+     * @param order a flag indicating the way of sorting
+     * @param startDate if given, only posts that have been created after
+     * (inclusive) startDate are returned
+     * @param endDate if given, only posts that have been created before
+     * (inclusive) endDate are returned
+     * @param start inclusive start index of the view window
+     * @param end exclusive end index of the view window
      *
      * @return field that represents a coauthorship
      */
-    public static IrregularField generateCoauthorshipUsingREST(String login, String apikey, GroupingEntity grouping, String groupingName, List<String> tags, String hash, String search, SearchType searchType, Set<Filter> filters, Order order, Date startDate, Date endDate, int start, int end)
-    {
+    public static IrregularField generateCoauthorshipUsingREST(String login, String apikey, GroupingEntity grouping, String groupingName, List<String> tags, String hash, String search, SearchType searchType, Set<Filter> filters, Order order, Date startDate, Date endDate, int start, int end) {
         final RestLogicFactory rlf = new RestLogicFactory();
         final LogicInterface logic = rlf.getLogicAccess(login, apikey);
         final List<Post<BibTex>> posts = logic.getPosts(BibTex.class, grouping, groupingName, tags, hash, search, searchType, filters, order, startDate, endDate, start, end);
@@ -121,16 +128,17 @@ public class ReadBibSonomyCore
     }
 
     /**
-     * Generates a field that represents a coauthorship graph from BibSonomy posts stored in a file.
+     * Generates a field that represents a coauthorship graph from BibSonomy
+     * posts stored in a file.
      *
-     * @param filePath file path to JSON or XML file containing posts exported from BibSonomy
+     * @param filePath file path to JSON or XML file containing posts exported
+     * from BibSonomy
      *
      * @return field that represents a coauthorship
      *
      * @throws IOException
      */
-    public static IrregularField generateCoauthorshipFromFile(String filePath) throws IOException
-    {
+    public static IrregularField generateCoauthorshipFromFile(String filePath) throws IOException {
         final List<Post<? extends Resource>> posts = parseDocument(filePath);
         final List<Post<BibTex>> bposts = new ArrayList<>(posts.size());
         for (final Post<? extends Resource> post : posts) {
@@ -139,8 +147,7 @@ public class ReadBibSonomyCore
         return generateFieldFromPosts(bposts);
     }
 
-    private static List<Post<? extends Resource>> parseDocument(final String fileName) throws IOException
-    {
+    private static List<Post<? extends Resource>> parseDocument(final String fileName) throws IOException {
         final RenderingFormat renderingFormat;
         final UrlRenderer urlRenderer = new UrlRenderer("");
         final RendererFactory rendererFactory = new RendererFactory(urlRenderer);
@@ -160,15 +167,32 @@ public class ReadBibSonomyCore
         }
     }
 
-    private static IrregularField generateFieldFromPosts(List<Post<BibTex>> posts)
-    {
+    private static IrregularField generateFieldFromPosts(List<Post<BibTex>> posts) {
         Set<PersonName> s_authors = new HashSet<>();
         List<Coauthorship> edges = new ArrayList<>();
+
+        Map<Author, Integer> mymap = new HashMap<>();
+
         int idx;
         for (final Post<BibTex> post : posts) {
+System.out.println("----- Parsing entry: ----- " + post.getResource().getTitle());
+
             List<PersonName> authors = post.getResource().getAuthor();
             s_authors.addAll(authors);
             for (PersonName author1 : authors) {
+
+                //
+                Author myAuthor = new Author(author1);
+System.out.println("*** Parsing author: " + myAuthor);
+                
+                if (mymap.containsKey(myAuthor)) {
+                    mymap.put(myAuthor, mymap.get(myAuthor) + 1);
+                    System.out.println("NEEEEEW Key: " + myAuthor + " value: " + mymap.get(myAuthor));
+                } else {
+                    mymap.put(myAuthor, 1);
+                    System.out.println("NO match, Key: " + myAuthor + " value: " + mymap.get(myAuthor));
+                }
+
                 for (PersonName author2 : authors) {
                     if (!author1.equals(author2)) {
                         if ((idx = edges.indexOf(new Coauthorship(author1, author2))) > -1) {
@@ -182,8 +206,12 @@ public class ReadBibSonomyCore
                         }
                     }
                 }
+
             }
         }
+
+        TreeMap sortedHashMap = new TreeMap(mymap);
+        System.out.println("Sorted HashMap: " + sortedHashMap);
 
         int nauthors = s_authors.size();
         ObjectLargeArray la_authors = new ObjectLargeArray(nauthors);
@@ -208,8 +236,9 @@ public class ReadBibSonomyCore
         CellSet cs_coauthorship = new CellSet("coauthorship");
         int[] segments = new int[edges.size() * 2];
         int[] indices = new int[edges.size()];
-        for (int j = 0; j < indices.length; j++)
+        for (int j = 0; j < indices.length; j++) {
             indices[j] = j;
+        }
         int i1, i2, s = 0;
         ObjectLargeArray la_edges = new ObjectLargeArray(edges.size());
         for (Coauthorship edge : edges) {
@@ -233,8 +262,7 @@ public class ReadBibSonomyCore
             if (i1 < i2) {
                 segments[2 * s] = i1;
                 segments[2 * s + 1] = i2;
-            }
-            else {
+            } else {
                 segments[2 * s] = i2;
                 segments[2 * s + 1] = i1;
             }
@@ -246,8 +274,9 @@ public class ReadBibSonomyCore
         cs_coauthorship.setCellArray(ca_coauthorship);
         cs_coauthorship.addComponent(DataArray.create(la_edges, 1, "edges"));
         float[] degrees = new float[edges.size()];
-        for (int j = 0; j < degrees.length; j++) 
-            degrees[j] = ((Coauthorship)la_edges.get(j)).toFloat();
+        for (int j = 0; j < degrees.length; j++) {
+            degrees[j] = ((Coauthorship) la_edges.get(j)).toFloat();
+        }
         cs_coauthorship.addComponent(DataArray.create(degrees, 1, "edge_degree"));
         field.addCellSet(cs_coauthorship);
 

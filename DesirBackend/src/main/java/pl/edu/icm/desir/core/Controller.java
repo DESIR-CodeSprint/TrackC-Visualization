@@ -36,6 +36,10 @@ public class Controller
                 return createTestJson(id, text, false);
             case "TestQuery":
                 return createTestQuery(id, text);
+            case "TestYearJSON":
+                return createTestYearJson(id, text);
+            case "smallTestYearJSON":
+                return createSmallTestYearJson(id, text);
         }
 
         return null;
@@ -106,6 +110,51 @@ public class Controller
 
     }
 
+        private static DataBlock createTestYearJson(String id, String text)
+    {
+        try {
+            Logger.getLogger(Controller.class.getName()).log(Level.INFO, "Opening file: " + System.getProperty("user.dir") + File.separator + "posts-small.json");
+
+            IrregularField outField = ReadBibSonomyCore.generateCoauthorshipFromFile(System.getProperty("user.dir") + File.separator + "posts-small.json");
+
+
+            //author data
+            int nNodes = (int) outField.getNNodes();
+            String[] nodeData = new String[nNodes];
+            ObjectLargeArray authorData = (ObjectLargeArray) outField.getComponent("authors").getRawArray();
+            for (int i = 0; i < nNodes; i++) {
+                Author a = (Author) authorData.get(i);
+System.out.println(" === Controller === : parsing author: " + a.getAuthorName().getFirstName() + " " + a.getAuthorName().getLastName());
+                nodeData[i] = a.getAuthorName().getFirstName() + " " + a.getAuthorName().getLastName();
+            }
+
+            //segments
+            int[] segments = outField.getCellSet(0).getCellArray(CellType.SEGMENT).getNodes();
+
+            //coauthorship data
+            int nEdges = (int) outField.getCellSet(0).getCellArray(CellType.SEGMENT).getNCells();
+            String[] segmentData = new String[nEdges];
+            ObjectLargeArray coauthorshipData = (ObjectLargeArray) outField.getCellSet(0).getComponent("edges").getRawArray();
+            for (int i = 0; i < nEdges; i++) {
+                Coauthorship ca = (Coauthorship) coauthorshipData.get(i);
+                segmentData[i] = ""+ca.getTitles().size();
+            }
+            
+
+            //create data block
+            DataBlock db = new DataBlock(id, text);
+            db.setNodeData(nodeData);
+
+            return db;
+
+        } catch (IOException ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+
+    }
+
+    
     private static DataBlock createTest1(String id, String text)
     {
 
