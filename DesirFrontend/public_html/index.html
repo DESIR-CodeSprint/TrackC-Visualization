@@ -8,6 +8,9 @@
         <script src="js/three.js"></script>
         <script src="js/Detector.js"></script>
         <script src="js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@3"></script>
         <link rel="stylesheet" type="text/css" href="css/style.css">
     </head>
 
@@ -24,6 +27,8 @@
                     <option value="Test2">Test2</option>  
                     <option value="TestJSON">TestJSON</option>  
                     <option value="TestQuery">TestQuery</option>  
+                    <option value="TestYearJSON">TestYearJSON</option>  
+                    <option value="SmallTestYearJSON">TestYearJSON</option>  
                 </select>
                 <label for="text">Text:</label>
                 <input type="text" id="text" name="text" ng-model="dataobject.text">
@@ -42,6 +47,40 @@
             </div>
             <div id="MouseInfo">
                 <p>Mouse:&nbsp;<span id="mouse_pos"></span>
+                </p>
+            </div>
+            <div id="vegaBarchart">
+                <p>Barchart:&nbsp;<span id="barchart"></span>
+                </p>
+            </div>
+
+  <script type="text/javascript">
+    var yourVlSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+  "description": "A simple bar chart to show authors and the number of their co-authors.",
+  "data": {
+    "values": [
+      {"name": "AAA AAA", "coworks": 28},
+      {"name": "BB BB", "coworks": 55},
+      {"name": "C C", "coworks": 43}
+    ]
+  },
+  "mark": "bar",
+  "encoding": {
+    "x": {"field": "name", "type": "ordinal"},
+    "y": {"field": "coworks", "type": "quantitative"}
+  }
+    }
+    
+    
+    
+    vegaEmbed("#vegaBarchart", yourVlSpec);
+    
+    
+  </script>
+  
+            <div id="ObjectSource">
+                <p>JSON response:&nbsp;<span id="id_jsonsource"></span>
                 </p>
             </div>
         </div>

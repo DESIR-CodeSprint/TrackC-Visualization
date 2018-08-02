@@ -22,8 +22,10 @@ window.onload = function () {
 
     container3D = document.getElementById('Container3D');
 
-    var width = 1024;
-    var height = 1024;
+//    var width = 1024;
+//    var height = 1024;
+    var width = 512;
+    var height = 512;
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xEEEEEE);
@@ -130,6 +132,54 @@ function onDocumentMouseMove(event) {
     render();
 }
 
+function draw2D($scope) {
+    
+    var idSource = document.getElementById("id_jsonsource");
+    idSource.innerHTML = $scope.dataobject.nodeData;
+
+    var nodeData = $scope.dataobject.nodeData;
+alert(nodeData);
+
+    var arrValues = [];
+    for (var i = 0; i < nodeData.length; i++) {
+            var n = nodeData[i];
+            console.log(n);
+            arrValues.push({"name": n, "coworks": 5});
+    }
+//JSON.stringify(arrValues, null, "  ");
+console.log(arrValues);
+
+    var arrData = [];
+    arrData = {
+    "values": arrValues
+    }
+console.log(arrData);
+   var arrValuesTest = [
+      {"name": "EEEE EEEE", "coworks": 28},
+      {"name": "AAA AAA", "coworks": 28},
+      {"name": "BB BB", "coworks": 55},
+      {"name": "C C", "coworks": 43}
+    ]
+ 
+    var yourVlSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+  "description": "A simple bar chart to show authors and the number of their co-authors.",
+  "data": {
+    "values": arrValues
+  },
+  "mark": "bar",
+  "encoding": {
+    "x": {"field": "name", "type": "ordinal"},
+    "y": {"field": "coworks", "type": "quantitative"}
+  }
+    }
+    
+    
+    
+    vegaEmbed("#vegaBarchart", yourVlSpec);
+
+}
+    
 function draw3D($scope) {
     if(pointsObject !== undefined)
         scene.remove(pointsObject);
@@ -217,8 +267,13 @@ app.controller('RetrieveMyObjectController', ['$scope', '$http', '$q', function 
                         var showSEQ = document.getElementById("seq_display");
                         showSEQ.innerHTML = ";  Text: " + $scope.dataobject.text;
 
-                        draw3D($scope);
+    var idSource = document.getElementById("id_jsonsource");
+    idSource.innerHTML = $scope.dataobject.nodeData;
 
+                        if($scope.dataobject.segments)
+                            draw3D($scope);
+
+                        draw2D($scope);
                     });
         };
 
