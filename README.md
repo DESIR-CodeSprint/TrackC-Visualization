@@ -61,8 +61,6 @@ To run all steps of our track and work with codes the following components are r
 - [JSciC API javadoc](http://javadoc.io/doc/pl.edu.icm/JSciC/1.0)
 - [VisNow page](https://visnow.icm.edu.pl/)
 - [BibSonomy REST API](https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/REST%20API)
-- [Track C Etherpad](https://etherpad.gwdg.de/p/Code_Sprint_Track_C)
-- [Track C Googledocs](https://docs.google.com/document/d/1EIHUoUggaXYwdUYwc_Cn4xnPZnMWuLNYRYUTsPUmd6s/edit?usp=sharing)
 - [D3.js library for 2D web visualization](https://d3js.org)
 - [Vega and Vega-lite for 2D web visualization](https://vega.github.io)
 - [Comac Navigator](http://devel.comac.ceon.pl/comac-navigator-latest/?graph=6b4f66cc) as example of simple 2D graph layout
@@ -72,7 +70,9 @@ To run all steps of our track and work with codes the following components are r
 - [WebGL](https://www.khronos.org/webgl/)
 - [three.js](https://threejs.org)
 - 
-- [Results presentation](https://docs.google.com/presentation/d/1cLppQT_KmbYA3zJx6tZt3l1WSvj6tcASykrnU8ogPv0/edit?usp=sharing)
+- [Track C Etherpad](https://etherpad.gwdg.de/p/Code_Sprint_Track_C)
+- [Track C Googledocs](https://docs.google.com/document/d/1EIHUoUggaXYwdUYwc_Cn4xnPZnMWuLNYRYUTsPUmd6s/edit?usp=sharing)
+- [Track C Results presentation](https://docs.google.com/presentation/d/1cLppQT_KmbYA3zJx6tZt3l1WSvj6tcASykrnU8ogPv0/edit?usp=sharing)
 
 ## Contact
 - Bartosz Borucki (<b.borucki@icm.edu.pl>)
