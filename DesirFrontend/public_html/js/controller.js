@@ -138,13 +138,15 @@ function draw2D($scope) {
     idSource.innerHTML = $scope.dataobject.nodeData;
 
     var nodeData = $scope.dataobject.nodeData;
+    var segments = $scope.dataobject.segments;
 alert(nodeData);
 
     var arrValues = [];
     for (var i = 0; i < nodeData.length; i++) {
-            var n = nodeData[i];
-            console.log(n);
-            arrValues.push({"name": n, "coworks": 5});
+            var name = nodeData[i];
+            var coworks = segments[i];
+            console.log(name);
+            arrValues.push({"name": name, "coworks": coworks});
     }
 //JSON.stringify(arrValues, null, "  ");
 console.log(arrValues);
@@ -169,17 +171,23 @@ console.log(arrData);
   },
   "mark": "bar",
   "encoding": {
-    "x": {"field": "name", "type": "ordinal"},
-    "y": {"field": "coworks", "type": "quantitative"}
-  }
-    }
+    "y": {"field": "coworks", "type": "quantitative", "sort": {"field": "coworks", "order":"descending"}},
+    "x": {"field": "name", "type": "ordinal"}
+   },
+   "opacity": {
+      "value": 0.7
+   }
+  };
     
     
     
     vegaEmbed("#vegaBarchart", yourVlSpec);
 
 }
-    
+
+//    "y": {"field": "coworks", "type": "quantitative", "sort": {"field": "coworks", "order":"descending"}},
+
+
 function draw3D($scope) {
     if(pointsObject !== undefined)
         scene.remove(pointsObject);
@@ -270,7 +278,7 @@ app.controller('RetrieveMyObjectController', ['$scope', '$http', '$q', function 
     var idSource = document.getElementById("id_jsonsource");
     idSource.innerHTML = $scope.dataobject.nodeData;
 
-                        if($scope.dataobject.segments)
+                        if($scope.dataobject.segmentData)
                             draw3D($scope);
 
                         draw2D($scope);
