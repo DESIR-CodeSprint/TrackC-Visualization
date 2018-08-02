@@ -171,7 +171,7 @@ public class ReadBibSonomyCore {
         Set<PersonName> s_authors = new HashSet<>();
         List<Coauthorship> edges = new ArrayList<>();
 
-        Map<Author, Integer> mymap = new HashMap<>();
+        Map<String, Integer> mymap = new HashMap<>();
 
         int idx;
         for (final Post<BibTex> post : posts) {
@@ -182,7 +182,7 @@ System.out.println("----- Parsing entry: ----- " + post.getResource().getTitle()
             for (PersonName author1 : authors) {
 
                 //
-                Author myAuthor = new Author(author1);
+                String myAuthor = author1.toString();
 System.out.println("*** Parsing author: " + myAuthor);
                 
                 if (mymap.containsKey(myAuthor)) {
@@ -283,4 +283,124 @@ System.out.println("*** Parsing author: " + myAuthor);
         return field;
     }
 
+
+
+
+    private static IrregularField generateFieldFromPosts2(List<Post<BibTex>> posts) {
+        Set<PersonName> s_authors = new HashSet<>();
+        List<Coauthorship> edges = new ArrayList<>();
+
+        Map<String, Integer> mymap = new HashMap<>();
+
+        int idx;
+        for (final Post<BibTex> post : posts) {
+System.out.println("----- Parsing entry: ----- " + post.getResource().getTitle());
+
+            List<PersonName> authors = post.getResource().getAuthor();
+            s_authors.addAll(authors);
+            for (PersonName author1 : authors) {
+
+                //
+                String myAuthor = author1.toString();
+System.out.println("*** Parsing author: " + myAuthor);
+                
+                if (mymap.containsKey(myAuthor)) {
+                    mymap.put(myAuthor, mymap.get(myAuthor) + 1);
+                    System.out.println("NEEEEEW Key: " + myAuthor + " value: " + mymap.get(myAuthor));
+                } else {
+                    mymap.put(myAuthor, 1);
+                    System.out.println("NO match, Key: " + myAuthor + " value: " + mymap.get(myAuthor));
+                }
+
+                for (PersonName author2 : authors) {
+                    if (!author1.equals(author2)) {
+                        if ((idx = edges.indexOf(new Coauthorship(author1, author2))) > -1) {
+                            edges.get(idx).addTitle(post.getResource().getTitle());
+                        } else if ((idx = edges.indexOf(new Coauthorship(author2, author1))) > -1) {
+                            edges.get(idx).addTitle(post.getResource().getTitle());
+                        } else {
+                            Coauthorship edge = new Coauthorship(author1, author2);
+                            edge.addTitle(post.getResource().getTitle());
+                            edges.add(edge);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        TreeMap sortedHashMap = new TreeMap(mymap);
+        System.out.println("Sorted HashMap: " + sortedHashMap);
+
+        int nauthors = s_authors.size();
+        ObjectLargeArray la_authors = new ObjectLargeArray(nauthors);
+        StringLargeArray la_names = new StringLargeArray(nauthors);
+        IntLargeArray la_publications = new IntLargeArray(nauthors);
+        int i = 0;
+        for (PersonName next : s_authors) {
+            la_authors.set(i, new Author(next));
+            la_names.set(i, next.getFirstName() + " " + next.getLastName());
+            la_publications.set(i, mymap.get(next.toString()));
+            i++;
+        }
+        IrregularField field = new IrregularField(nauthors);
+        field.setCurrentCoords((FloatLargeArray) LargeArrayUtils.generateRandom(LargeArrayType.FLOAT, 3 * nauthors));
+        ObjectDataArray authors = new ObjectDataArray(la_authors, new DataArraySchema("authors", DataArrayType.FIELD_DATA_OBJECT, nauthors, 1));
+        field.addComponent(authors);
+        StringDataArray names = new StringDataArray(la_names, new DataArraySchema("names", DataArrayType.FIELD_DATA_STRING, nauthors, 1));
+        field.addComponent(names);
+        IntDataArray publications = new IntDataArray(la_publications, new DataArraySchema("publications", DataArrayType.FIELD_DATA_INT, nauthors, 1));
+        field.addComponent(publications);
+
+        CellSet cs_coauthorship = new CellSet("coauthorship");
+        int[] segments = new int[edges.size() * 2];
+        int[] indices = new int[edges.size()];
+        for (int j = 0; j < indices.length; j++) {
+            indices[j] = j;
+        }
+        int i1, i2, s = 0;
+        ObjectLargeArray la_edges = new ObjectLargeArray(edges.size());
+        for (Coauthorship edge : edges) {
+            la_edges.set(s, edge);
+            PersonName a1 = edge.author1;
+            PersonName a2 = edge.author2;
+            i1 = -1;
+            i2 = -1;
+            for (int j = 0; j < nauthors; j++) {
+                PersonName a3 = ((Author) la_authors.get(j)).getAuthorName();
+                if (i1 < 0 && a3.equals(a1)) {
+                    i1 = j;
+                }
+                if (i2 < 0 && a3.equals(a2)) {
+                    i2 = j;
+                }
+                if (i1 >= 0 && i2 >= 0) {
+                    break;
+                }
+            }
+            if (i1 < i2) {
+                segments[2 * s] = i1;
+                segments[2 * s + 1] = i2;
+            } else {
+                segments[2 * s] = i2;
+                segments[2 * s + 1] = i1;
+            }
+            s++;
+        }
+        IntVectorHeapSort.sort(segments, indices, 2);
+        CellArray ca_coauthorship = new CellArray(CellType.SEGMENT, segments, null, null);
+        ca_coauthorship.setDataIndices(indices);
+        cs_coauthorship.setCellArray(ca_coauthorship);
+        cs_coauthorship.addComponent(DataArray.create(la_edges, 1, "edges"));
+        float[] degrees = new float[edges.size()];
+        for (int j = 0; j < degrees.length; j++) {
+            degrees[j] = ((Coauthorship) la_edges.get(j)).toFloat();
+        }
+        cs_coauthorship.addComponent(DataArray.create(degrees, 1, "edge_degree"));
+        field.addCellSet(cs_coauthorship);
+
+        return field;
+    }
+
 }
+

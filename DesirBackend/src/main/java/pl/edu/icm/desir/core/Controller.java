@@ -115,7 +115,7 @@ public class Controller
         try {
             Logger.getLogger(Controller.class.getName()).log(Level.INFO, "Opening file: " + System.getProperty("user.dir") + File.separator + "posts-small.json");
 
-            IrregularField outField = ReadBibSonomyCore.generateCoauthorshipFromFile(System.getProperty("user.dir") + File.separator + "posts-small.json");
+            IrregularField outField = ReadBibSonomyCore.generateCoauthorshipFromFile2(System.getProperty("user.dir") + File.separator + "posts-small.json");
 
 
             //author data
@@ -128,6 +128,18 @@ System.out.println(" === Controller === : parsing author: " + a.getAuthorName().
                 nodeData[i] = a.getAuthorName().getFirstName() + " " + a.getAuthorName().getLastName();
             }
 
+
+            //publications data
+            int iPublications = (int) outField.getNNodes();
+            String[] publicationsData = new String[iPublications];
+            ObjectLargeArray publicationData = (ObjectLargeArray) outField.getComponent("publications").getRawArray();
+            for (int i = 0; i < iPublications; i++) {
+                String iPub = (String) publicationData.get(i);
+System.out.println(" === Controller === : parsing publications: " + iPub);
+                publicationsData[i] = iPub;
+            }            
+            
+            /*
             //segments
             int[] segments = outField.getCellSet(0).getCellArray(CellType.SEGMENT).getNodes();
 
@@ -139,11 +151,12 @@ System.out.println(" === Controller === : parsing author: " + a.getAuthorName().
                 Coauthorship ca = (Coauthorship) coauthorshipData.get(i);
                 segmentData[i] = ""+ca.getTitles().size();
             }
-            
+*/            
 
             //create data block
             DataBlock db = new DataBlock(id, text);
             db.setNodeData(nodeData);
+            db.setSegmentData(publicationsData);
 
             return db;
 
