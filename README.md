@@ -31,18 +31,18 @@ Within this Code Sprint we will focus on the extension of our tool both towards 
 
 For new data sources consider one of our three usage scenarios:
 1) Bibliographical data
-** JSON file exported from BibSonomy
-** JSON file exported from BibSonomy smaller subset
-** RDF file in v1.0 format
-** RDF file in v2.0 format
+- JSON file exported from BibSonomy
+- JSON file exported from BibSonomy smaller subset
+- RDF file in v1.0 format
+- RDF file in v2.0 format
 2) Genealogy
 3) Character interactions (play/movie,etc.)
-** [DraCor](https://dracor.org/)
-** [DraCor API](https://dracor.org/documentation/api)
-** [Hamlet network CSV](https://dracor.org/api/corpora/shake/play/hamlet/networkdata/csv)
-** [Hamlet network GEXF](https://dracor.org/api/corpora/shake/play/hamlet/networkdata/gexf)
-** [Hamlet scene segments JSON](https://dracor.org/api/corpora/shake/play/hamlet)
-** [Example visualization with R](https://rpubs.com/Pozdniakov/godunov)
+- [DraCor](https://dracor.org/)
+- [DraCor API](https://dracor.org/documentation/api)
+- [Hamlet network CSV](https://dracor.org/api/corpora/shake/play/hamlet/networkdata/csv)
+- [Hamlet network GEXF](https://dracor.org/api/corpora/shake/play/hamlet/networkdata/gexf)
+- [Hamlet scene segments JSON](https://dracor.org/api/corpora/shake/play/hamlet)
+- [Example visualization with R](https://rpubs.com/Pozdniakov/godunov)
 
 
 ## Prerequisites 
