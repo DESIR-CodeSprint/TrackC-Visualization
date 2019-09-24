@@ -1,0 +1,126 @@
+#institution/actor #1 name
+<http://desir.icm.edu.pl/actor#univ1>
+<http://desir.icm.edu.pl/hasName>
+”University of Somewhere"^<http://www.w3.org/2001/XMLSchema#string>
+
+#institution/actor #2 name
+<http://desir.icm.edu.pl/actor#dep1>
+<http://desir.icm.edu.pl/hasName>
+”Department of Something"^<http://www.w3.org/2001/XMLSchema#string>
+
+#institution/actor #2 being part-of #1 name
+<http://desir.icm.edu.pl/actor#dep1>
+<http://desir.icm.edu.pl/partOf>
+<http://desir.icm.edu.pl/actor#univ1>
+
+#author/actor #1 name
+<http://desir.icm.edu.pl/actor#a1>
+<http://desir.icm.edu.pl/hasName>
+”John Doe"^<http://www.w3.org/2001/XMLSchema#string>
+
+#author/actor #1 works for institution/actor #2 without time range
+<http://desir.icm.edu.pl/actor#a1>
+<http://desir.icm.edu.pl/partOf>
+<http://desir.icm.edu.pl/actor#dep1>
+
+# alternatively with time range
+# i.e. John Doe worked for Department of Something from 1997 till 2018 
+# as senior researcher
+#
+#<http://desir.icm.edu.pl/partof#po_a1_dep1>
+#<http://desir.icm.edu.pl/hasRole>
+#"senior researcher"^<http://www.w3.org/2001/XMLSchema#string>
+#
+#<http://desir.icm.edu.pl/partof#po_a1_dep1>
+#<http://desir.icm.edu.pl/start>
+#"1997"^<http://www.w3.org/2001/XMLSchema#integer>
+#
+#<http://desir.icm.edu.pl/partof#po_a1_dep1>
+#<http://desir.icm.edu.pl/end>
+#"2018"^<http://www.w3.org/2001/XMLSchema#integer>
+#
+#<http://desir.icm.edu.pl/actor#ka1>
+#<http://desir.icm.edu.pl/partof#po_a1_dep1>
+#<http://desir.icm.edu.pl/actor#dep1>
+
+#author/actor #2 name
+<http://desir.icm.edu.pl/actor#a2>
+<http://desir.icm.edu.pl/hasName>
+”Anthony Monster"^<http://www.w3.org/2001/XMLSchema#string>
+
+#author/actor #3 name
+<http://desir.icm.edu.pl/actor#a3>
+<http://desir.icm.edu.pl/hasName>
+”George Someone"^<http://www.w3.org/2001/XMLSchema#string>
+
+#article/event #1 title and date
+<http://desir.icm.edu.pl/event#e1>
+<http://desir.icm.edu.pl/hasTitle>
+”Very Interesting Article A on the Exemplary RDF Format"^<http://www.w3.org/2001/XMLSchema#string>
+
+<http://desir.icm.edu.pl/event#e1>
+<http://desir.icm.edu.pl/occurs>
+"2001"^<http://www.w3.org/2001/XMLSchema#integer>
+
+#article/event #2 title and date
+<http://desir.icm.edu.pl/event#e2>
+<http://desir.icm.edu.pl/hasTitle>
+”Very Interesting Article B on the Exemplary RDF Format"^<http://www.w3.org/2001/XMLSchema#string>
+
+<http://desir.icm.edu.pl/event#e2>
+<http://desir.icm.edu.pl/occurs>
+"2003"^<http://www.w3.org/2001/XMLSchema#integer>
+
+#article/event #3 title and date
+<http://desir.icm.edu.pl/event#e3>
+<http://desir.icm.edu.pl/hasTitle>
+”Not So Interesting Article C on Something Else"^<http://www.w3.org/2001/XMLSchema#string>
+
+<http://desir.icm.edu.pl/event#e3>
+<http://desir.icm.edu.pl/occurs>
+"2007"^<http://www.w3.org/2001/XMLSchema#integer>
+
+#authorship relations / event participation
+#if we do not want directly to set any properties of the relation we do not have to directly pre-define its ID 
+<http://desir.icm.edu.pl/actor#a1>
+<http://desir.icm.edu.pl/participatesIn>
+<http://desir.icm.edu.pl/event#e1>
+
+#alternatively if we want to set some properties of the relation we can it as
+#<http://desir.icm.edu.pl/participation#p1>
+#<http://desir.icm.edu.pl/hasRole>
+#"author"^<http://www.w3.org/2001/XMLSchema#string>
+#
+#<http://desir.icm.edu.pl/actor#a1>
+#<http://desir.icm.edu.pl/participation#p1>
+#<http://desir.icm.edu.pl/event#e1>
+
+<http://desir.icm.edu.pl/actor#a2>
+<http://desir.icm.edu.pl/participatesIn>
+<http://desir.icm.edu.pl/event#e1>
+
+<http://desir.icm.edu.pl/actor#a1>
+<http://desir.icm.edu.pl/participatesIn>
+<http://desir.icm.edu.pl/event#e2>
+
+<http://desir.icm.edu.pl/actor#a3>
+<http://desir.icm.edu.pl/participatesIn>
+<http://desir.icm.edu.pl/event#e2>
+
+<http://desir.icm.edu.pl/actor#a2>
+<http://desir.icm.edu.pl/participatesIn>
+<http://desir.icm.edu.pl/event#e3>
+
+#citation relations / event dependencies
+<http://desir.icm.edu.pl/event#e2>
+<http://desir.icm.edu.pl/dependsOn>
+<http://desir.icm.edu.pl/event#e1>
+
+<http://desir.icm.edu.pl/event#e3>
+<http://desir.icm.edu.pl/dependsOn>
+<http://desir.icm.edu.pl/event#e1>
+
+<http://desir.icm.edu.pl/event#e3>
+<http://desir.icm.edu.pl/dependsOn>
+<http://desir.icm.edu.pl/event#e2>
+
