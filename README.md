@@ -31,10 +31,10 @@ Within this Code Sprint we will focus on the extension of our tool both towards 
 
 For new data sources consider one of our three usage scenarios:
 1) Bibliographical data
-- JSON file exported from BibSonomy
-- JSON file exported from BibSonomy smaller subset
-- RDF file in v1.0 format
-- RDF file in v2.0 format
+- [JSON file exported from BibSonomy](https://github.com/DARIAH-ERIC/DESIR-CodeSprint-TrackC-Visualization/blob/master/data/bibsonomy_export.json)
+- [JSON file exported from BibSonomy smaller subset](https://github.com/DARIAH-ERIC/DESIR-CodeSprint-TrackC-Visualization/blob/master/data/bibsonomy_export_simple.json)
+- [RDF file in v1.0 format](https://github.com/DARIAH-ERIC/DESIR-CodeSprint-TrackC-Visualization/blob/master/data/case1_bibliography_v1.rdf)
+- [RDF file in v2.0 format](https://github.com/DARIAH-ERIC/DESIR-CodeSprint-TrackC-Visualization/blob/master/data/case1_bibliography_v2.rdf)
 2) Genealogy
 3) Character interactions (play/movie,etc.)
 - [DraCor](https://dracor.org/)
