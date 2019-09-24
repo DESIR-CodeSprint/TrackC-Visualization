@@ -1,66 +1,68 @@
-# Track C: Visualisation of processed data with added dimensions for journals, topics, or reference dependency graphs
+# Track C: Visualization of processed data with added dimensions for journals, topics, or reference dependency graphs
 
-The general concept of this track during the code sprint is at least twofold. On one hand, we want to elaborate specific visualization means for bibliographical data (e.g. author networks with additional dimensions for e.g. journals, topics or reference dependency graphs). On the other hand, conceptualization of specific services that fit into the current DARIAH infrastructure landscape is needed and combined with the preconditions provided by the other code sprint tracks (e.g. using data from BibSonomy).
+One of the major substantial outcomes of the previous DESIR Code Sprint Track-C was the novel generic concept of time dependent graphs of relations and its visual presentation. Examples of such graphs may be co-authorship and citation graphs, genealogy trees, or characters interaction graphs. 
+From the visual perspective both the structure and time characteristics of such graphs play a significant analytical role. Our web-based tool developed throughout DESIR project now holds a functionality of visualizing bibliographical datasets (e.g imported via BibSonomy API or loaded from a file), on top of the generic data model. 
 
 
 ## Track goal
-The goal of this track is to create certain blocks or functioanlities of the web-based 3D graph visualization service. Each block or functionality needs to bring the tool closer to its ultimate goal of providing a comprehensive web visualization tool for interactive multidimensional graph data analysis and combination of this too, with external DARIAH services. 
-
+Within this Code Sprint we will focus on the extension of our tool both towards new data formats and use cases, as well as new visual forms. The participants will have the opportunity to work on the mapping of different data to the generic model of our graphs and/or on the translation of data formats to intermediate RDF description (subject-predicate-object). Bring-Your-Own-Data model is encouraged. New visual forms will cover the modification of web application user interface to include additional visualizations of metadata or aggregated information. 
 
 ## Agenda
 1) General introduction to visualization
 2) Graphs and graph visualization
-3) VisNow as a generic visualization platform
-4) Example: co-authorship graph visualization in VisNow
-5) Example: web-based co-authorship graph visualization 
+3) Temporal graphs concept
+4) Example: temporal graph visualization in DESIR web app
+5) Example: temporal graph visualization in VisNow 
 6) Code sprint projects overview
-7) Tech-talk: VisNow data model and API
-8) Tech-talk: VisNow module creation
-9) Tech-talk: overview of web application template
-10) Tech-talk: visualization with WebGL and three.js
+7) Tech-talk: intermediate data model
+8) Tech-talk: RDF 
+9) Tech-talk: backend-fronted data communication
 
 
 ## Track projects choice
-1) Remodelling of data translation layer (from BibSonomy to JSciC)
-2) Graph creation and presentation parametrization
-3) Visual representation
-4) Integrate BibSonomy querying 
-5) Introduce query data filtering
-6) Introduce visual data filtering
-7) 3D user interaction for additional information
-8) 3D user interaction for visual data filtering
-9) Introduce 2D visualization for additional data analytics
-10) Introduce geospatial data from affiliations (if data available) and visualize collaborations on map
-11) Conceptualize and implement usage scenarios
+1) Create your own test data directly in data model (hardcoded)
+2) Create your own data source (API or file) and map it to data model
+3) Translate your own data source (API or file) to RDF format
+4) Advance RDF parsing to understand new commands
+5) Create data model export to RDF
+6) Work on automated translation of data model to DataObject (*)
+7) Enhance BibSonomy query
 
+For new data sources consider one of our three usage scenarios:
+1) Bibliographical data
+2) Genealogy
+3) Character interactions (play/movie,etc.) - you can use the data source provided below
 
 ## Prerequisites 
 The substantial and technical skills prerequisites depend on the choice of the project and cover one of the following topics:
 - Java programming
 - Java web programming frameworks (e.g. Spring/SpringBoot)
 - General web frontend programming (e.g Angular, JavaScript)
-- WebGL/three.js programming
-- Vega/Vega-lite/D3.js programming
-
 
 ## Technical preparation
 To run all steps of our track and work with codes the following components are required:
 - 64-bit Windows, Mac OS or Linux operating system. 
-- VisNow v1.3-RC2 - installers can be downloaded [here](https://visnow.icm.edu.pl/index.php/downloads).
-- VisNow Plugin DESIR - download [here](https://visnow.icm.edu.pl/index.php/downloads/plugins) and follow the installation instruction.
-- Java JDK 8 64-bit - we sugest downloading from Oracle website [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). 
-- NetBeans IDE v8.2 for Java EE - download [here](https://netbeans.org/downloads/). Note that all provided projects are in NetBeans project format. If you wish to use another Java IDE you need to convert the projects by yourself. NetBeans for Java EE bundles also GlassFish and Apache Tomcat servers for local running of web apps. 
+- Java JDK 8 64-bit - we suggest downloading from Oracle website [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). 
+- NetBeans IDE v8.2 for Java EE - download [here](https://netbeans.org/downloads/). Note that all provided projects are in NetBeans project format. If you wish to use another Java IDE you need to convert the projects by yourself. 
 - [BibSonomy](https://www.bibsonomy.org) account and API key will be required for API querying.
-- Project templates for DesirFrontend and DesirBackend from this Git repository. You can pull it directly from NetBeans through Team->Git->Clone and providing URL: https://github.com/DESIR-CodeSprint/TrackC-Visualization.git 
+- Project sources and presentations from this Git repository. You can pull it directly from NetBeans through Team->Git->Clone and providing URL: https://github.com/DARIAH-ERIC/DESIR-CodeSprint-TrackC-Visualization
+- You need your GitHub user to commit to repository. Please use your own branch for your work. We suggest branch named "feature/<your_user>".
 
 ## Links
+- [Data model description + RDF examples]()
+- [BibSonomy REST API](https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/REST%20API)
+- [Apache Jena](http://jena.apache.org/documentation/io/index.html)
+- [Apache Jena RDF output](https://jena.apache.org/documentation/io/rdf-output.html)
+- [Track C Googledocs]()
+- [Track C Results presentation]()
+
+##Additional links
 - [VisNow project](https://gitlab.com/ICM-VisLab/VisNow)
 - [JLargeArrays project](https://gitlab.com/ICM-VisLab/JLargeArrays)
 - [JLargeArrays API javadoc](http://javadoc.io/doc/pl.edu.icm/JLargeArrays/1.6)
 - [JSciC project](https://gitlab.com/ICM-VisLab/JSciC)
 - [JSciC API javadoc](http://javadoc.io/doc/pl.edu.icm/JSciC/1.0)
 - [VisNow page](https://visnow.icm.edu.pl/)
-- [BibSonomy REST API](https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/REST%20API)
 - [D3.js library for 2D web visualization](https://d3js.org)
 - [Vega and Vega-lite for 2D web visualization](https://vega.github.io)
 - [Comac Navigator](http://devel.comac.ceon.pl/comac-navigator-latest/?graph=6b4f66cc) as example of simple 2D graph layout
@@ -69,11 +71,8 @@ To run all steps of our track and work with codes the following components are r
 - [Walrus - 3D graph visualization tool for desktop](https://www.caida.org/tools/visualization/walrus/)
 - [WebGL](https://www.khronos.org/webgl/)
 - [three.js](https://threejs.org)
-- 
-- [Track C Etherpad](https://etherpad.gwdg.de/p/Code_Sprint_Track_C)
-- [Track C Googledocs](https://docs.google.com/document/d/1EIHUoUggaXYwdUYwc_Cn4xnPZnMWuLNYRYUTsPUmd6s/edit?usp=sharing)
-- [Track C Results presentation](https://docs.google.com/presentation/d/1cLppQT_KmbYA3zJx6tZt3l1WSvj6tcASykrnU8ogPv0/edit?usp=sharing)
+
 
 ## Contact
 - Bartosz Borucki (<b.borucki@icm.edu.pl>)
-- Piotr Wendykier (<p.wendykier@icm.edu.pl>)
+- Tomasz Blazejczyk (<t.blazejczyk@icm.edu.pl>)
