@@ -7,6 +7,7 @@ From the visual perspective both the structure and time characteristics of such 
 ## Track goal
 Within this Code Sprint we will focus on the extension of our tool both towards new data formats and use cases, as well as new visual forms. The participants will have the opportunity to work on the mapping of different data to the generic model of our graphs and/or on the translation of data formats to intermediate RDF description (subject-predicate-object). Bring-Your-Own-Data model is encouraged. New visual forms will cover the modification of web application user interface to include additional visualizations of metadata or aggregated information. 
 
+
 ## Agenda
 1) General introduction to visualization
 2) Graphs and graph visualization
@@ -16,7 +17,7 @@ Within this Code Sprint we will focus on the extension of our tool both towards 
 6) Code sprint projects overview
 7) Tech-talk: intermediate data model
 8) Tech-talk: RDF 
-9) Tech-talk: backend-fronted data communication
+9) Tech-talk: backend-frontend data communication
 
 
 ## Track projects choice
@@ -33,11 +34,13 @@ For new data sources consider one of our three usage scenarios:
 2) Genealogy
 3) Character interactions (play/movie,etc.) - you can use the data source provided below
 
+
 ## Prerequisites 
 The substantial and technical skills prerequisites depend on the choice of the project and cover one of the following topics:
 - Java programming
 - Java web programming frameworks (e.g. Spring/SpringBoot)
 - General web frontend programming (e.g Angular, JavaScript)
+
 
 ## Technical preparation
 To run all steps of our track and work with codes the following components are required:
@@ -48,15 +51,17 @@ To run all steps of our track and work with codes the following components are r
 - Project sources and presentations from this Git repository. You can pull it directly from NetBeans through Team->Git->Clone and providing URL: https://github.com/DARIAH-ERIC/DESIR-CodeSprint-TrackC-Visualization
 - You need your GitHub user to commit to repository. Please use your own branch for your work. We suggest branch named "feature/<your_user>".
 
+
 ## Links
-- [Data model description + RDF examples]()
+- [Data model description + RDF examples](https://docs.google.com/document/d/1-VYCZn8o19WeE6GRmxmbihA3qp7dhw0syn6K7cHMqwo/edit?usp=sharing)
 - [BibSonomy REST API](https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/REST%20API)
 - [Apache Jena](http://jena.apache.org/documentation/io/index.html)
 - [Apache Jena RDF output](https://jena.apache.org/documentation/io/rdf-output.html)
-- [Track C Googledocs]()
-- [Track C Results presentation]()
+- [Track C Googledocs](https://docs.google.com/document/d/1EIHUoUggaXYwdUYwc_Cn4xnPZnMWuLNYRYUTsPUmd6s/edit?usp=sharing)
+- [Track C Results presentation](https://docs.google.com/presentation/d/1k6Z6vOrrAbxm3KarQYp35Tw9Pq0VV8Am-Sou-ePWfYE/edit?usp=sharing)
 
-##Additional links
+
+## Additional links
 - [VisNow project](https://gitlab.com/ICM-VisLab/VisNow)
 - [JLargeArrays project](https://gitlab.com/ICM-VisLab/JLargeArrays)
 - [JLargeArrays API javadoc](http://javadoc.io/doc/pl.edu.icm/JLargeArrays/1.6)
