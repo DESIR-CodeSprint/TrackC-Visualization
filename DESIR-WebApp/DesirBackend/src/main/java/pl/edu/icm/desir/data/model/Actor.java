@@ -1,5 +1,6 @@
 package pl.edu.icm.desir.data.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class Actor extends Entity {
 
 	public Actor(String identifier, String name) {
 		super(identifier, name);
+		this.participation = new ArrayList<>();
 	}
 
 	@Override
