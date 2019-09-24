@@ -1,4 +1,4 @@
-# Track C: Visualization of processed data with added dimensions for journals, topics, or reference dependency graphs
+# Track C: Visualization of time-dependent graphs
 
 One of the major substantial outcomes of the previous DESIR Code Sprint Track-C was the novel generic concept of time dependent graphs of relations and its visual presentation. Examples of such graphs may be co-authorship and citation graphs, genealogy trees, or characters interaction graphs. 
 From the visual perspective both the structure and time characteristics of such graphs play a significant analytical role. Our web-based tool developed throughout DESIR project now holds a functionality of visualizing bibliographical datasets (e.g imported via BibSonomy API or loaded from a file), on top of the generic data model. 
