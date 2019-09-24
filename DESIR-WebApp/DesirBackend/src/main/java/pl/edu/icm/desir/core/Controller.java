@@ -350,15 +350,15 @@ public class Controller
     }
     
     private DataBlock processModel(ModelBuilder builder, boolean doPlacement) {        
-//        IrregularField outField = graphGenerator.generateGraphDataFromModel(builder);
-//        if(doPlacement)
-//            outField = PlacementCore.optimizePlacement(outField,
-//                                                      (float) .7, 1, 100,
-//                                                      1, 4, (float) .001, 0,
-//                                                      null);
-//        return generateRelationsDataBlock(outField);   
+        IrregularField outField = graphGenerator.generateGraphDataFromModel(builder);
+        if(doPlacement)
+            outField = PlacementCore.optimizePlacement(outField,
+                                                      (float) .7, 1, 100,
+                                                      1, 4, (float) .001, 0,
+                                                      null);
+        return generateRelationsDataBlock(outField);   
             
-            return graphGenerator.generateDataBlockFromModel(builder);
+      //      return graphGenerator.generateDataBlockFromModel(builder);
     }
     
 
