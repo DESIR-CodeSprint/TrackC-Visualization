@@ -31,15 +31,15 @@ public class RdfModelExtractor implements ModelBuilder {
 
 	static final String BASE_URI = "http://desir.icm.edu.pl/";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
-		     .appendPattern("yyyy")
-		     .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-		     .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-		     .toFormatter();
+			.appendPattern("yyyy")
+			.parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+			.parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+			.toFormatter();
 	private List<Actor> actors;
 	private List<Event> events;
 	private String filename;
-	
-	
+
+
 	public RdfModelExtractor(String filename) {
 		this.filename = filename;
 	}
@@ -51,14 +51,14 @@ public class RdfModelExtractor implements ModelBuilder {
 
 		Model model = ModelFactory.createDefaultModel();
 		String syntax = FileUtils.guessLang(filename) ;
-        if ( syntax == null || syntax.equals("") )
-            syntax = FileUtils.langXML ;
+		if ( syntax == null || syntax.equals("") )
+			syntax = FileUtils.langXML ;
 		RDFReader r = model.getReader(syntax);
 		r.setProperty("iri-rules", "strict");
 		r.setProperty("error-mode", "strict"); // Warning will be errors.
 		r.read(model, in, BASE_URI);
 		in.close();
-		
+
 		StmtIterator iter = model.listStatements();
 		try {
 			while (iter.hasNext()) {
@@ -72,8 +72,7 @@ public class RdfModelExtractor implements ModelBuilder {
 					if (actorsMap.containsKey(s.toString())) {
 						actorsMap.get(s.toString()).setName(o.toString());
 					} else {
-						Actor actor = new Actor(null, null);
-						actor.setName(o.toString());
+						Actor actor = new Actor(parseIdentifier(s.toString()), o.toString());
 						actorsMap.put(s.toString(), actor);
 					}
 				}
@@ -82,7 +81,7 @@ public class RdfModelExtractor implements ModelBuilder {
 					if (eventsMap.containsKey(s.toString())) {
 						eventsMap.get(s.toString()).setName(o.toString());
 					} else {
-						Event event = new Event(null, null);
+						Event event = new Event(parseIdentifier(s.toString()), o.toString(), null, null);
 						event.setName(o.toString());
 						eventsMap.put(s.toString(), event);
 					}
@@ -96,21 +95,22 @@ public class RdfModelExtractor implements ModelBuilder {
 						eventsMap.get(s.toString()).setStartPoint(stPoint);
 						eventsMap.get(s.toString()).setEndPoint(stPoint);
 					} else {
-						Event event = new Event(stPoint, stPoint);
+						Event event = new Event(parseIdentifier(s.toString()), o.toString(), stPoint, stPoint);
 						eventsMap.put(s.toString(), event);
 					}
 
 				}
 
 				if (p.toString().equals("http://desir.icm.edu.pl/participatesIn")) {
-					Actor actor = new Actor(null, null);
-					actor.setParticipation(new ArrayList<Event>());
-					
+					Actor actor;
 					if (actorsMap.containsKey(s.toString())) {
 						actor = actorsMap.get(s.toString());
+					} else {
+						actor = new Actor(parseIdentifier(s.toString()), o.toString());
 					}
+					actor.setParticipation(new ArrayList<>());
 
-					Event event = new Event(null, null);
+					Event event = new Event(parseIdentifier(s.toString()), o.toString(), null, null);
 					if (eventsMap.containsKey(o.toString())) {
 						event = eventsMap.get(o.toString());
 					}
@@ -124,7 +124,7 @@ public class RdfModelExtractor implements ModelBuilder {
 			if (iter != null)
 				iter.close();
 		}
-		
+
 		actors = new ArrayList<Actor>(actorsMap.values());
 		events = new ArrayList<Event>(eventsMap.values());
 	}
@@ -139,4 +139,7 @@ public class RdfModelExtractor implements ModelBuilder {
 		return events;
 	}
 
+	private static String parseIdentifier(String subject) {
+		return subject.substring(subject.lastIndexOf("#") + 1);
+	}
 }

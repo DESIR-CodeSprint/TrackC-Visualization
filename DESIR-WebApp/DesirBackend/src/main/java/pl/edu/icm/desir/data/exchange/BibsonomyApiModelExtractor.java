@@ -41,8 +41,8 @@ public class BibsonomyApiModelExtractor implements ModelBuilder {
 	Date endDate;
 	int start;
 	int end;
-	
-	
+
+
 	private List<Actor> actors;
 	private List<Event> events;
 
@@ -67,11 +67,11 @@ public class BibsonomyApiModelExtractor implements ModelBuilder {
 	@Override
 	public void parseInputData(InputStream in) throws IOException {
 
-        final RestLogicFactory rlf = new RestLogicFactory();
-        final LogicInterface logic = rlf.getLogicAccess(login, apikey);
-        final List<Post<BibTex>> posts = logic.getPosts(BibTex.class, grouping, groupingName, tags, hash, search, searchType, filters, order, startDate, endDate, start, end);
-		
-       	generateModelFromPosts(posts);
+		final RestLogicFactory rlf = new RestLogicFactory();
+		final LogicInterface logic = rlf.getLogicAccess(login, apikey);
+		final List<Post<BibTex>> posts = logic.getPosts(BibTex.class, grouping, groupingName, tags, hash, search, searchType, filters, order, startDate, endDate, start, end);
+
+		generateModelFromPosts(posts);
 	}
 
 	@Override
@@ -85,35 +85,36 @@ public class BibsonomyApiModelExtractor implements ModelBuilder {
 	}
 
 
-    private void generateModelFromPosts(List<Post<BibTex>> posts) {
+	private void generateModelFromPosts(List<Post<BibTex>> posts) {
 
 		Map<PersonName, Actor> actorsMap = new HashMap<PersonName, Actor>();
 		Map<Post<BibTex>, Event> eventsMap = new HashMap<Post<BibTex>, Event>();
-    	
-    	actors = new ArrayList<>();
-        for (final Post<BibTex> post : posts) {
-        	SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
+
+		actors = new ArrayList<>();
+		for (final Post<BibTex> post : posts) {
+			SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 			ScaledTime st = new ScaledTime();
 			st.setLocalDate(DataUtils.convertToLocalDate(post.getDate()));
-			Event event = new Event(stPoint, stPoint);
+			Event event = new Event(DataUtils.createHashWithTimestamp(post.getResource().getTitle()),
+					post.getResource().getTitle(), stPoint, stPoint);
 			event.setName(post.getResource().getTitle());
 			eventsMap.put(post, event);
-            for (PersonName personName:post.getResource().getAuthor()) {
-            	if (actorsMap.containsKey(personName)) {
-            		Actor actor = actorsMap.get(personName);
-            		
-            		actor.getParticipation().add(event);
-            	}
-            	Actor actor = new Actor(null, null);
-            	actor.setName(personName.getFirstName() + " " + personName.getLastName());
+			for (PersonName personName:post.getResource().getAuthor()) {
+				if (actorsMap.containsKey(personName)) {
+					Actor actor = actorsMap.get(personName);
+
+					actor.getParticipation().add(event);
+				}
+				Actor actor = new Actor(null, null); //todo: Yoann
+				actor.setName(personName.getFirstName() + " " + personName.getLastName());
 				actor.setParticipation(new ArrayList<Event>());
 				actor.getParticipation().add(event);
 				actorsMap.put(personName, actor);
-            }
-        }
+			}
+		}
 		actors = new ArrayList<Actor>(actorsMap.values());
 		events = new ArrayList<Event>(eventsMap.values());
 
-    }
+	}
 
 }

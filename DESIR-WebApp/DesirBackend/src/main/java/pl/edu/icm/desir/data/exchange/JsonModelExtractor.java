@@ -38,20 +38,20 @@ public class JsonModelExtractor implements ModelBuilder {
 
 	@Override
 	public void parseInputData(InputStream in) throws IOException {
-        final RenderingFormat renderingFormat;
-        final UrlRenderer urlRenderer = new UrlRenderer("");
-        final RendererFactory rendererFactory = new RendererFactory(urlRenderer);
-        renderingFormat = RenderingFormat.JSON;
+		final RenderingFormat renderingFormat;
+		final UrlRenderer urlRenderer = new UrlRenderer("");
+		final RendererFactory rendererFactory = new RendererFactory(urlRenderer);
+		renderingFormat = RenderingFormat.JSON;
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(in, "utf-8"));
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(in, "utf-8"));
 
-        try {
-        	List<Post<? extends Resource>> posts =  rendererFactory.getRenderer(renderingFormat).parsePostList(reader, NoDataAccessor.getInstance());
-        	generateModelFromPosts(posts);
-        } catch (final InternServerException ex) {
-            reader.close();
-            throw new BadRequestOrResponseException(ex);
-        }
+		try {
+			List<Post<? extends Resource>> posts =  rendererFactory.getRenderer(renderingFormat).parsePostList(reader, NoDataAccessor.getInstance());
+			generateModelFromPosts(posts);
+		} catch (final InternServerException ex) {
+			reader.close();
+			throw new BadRequestOrResponseException(ex);
+		}
 
 	}
 
@@ -66,36 +66,38 @@ public class JsonModelExtractor implements ModelBuilder {
 	}
 
 
-    private void generateModelFromPosts(List<Post<? extends Resource>> posts) {
+	private void generateModelFromPosts(List<Post<? extends Resource>> posts) {
 
 		Map<PersonName, Actor> actorsMap = new HashMap<PersonName, Actor>();
 		Map<Post<BibTex>, Event> eventsMap = new HashMap<Post<BibTex>, Event>();
-    	
-    	actors = new ArrayList<>();
-        for (final Post<? extends Resource> apost : posts) {
-        	Post<BibTex> post = (Post<BibTex>) apost; 
-        	SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
+
+		actors = new ArrayList<>();
+		for (final Post<? extends Resource> apost : posts) {
+			Post<BibTex> post = (Post<BibTex>) apost;
+			SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 			ScaledTime st = new ScaledTime();
 			st.setLocalDate(DataUtils.convertToLocalDate(post.getDate()));
-			Event event = new Event(stPoint, stPoint);
+			Event event = new Event(DataUtils.createHashWithTimestamp(post.getResource().getTitle()),
+					post.getResource().getTitle(), stPoint, stPoint);
 			event.setName(post.getResource().getTitle());
 			eventsMap.put(post, event);
-            for (PersonName personName:post.getResource().getAuthor()) {
-            	if (actorsMap.containsKey(personName)) {
-            		Actor actor = actorsMap.get(personName);
-            		
-            		actor.getParticipation().add(event);
-            	}
-            	Actor actor = new Actor(null, null);
-            	actor.setName(personName.getFirstName() + " " + personName.getLastName());
+			for (PersonName personName:post.getResource().getAuthor()) {
+				if (actorsMap.containsKey(personName)) {
+					Actor actor = actorsMap.get(personName);
+
+					actor.getParticipation().add(event);
+				}
+				Actor actor =
+						new Actor(DataUtils.createHashWithTimestamp(personName.getFirstName() + " " + personName.getLastName()),
+								personName.getFirstName() + " " + personName.getLastName());
 				actor.setParticipation(new ArrayList<Event>());
 				actor.getParticipation().add(event);
 				actorsMap.put(personName, actor);
-            }
-        }
+			}
+		}
 		actors = new ArrayList<Actor>(actorsMap.values());
 		events = new ArrayList<Event>(eventsMap.values());
 
-    }
+	}
 
 }

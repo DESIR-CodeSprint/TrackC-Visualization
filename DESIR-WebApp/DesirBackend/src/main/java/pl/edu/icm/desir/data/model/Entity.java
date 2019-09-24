@@ -28,34 +28,40 @@ public abstract class Entity implements DataObjectInterface, Serializable {
 	public enum GeneralizationLevel {
 		DEFAULT
 	}
-	
-	String id;
-	String externalId;
-	String typeCommonName;
-	String name;
-    
-    //obligatory fields forced by constructor
-	
-	SpatiotemporalPoint startPoint;
-	SpatiotemporalPoint endPoint;
-	
 
-	public Entity(SpatiotemporalPoint startPoint, SpatiotemporalPoint endPoint) {
+	private String id;
+	private String externalId;
+	private String typeCommonName = "actor";
+	private String name;
+
+	//obligatory fields forced by constructor
+	private SpatiotemporalPoint startPoint;
+	private SpatiotemporalPoint endPoint;
+
+
+	public Entity(String identifier, String name) {
+		this.id = identifier;
+		this.name = name;
+	}
+
+	public Entity(String identifier, String name, SpatiotemporalPoint startPoint, SpatiotemporalPoint endPoint) {
+		this.id = identifier;
+		this.name = name;
 		this.startPoint = startPoint;
 		this.endPoint = endPoint;
 	}
-	
+
 	/*
-	 * Level of generalization (e.g. 0 - states and centuries, 
+	 * Level of generalization (e.g. 0 - states and centuries,
 	 * 1 - years and armies etc.)
 	 */
 	GeneralizationLevel level; //change to comparable enum, for the time being limit enum to single option e.g. "DEFAULT"
-	
+
 	List<Relation> relations;
-	
+
 	Map<String, String> metadata;
-	
-	/** 
+
+	/**
 	 * That can start a philosophical
 	 * discussion of the type “is the second world war real or abstract?
 	 */
@@ -113,12 +119,12 @@ public abstract class Entity implements DataObjectInterface, Serializable {
 	 * argument sorted by caledarTime or abstractTime / copmarator jako argument / defaulyowe po calendarTime jeśli istnieje, abstractTime jeśli nie istnieje calendar
 	 */
 	public Set<SpatiotemporalPoint> getTrajectory(boolean sortByCalendarTime, Comparator<SpatiotemporalPoint> comparator) {
-		
-        //generowanie posortowanej listy punktów: z entity start/end i ze wszystkich relacji biorąc pod uwagę zarówno target realcji, jak i start/end relacji
-        //domyślny komparator czasu musi uwzględniać najmniejszą wspólną valid skalę czasu
-		
+
+		//generowanie posortowanej listy punktów: z entity start/end i ze wszystkich relacji biorąc pod uwagę zarówno target realcji, jak i start/end relacji
+		//domyślny komparator czasu musi uwzględniać najmniejszą wspólną valid skalę czasu
+
 		return TrajectoryHelper.getTrajectory(sortByCalendarTime, comparator);
-        
+
 	}
 
 	public Set<String> getPath() {
@@ -132,16 +138,16 @@ public abstract class Entity implements DataObjectInterface, Serializable {
 		return TrajectoryHelper.getCalendarTimeline(this);
 	}
 
-    
-    //przyjmijmy że wszystkie ScvaledTime mają to samo validity scale
-	public ScaledTime[] getCalendarTimeline(Scale scale) {   
+
+	//przyjmijmy że wszystkie ScvaledTime mają to samo validity scale
+	public ScaledTime[] getCalendarTimeline(Scale scale) {
 		////wrapper do utility tłumaczącego trajectory na time
 		return TrajectoryHelper.getCalendarTimeline(this, scale);
 	}
 
-    public float[] getAbstractTimeline() {
+	public float[] getAbstractTimeline() {
 		//wrapper do utility tłumaczącego trajectory na time
-    	return TrajectoryHelper.getAbstractTimeline(this);
+		return TrajectoryHelper.getAbstractTimeline(this);
 	}
 
 	public GeneralizationLevel getLevel() {
@@ -159,20 +165,20 @@ public abstract class Entity implements DataObjectInterface, Serializable {
 	public void setRelations(List<Relation> relations) {
 		this.relations = relations;
 	}
-    
-    public void addRelation(Relation relation) {
-    	if (relations == null) {
-    		relations = new ArrayList<Relation>();
-    	}
-    	relations.add(relation);
-    }
-    
-    public void removeRelation(Relation relation) {
-    	if (relations == null) {
-    		relations = new ArrayList<Relation>();
-    	}
-    	relations.remove(relation);
-    }
+
+	public void addRelation(Relation relation) {
+		if (relations == null) {
+			relations = new ArrayList<Relation>();
+		}
+		relations.add(relation);
+	}
+
+	public void removeRelation(Relation relation) {
+		if (relations == null) {
+			relations = new ArrayList<Relation>();
+		}
+		relations.remove(relation);
+	}
 
 	public Map<String, String> getMetadata() {
 		return metadata;
@@ -181,6 +187,6 @@ public abstract class Entity implements DataObjectInterface, Serializable {
 	public void setMetadata(Map<String, String> metadata) {
 		this.metadata = metadata;
 	}
-	
-	
+
+
 }

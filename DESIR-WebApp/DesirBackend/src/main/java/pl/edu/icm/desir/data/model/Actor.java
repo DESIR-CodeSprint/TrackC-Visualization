@@ -1,5 +1,6 @@
 package pl.edu.icm.desir.data.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,16 +23,14 @@ import java.util.List;
  *
  */
 public class Actor extends Entity {
+	private Date timelifeStartPoint;
+	private Date timelifeEndPoint;
+	private List<Event> participation;
+	private String type;
 
-	Date timelifeStartPoint;
-	Date timelifeEndPoint;
-	
-	List<Event> participation;
-	
-	String type;
-
-	public Actor(SpatiotemporalPoint startPoint, SpatiotemporalPoint endPoint) {
-		super(startPoint, endPoint);
+	public Actor(String identifier, String name) {
+		super(identifier, name);
+		this.participation = new ArrayList<>();
 	}
 
 	@Override
@@ -75,6 +74,6 @@ public class Actor extends Entity {
 	public float toFloat() {
 		return 0;
 	}
-	
-	
+
+
 }
