@@ -163,8 +163,8 @@ public class GraphGenerator {
 		return edges;
 	}
     
-        public DataBlock generateDataBlockFromModel(ModelBuilder builder) {
-        
+    public DataBlock generateDataBlockFromModel(ModelBuilder builder) {
+        System.out.println("huhu");
         
         
         
