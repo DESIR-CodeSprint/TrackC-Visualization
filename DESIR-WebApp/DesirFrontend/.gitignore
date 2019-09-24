@@ -1,0 +1,6 @@
+/bin/
+/package-lock.json
+<<<<<<< HEAD
+/target/
+=======
+>>>>>>> branch 'develop' of git@gitlab.com:ICM-VisLab/DESIR-WebApp.git

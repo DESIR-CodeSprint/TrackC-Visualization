@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <title>TITLE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" type="text/css" href="css/style-03.css">
+</head>
+<body>
+  <div id="network"></div>
+
+  <div id="charts">
+    <input class="toggle-box" id="header1" type="checkbox" checked>
+    <label for="header1"></label>
+    <div class="control">
+      <h1>Cosmic Web</h1>
+      <div id="dataButtons">
+        <h2>Network Models</h2>
+        <input type="radio" name="edgeSelect" id="links1" onclick="nodes()" value="fll-t-1-15"><label for="links1">Fixed Length</label></br>
+        <input type="radio" name="edgeSelect" id="links2" onclick="nodes()" value="vll-t-1-10"><label for="links2">Varying Length</label></br>
+        <input type="radio" name="edgeSelect" id="links3" onclick="nodes()" value="nn-t-1-10"><label for="links3">Nearest Neighbor</label></br>
+      </div>
+      <br>
+      <h2>Average Degree</h2>
+      <div id="fixed_length">
+        <div id="fllWeakComponent" class="chart fixed_length">
+          <div class="title">Weak Component</div>
+        </div>
+      </div>
+      <div id="varying_length">
+        <div id="vllWeakComponent" class="chart varying_length">
+          <div class="title">Weak Component</div>
+        </div>
+        <div id="vllStrongComponent" class="chart varying_length">
+          <div class="title">Strong Component</div>
+        </div>
+      </div>
+      <div id="nearest_neighbour">
+        <div id="nnWeakComponent" class="chart nearest_neighbour">
+          <div class="title">Weak Component</div>
+        </div>
+        <div id="nnStrongComponent" class="chart nearest_neighbour">
+          <div class="title">Strong Component</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="js/three.js"></script>
+  <script src="js/controls/TrackballControls.js"></script>
+  <script src="js/d3.v3.min.js"></script>
+  <script src="js/crossfilter.v1.min.js"></script>
+  <script src="vis/history-01.js"></script>
+  <script src="vis/nodes-01.js"></script>
+  <script src="vis/filter-01.js"></script>
+  <script src="vis/edges-01.js"></script>
+
+</body>
+
+

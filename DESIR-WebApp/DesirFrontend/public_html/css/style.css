@@ -1,0 +1,286 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 2017-12-20, 11:03:03
+    Author     : norkap
+*/
+
+body {
+    font-family: "Lato", sans-serif;
+    margin:0px    
+}
+
+#logo{
+    margin-left:20px;
+    padding-bottom:28px
+}
+
+.sidenav {
+    height: 100%;
+    width: 350px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 32px;
+}
+
+.sidenav h2{
+    padding: 8px 8px 0px 20px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav ul{
+    padding:0
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav label{
+    padding: 0px 20px;
+    text-decoration: none;
+    font-size: 16px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+input[type=text], select {
+    width: 80%;
+    padding: 12px 20px;
+    margin: 8px 20px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    width: 80%;
+    background-color: #005c99;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #005c49;
+}
+
+#openMenu{
+    font-size:30px;
+    cursor:pointer;
+}
+
+#main {
+    transition: margin-left .5s;
+    margin-top: 0;
+    margin-left: 342px;
+}
+
+#main #ObjectInfo{
+    height: 60px;
+    background-color: #005c99;
+    color: white;
+    padding:20px 0px 30px 30px;
+    font-size: 22px;
+    font-weight: bold
+}
+
+#main #Container3D{
+    width:1024px;
+    height:1024px;
+    background:#eeeeee;
+    margin-bottom: 25px;
+    padding: 0px;
+    float: left;
+}
+
+#main #MouseInfo{
+    color: white;
+}
+
+@media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+}
+
+#charts{
+    background: #111;
+    font-family: "Open Sans", "Helvetica Neue";
+    font-weight: 300;
+    font-size: 12px;    
+    color: white;
+    border: 10px;
+    padding: 10px;
+    z-index: 5;
+    float:right;
+    position: fixed;
+    top: 150px;
+    right: 20px;
+    width: 350px;
+}
+.chart {
+    display: inline-block;
+    height: 100px;
+    margin-bottom: 20px;
+}
+.title{
+    margin-left: 10px;
+}
+.reset {
+    padding-left: 1em;
+    font-size: smaller;
+    color: #ccc;
+}
+
+.background.bar {
+    fill: gray;
+}
+
+.foreground.bar {
+    fill: #ccc;
+}
+
+.axis path {
+    fill: none;
+    stroke: none;
+}
+
+.axis line {
+    fill: none;
+    stroke: #ccc;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: "Open Sans", "Helvetica Neue";
+    font-weight: 300;
+    font-size: 8px;
+    fill: white;
+}
+
+.brush rect.extent {
+    fill: gray;
+    fill-opacity: .125;
+}
+
+.brush .resize path {
+    fill: #eee;
+    stroke: #666;
+}
+
+input[type="radio"] {
+    display:none;   
+}
+
+input[type="radio"]:checked + label {
+    text-decoration: underline;
+}
+label{
+    margin-left: 10px;
+    cursor: pointer;
+}
+label:hover{
+    text-decoration: underline;
+}
+
+
+.toggle-box {
+  display: none;
+}
+
+.toggle-box + label {
+  cursor: pointer;
+/*  display: block;
+  font-weight: bold;
+  line-height: 0px;
+  margin-bottom: 5px;*/
+}
+
+.toggle-box + label + .control {
+  display: none;
+  background-color: rgba(17, 17, 17, .5);
+}
+
+.toggle-box:checked + label + .control {
+  display: block;
+  padding: 10px;
+  margin: 10px;
+  z-index: -10;
+  position: fixed;
+  top: 150px;
+  right: 20px;
+  width: 320px;
+}
+
+.toggle-box + label:before {
+  background-color: #FFF; 
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  color: #000;
+  content: "+";
+  display: block;
+  float: right;
+  font-weight: bold;
+  height: 20px;
+  line-height: 20px;
+  margin-right: 10px;
+  margin-top: 10px;
+  text-align: center;
+  width: 20px;
+}
+
+.toggle-box:checked + label:before {
+  content: "\2212";
+}
+
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+  font-size: 200px !important;
+  direction: ltr;
+  cursor: pointer;
+}

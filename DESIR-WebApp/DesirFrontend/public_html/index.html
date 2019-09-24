@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+    <head>
+        <title>DESIR Graph Visualization</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+        <script src="js/controller.js"></script>
+        <script src="js/interactions.js"></script>
+        <script src="js/three.js"></script>
+        <script src="js/Detector.js"></script>
+        <script src="js/controls/OrbitControls.js"></script>
+        <script src="js/d3.v3.min.js"></script>
+        <script src="js/crossfilter.v1.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+  		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        
+    </head>
+
+    <body ng-app="desirApp">
+        <div id="mySidenav" class="sidenav">
+            <img id="logo" src="img/DESIR_logo_01.png" alt="logo" width="300"/>
+            <h2>
+                Data provider:
+            </h2>
+            <div class="panel-group" id="accordion">
+            	<div class="panel panel-default">
+            		<div class="panel-heading">
+            			<h4 class="panel-title">
+            				<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">Test dataset 1</a>
+            			</h4>
+            		</div>
+            		<div id="collapse1" class="panel-collapse collapse">
+            			<div class="panel-body">
+				            <form ng-controller="RetrieveMyObjectController" ng-init="dataobject.id='Test1';dataobject.text=''" ng-submit="retrieveMyObject()">
+               					<input type="submit" id="submit" value="Submit" />
+            				</form>
+            			</div>
+            		</div>
+            	</div>
+            	<div class="panel panel-default">
+            		<div class="panel-heading">
+            			<h4 class="panel-title">
+            				<a data-toggle="collapse" data-parent="#accordion" href="#collapse2">Test dataset 2</a>
+            			</h4>
+            		</div>
+            		<div id="collapse2" class="panel-collapse collapse">
+            			<div class="panel-body">
+				            <form ng-controller="RetrieveMyObjectController" ng-init="dataobject.id='Test2';dataobject.text=''" ng-submit="retrieveMyObject()">
+               					<input type="submit" id="submit" value="Submit" />
+            				</form>
+            			</div>
+            		</div>
+            	</div>
+            	<div class="panel panel-default">
+            		<div class="panel-heading">
+            			<h4 class="panel-title">
+            				<a data-toggle="collapse" data-parent="#accordion" href="#collapse3">Dataset from file</a>
+            			</h4>
+            		</div>
+            		<div id="collapse3" class="panel-collapse collapse">
+            			<div class="panel-body">
+		
+						<span class="btn btn-success fileinput-button">
+                    	<i class="glyphicon glyphicon-plus"></i>
+                    	<span>Open file</span>
+						<input id="fileupload" type="file" name="fileupload" data-url="fileupload">
+							<script src="js/vendor/jquery.ui.widget.js"></script>
+							<script src="js/jquery.iframe-transport.js"></script>
+							<script src="js/jquery.fileupload.js"></script>
+							<script>
+								$(function () {
+    								$('#fileupload').fileupload({
+        								dataType: 'json',
+        								done: function (e, data) {
+                							processDataObject(data.result);
+        								}
+    								});
+								});
+							</script>
+						</span>
+            			</div>
+            		</div>
+            	</div>
+            	<div class="panel panel-default">
+            		<div class="panel-heading">
+            			<h4 class="panel-title">
+            				<a data-toggle="collapse" data-parent="#accordion" href="#collapse7">Dataset from RDF</a>
+            			</h4>
+            		</div>
+            		<div id="collapse7" class="panel-collapse collapse">
+            			<div class="panel-body">
+		
+						<span class="btn btn-success fileinput-button">
+                    	<i class="glyphicon glyphicon-plus"></i>
+                    	<span>Open file</span>
+						<input id="rdfFileUpload" type="file" name="rdfFileUpload" data-url="http://localhost:8080/rdfFileUpload">
+							<script src="js/vendor/jquery.ui.widget.js"></script>
+							<script src="js/jquery.iframe-transport.js"></script>
+							<script src="js/jquery.fileupload.js"></script>
+							<script>
+								$(function () {
+    								$('#rdfFileUpload').fileupload({
+                                        done: function (e, data) {
+                							processDataObject(data.result);
+        								}
+    								});
+								});
+							</script>
+						</span>
+            			</div>
+            		</div>
+            	</div>
+            	<div class="panel panel-default">
+            		<div class="panel-heading">
+            			<h4 class="panel-title">
+            				<a data-toggle="collapse" data-parent="#accordion" href="#collapse4">Dataset query from Bibsonomy</a>
+            			</h4>
+            		</div>
+            		<div id="collapse4" class="panel-collapse collapse">
+            			<div class="panel-body">
+				            <form ng-controller="RetrieveMyObjectController" ng-init="dataobject.text=''" ng-submit="retrieveBibsonomyQuery()">
+				                <label for="text">Login:</label>
+                				<input type="text" id="login" name="login" ng-model="dataobject.login">
+				                <label for="apikey">API key:</label>
+                				<input type="text" id="apikey" name="apikey" ng-model="dataobject.apikey">
+				                <label for="refUsername">Ref user name:</label>
+                				<input type="text" id="refUsername" name="refUsername" ng-model="dataobject.refUsername">
+				                <label for="tags">Tags (comma separated):</label>
+                				<input type="text" id="tags" name="tags" ng-model="dataobject.tags">
+
+               					<input type="submit" id="submit" value="Submit" />
+            				</form>
+            			</div>
+            		</div>
+            	</div>
+
+            </div>
+        </div>
+
+
+        <div id="main">
+            <!-- div id="ObjectInfo">
+                <p>MyObject ID:&nbsp;<span id="id_display"></span><span id="seq_display"></span>
+                </p>
+            </div -->
+            <div id="Container3D">
+            </div>
+            <div id="MouseInfo">
+                <p>Mouse:&nbsp;<span id="mouse_pos"></span>
+                </p>
+            </div>
+            <div id="charts">
+                <input class="toggle-box" id="header1" type="checkbox" checked>
+                <label for="header1"></label>
+                <div class="control">
+                    <h1>Filter Controls</h1>
+                    <div id="myChart1" class="chart fixed_length">
+                        <div class="title">Chart #1 Title</div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </body>
+</html>

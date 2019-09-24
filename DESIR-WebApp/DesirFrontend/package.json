@@ -1,0 +1,24 @@
+{
+    "name": "desir-ui",
+    "version": "1.0.0",
+    "scripts": {
+        "ng": "ng",
+        "start": "ng serve",
+        "build": "node node_modules/@angular/cli/bin/ng build",
+        "build-beta": "node node_modules/@angular/cli/bin/ng build --env=beta",
+        "build-prod": "node node_modules/@angular/cli/bin/ng build --env=prod",
+        "test": "ng test",
+        "lint": "ng lint",
+        "e2e": "ng e2e"
+    },
+    "keywords": [
+        "util",
+        "functional",
+        "server",
+        "client",
+        "browser"
+    ],
+    "author": "norkap",
+    "contributors": [],
+    "dependencies": {}
+}
