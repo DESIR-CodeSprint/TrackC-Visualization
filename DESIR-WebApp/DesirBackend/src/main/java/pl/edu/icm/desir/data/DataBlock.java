@@ -4,13 +4,15 @@ import java.text.SimpleDateFormat;
 
 public class DataBlock {
     
-    public static final int NODE_TYPE_VIRTUAL = 0;
     public static final int NODE_TYPE_ACTOR_POINT = 10;
     public static final int NODE_TYPE_ACTOR_START = 11;
     public static final int NODE_TYPE_ACTOR_END = 12;
+    public static final int NODE_TYPE_ACTOR_INTERMEDIATE = 13;
+    
     public static final int NODE_TYPE_EVENT_POINT = 20;
     public static final int NODE_TYPE_EVENT_START = 21;
     public static final int NODE_TYPE_EVENT_END = 22;
+    public static final int NODE_TYPE_EVENT_INTERMEDIATE = 23;
     
     public static final int SEGMENT_TYPE_ACTOR = 101;
     public static final int SEGMENT_TYPE_EVENT = 102;
