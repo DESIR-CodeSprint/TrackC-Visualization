@@ -22,6 +22,10 @@ public class PartOf extends Relation {
 		super(subject, targetObject);
 	}
 
+	public PartOf(String identifier) {
+		super(identifier);
+	}
+
 	@Override
 	String getType() {
 		return PARTOF_TYPE;

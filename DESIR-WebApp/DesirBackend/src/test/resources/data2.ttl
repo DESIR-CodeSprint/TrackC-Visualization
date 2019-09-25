@@ -22,25 +22,27 @@
 <http://desir.icm.edu.pl/isPartOf>
 <http://desir.icm.edu.pl/actor#dep1> .
 
-# alternatively with time range
-# i.e. John Doe worked for Department of Something from 1997 till 2018
-# as senior researcher
-#
-#<http://desir.icm.edu.pl/partOf#po_a1_dep1>
-#<http://desir.icm.edu.pl/hasRole>
-#"senior researcher"^<http://www.w3.org/2001/XMLSchema#string>
-#
-#<http://desir.icm.edu.pl/partOf#po_a1_dep1>
-#<http://desir.icm.edu.pl/start>
-#"1997"^<http://www.w3.org/2001/XMLSchema#integer>
-#
-#<http://desir.icm.edu.pl/partOf#po_a1_dep1>
-#<http://desir.icm.edu.pl/end>
-#"2018"^<http://www.w3.org/2001/XMLSchema#integer>
-#
-#<http://desir.icm.edu.pl/actor#a1>
-#<http://desir.icm.edu.pl/isPartOf#po_a1_dep1>
-#<http://desir.icm.edu.pl/actor#dep1>
+# Alternatively with time range:
+# i.e. John Doe worked for Department of Something from 1997 till 2018 as senior researcher
+<http://desir.icm.edu.pl/partOf#po_a1_dep1>
+<http://desir.icm.edu.pl/hasRole>
+"senior researcher" .
+
+<http://desir.icm.edu.pl/partOf#po_a1_dep1>
+<http://desir.icm.edu.pl/start>
+"1997" .
+
+<http://desir.icm.edu.pl/partOf#po_a1_dep1>
+<http://desir.icm.edu.pl/end>
+"2018" .
+
+<http://desir.icm.edu.pl/partOf#po_a1_dep1>
+<http://desir.icm.edu.pl/sourceActor>
+<http://desir.icm.edu.pl/actor#a1> .
+
+<http://desir.icm.edu.pl/partOf#po_a1_dep1>
+<http://desir.icm.edu.pl/targetActor>
+<http://desir.icm.edu.pl/actor#dep1> .
 
 #author/actor #2 name
 <http://desir.icm.edu.pl/actor#a2>
