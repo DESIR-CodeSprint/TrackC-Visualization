@@ -1,12 +1,21 @@
 package pl.edu.icm.desir.data.exchange;
 
-import org.junit.Assert;
-import org.junit.Test;
-import pl.edu.icm.desir.data.model.Actor;
-import pl.edu.icm.desir.data.model.Event;
+import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+
+import org.assertj.core.api.Condition;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.util.ResourceUtils;
+
+import pl.edu.icm.desir.data.model.Actor;
+import pl.edu.icm.desir.data.model.Event;
+import pl.edu.icm.desir.data.model.Relation;
 
 public class RdfModelExtractorTest {
 
@@ -75,38 +84,77 @@ public class RdfModelExtractorTest {
 		File file = ResourceUtils.getFile("classpath:data2.ttl");
 		RdfModelExtractor extractor = new RdfModelExtractor(file.getName());
 		extractor.parseInputData(new FileInputStream(file));
-		assertNotNull("Actors list is empty", extractor.getActors());
-		assertTrue("The number of actors is wrong: " + extractor.getActors().size() + " shuld be 5" , extractor.getActors().size() == 5);
-		assertNotNull("Events list is null", extractor.getEvents());
-		assertTrue("Events list is empty", extractor.getEvents().size() > 0);
+		Assert.assertNotNull("Actors list is empty", extractor.getActors());
+		Assert.assertTrue("The number of actors is wrong: " + extractor.getActors().size() + " shuld be 5" , extractor.getActors().size() == 5);
+		Assert.assertNotNull("Events list is null", extractor.getEvents());
+		Assert.assertTrue("Events list is empty", extractor.getEvents().size() > 0);
 		
 		Actor actor1 = new Actor("a1", "John Doe");
-		assertTrue(actor1.getId() + " is not present", extractor.getActors().contains(actor1));
+		Assert.assertTrue(actor1.getId() + " is not present", extractor.getActors().contains(actor1));
 		
 		Actor actor2 = new Actor("a2", "Anthony Monster");
-		assertTrue(actor2.getId() + " is not present", extractor.getActors().contains(actor2));
+		Assert.assertTrue(actor2.getId() + " is not present", extractor.getActors().contains(actor2));
 
 		Actor actor3 = new Actor("a3", "George Someone");
-		assertTrue(actor3.getId() + " is not present" , extractor.getActors().contains(actor3));
+		Assert.assertTrue(actor3.getId() + " is not present" , extractor.getActors().contains(actor3));
+		
+		Actor actor4 = new Actor("univ1", "University of Somewhere");
+		Assert.assertTrue(actor4.getId() + " is not present" , extractor.getActors().contains(actor4));
+		
+		Actor actor5 = new Actor("dep1", "Department of Something");
+		Assert.assertTrue(actor5.getId() + " is not present" , extractor.getActors().contains(actor5));
 
 		Event event1 = new Event("e1", "Very Interesting Article A on the Exemplary RDF Format", null, null);
 		Event event2 = new Event("e2", "Very Interesting Article B on the Exemplary RDF Format", null, null);
 		Event event3 = new Event("e3", "Not So Interesting Article C on Something Else", null, null);
 	
 		Actor foundActor1 = extractor.getActors().get(extractor.getActors().indexOf(actor1));
-		assertTrue(foundActor1.getId() + " has wrong participation size: " + foundActor1.getParticipation().size(), foundActor1.getParticipation().size() == 2);
-		assertTrue(foundActor1.getId() + " does not contain " + event1.getId(), foundActor1.getParticipation().contains(event1));
-		assertTrue(foundActor1.getId() + "does not contain" + event2.getId(), foundActor1.getParticipation().contains(event2));
-
+		Assert.assertTrue(foundActor1.getId() + " has wrong participation size: " + foundActor1.getRelations().size(), foundActor1.getRelations().size() == 2);
+		
+		assertThat(foundActor1.getRelations()).areExactly(1, new Condition<Relation>() {
+            public boolean matches(Relation relation) {
+            	return relation.getTargetObject().getId().contentEquals("e1");
+            }
+		 });
+		assertThat(foundActor1.getRelations()).areExactly(1, new Condition<Relation>() {
+            public boolean matches(Relation relation) {
+            	return relation.getTargetObject().getId().contentEquals("e2");
+            }
+		 });
+		
+		
 		Actor foundActor2 = extractor.getActors().get(extractor.getActors().indexOf(actor2));
-		assertTrue(foundActor2.getId() + " has wrong participation size: " + foundActor2.getParticipation().size(), foundActor2.getParticipation().size() == 2);
-		assertTrue(foundActor2.getId() + "does not contain" + event1.getId(), foundActor2.getParticipation().contains(event1));
-		assertTrue(foundActor2.getId() + "does not contain" + event3.getId(), foundActor2.getParticipation().contains(event3));
+		Assert.assertTrue(foundActor2.getId() + " has wrong participation size: " + foundActor2.getRelations().size(), foundActor2.getRelations().size() == 2);
+		//assertTrue(foundActor2.getId() + "does not contain" + event1.getId(), foundActor2.getParticipation().contains(event1));
+		//assertTrue(foundActor2.getId() + "does not contain" + event3.getId(), foundActor2.getParticipation().contains(event3));
 		
 		Actor foundActor3 = extractor.getActors().get(extractor.getActors().indexOf(actor3));
-		assertTrue(foundActor3.getId() + " has wrong participation size: " + foundActor3.getParticipation().size(), foundActor3.getParticipation().size() == 1);
-		assertTrue(foundActor3.getId() + "does not contain" + event2.getId(), foundActor3.getParticipation().contains(event2));
+		Assert.assertTrue(foundActor3.getId() + " has wrong participation size: " + foundActor3.getRelations().size(), foundActor3.getRelations().size() == 1);
+		//assertTrue(foundActor3.getId() + "does not contain" + event2.getId(), foundActor3.getParticipation().contains(event2));
+		
+		assertThat(extractor.getRelations()).areExactly(1, new Condition<Relation>() {
+            public boolean matches(Relation relation) {
+            	return relation.getSubject().getId().equals("dep1") && relation.getTargetObject().getId().equals("univ1");
+            }
+		 });
 
+		assertThat(extractor.getRelations()).areExactly(1, new Condition<Relation>() {
+            public boolean matches(Relation relation) {
+            	return relation.getSubject().getId().equals("a1") && relation.getTargetObject().getId().equals("dep1");
+            }
+		 });
+
+		assertThat(extractor.getPartOfs()).areExactly(1, new Condition<Relation>() {
+            public boolean matches(Relation relation) {
+            	return relation.getSubject().getId().equals("dep1") && relation.getTargetObject().getId().equals("univ1");
+            }
+		 });
+
+		assertThat(extractor.getPartOfs()).areExactly(1, new Condition<Relation>() {
+            public boolean matches(Relation relation) {
+            	return relation.getSubject().getId().equals("a1") && relation.getTargetObject().getId().equals("dep1");
+            }
+		 });
 	}
 
 }
