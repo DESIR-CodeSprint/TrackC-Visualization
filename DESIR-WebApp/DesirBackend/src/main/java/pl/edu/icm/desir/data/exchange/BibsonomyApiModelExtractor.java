@@ -19,10 +19,7 @@ import org.bibsonomy.model.enums.Order;
 import org.bibsonomy.model.logic.LogicInterface;
 import org.bibsonomy.rest.client.RestLogicFactory;
 
-import pl.edu.icm.desir.data.model.Actor;
-import pl.edu.icm.desir.data.model.Event;
-import pl.edu.icm.desir.data.model.ScaledTime;
-import pl.edu.icm.desir.data.model.SpatiotemporalPoint;
+import pl.edu.icm.desir.data.model.*;
 import pl.edu.icm.desir.data.utils.DataUtils;
 
 public class BibsonomyApiModelExtractor implements ModelBuilder {
@@ -41,10 +38,12 @@ public class BibsonomyApiModelExtractor implements ModelBuilder {
 	Date endDate;
 	int start;
 	int end;
-	
-	
+
+
 	private List<Actor> actors;
 	private List<Event> events;
+	private List<Relation> relations;
+	private List<Participation> participations;
 
 	public BibsonomyApiModelExtractor(String login, String apikey, GroupingEntity grouping, String groupingName, List<String> tags, String hash, String search, SearchType searchType, Set<Filter> filters, Order order, Date startDate, Date endDate, int start, int end) {
 		this.login = login;
@@ -67,11 +66,11 @@ public class BibsonomyApiModelExtractor implements ModelBuilder {
 	@Override
 	public void parseInputData(InputStream in) throws IOException {
 
-        final RestLogicFactory rlf = new RestLogicFactory();
-        final LogicInterface logic = rlf.getLogicAccess(login, apikey);
-        final List<Post<BibTex>> posts = logic.getPosts(BibTex.class, grouping, groupingName, tags, hash, search, searchType, filters, order, startDate, endDate, start, end);
-		
-       	generateModelFromPosts(posts);
+		final RestLogicFactory rlf = new RestLogicFactory();
+		final LogicInterface logic = rlf.getLogicAccess(login, apikey);
+		final List<Post<BibTex>> posts = logic.getPosts(BibTex.class, grouping, groupingName, tags, hash, search, searchType, filters, order, startDate, endDate, start, end);
+
+		generateModelFromPosts(posts);
 	}
 
 	@Override
@@ -84,36 +83,55 @@ public class BibsonomyApiModelExtractor implements ModelBuilder {
 		return events;
 	}
 
+	@Override
+	public List<Relation> getRelations() {
+		return null;
+	}
 
-    private void generateModelFromPosts(List<Post<BibTex>> posts) {
+	@Override
+	public List<PartOf> getPartOfs() {
+		return null;
+	}
+
+	@Override
+	public List<Dependency> getDependencies() {
+		return null;
+	}
+
+	@Override
+	public List<Participation> getParticipations() {
+		return null;
+	}
+
+	private void generateModelFromPosts(List<Post<BibTex>> posts) {
 
 		Map<PersonName, Actor> actorsMap = new HashMap<PersonName, Actor>();
 		Map<Post<BibTex>, Event> eventsMap = new HashMap<Post<BibTex>, Event>();
-    	
-    	actors = new ArrayList<>();
-        for (final Post<BibTex> post : posts) {
-        	SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
+
+		actors = new ArrayList<>();
+		for (final Post<BibTex> post : posts) {
+			SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 			ScaledTime st = new ScaledTime();
 			st.setLocalDate(DataUtils.convertToLocalDate(post.getDate()));
-			Event event = new Event(stPoint, stPoint);
+			Event event = new Event(DataUtils.createHashWithTimestamp(post.getResource().getTitle()),
+					post.getResource().getTitle(), stPoint, stPoint);
 			event.setName(post.getResource().getTitle());
 			eventsMap.put(post, event);
-            for (PersonName personName:post.getResource().getAuthor()) {
-            	if (actorsMap.containsKey(personName)) {
-            		Actor actor = actorsMap.get(personName);
-            		
-            		actor.getEvents().add(event);
-            	}
-            	Actor actor = new Actor(null, null);
-            	actor.setName(personName.getFirstName() + " " + personName.getLastName());
-				actor.setEvents(new ArrayList<Event>());
-				actor.getEvents().add(event);
+			for (PersonName personName:post.getResource().getAuthor()) {
+				Actor actor;
+				if (actorsMap.containsKey(personName)) {
+					actor = actorsMap.get(personName);
+				}
+				actor = new Actor(DataUtils.createHashWithTimestamp(personName.getFirstName() + " " + personName.getLastName()), personName.getFirstName() + " " + personName.getLastName());
+				actor.setName(personName.getFirstName() + " " + personName.getLastName());
+				Participation participation = new Participation(actor, event, "");
+				relations.add(participation);
+				participations.add(participation);
 				actorsMap.put(personName, actor);
-            }
-        }
+			}
+		}
 		actors = new ArrayList<Actor>(actorsMap.values());
 		events = new ArrayList<Event>(eventsMap.values());
-
-    }
+	}
 
 }

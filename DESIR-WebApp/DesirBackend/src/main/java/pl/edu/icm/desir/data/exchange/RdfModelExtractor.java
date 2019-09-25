@@ -8,10 +8,8 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -22,112 +20,185 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.FileUtils;
 
-import pl.edu.icm.desir.data.model.Actor;
-import pl.edu.icm.desir.data.model.Event;
-import pl.edu.icm.desir.data.model.ScaledTime;
-import pl.edu.icm.desir.data.model.SpatiotemporalPoint;
+import org.apache.log4j.Logger;
+import pl.edu.icm.desir.data.model.*;
 
 public class RdfModelExtractor implements ModelBuilder {
 
-	static final String BASE_URI = "http://desir.icm.edu.pl/";
+	private static final String BASE_URI = "http://desir.icm.edu.pl/";
+	private static final String ACTOR_NAMESPACE = "http://desir.icm.edu.pl/actor#";
+	private static final String EVENT_NAMESPACE = "http://desir.icm.edu.pl/event#";
+	private static final String HAS_NAME = "http://desir.icm.edu.pl/hasName";
+	private static final String HAS_TITLE = "http://desir.icm.edu.pl/hasTitle";
+	private static final String IS_PART_OF = "http://desir.icm.edu.pl/isPartOf";
+	private static final String OCCURS = "http://desir.icm.edu.pl/occurs";
+	private static final String PARTICIPATES_IN = "http://desir.icm.edu.pl/participatesIn";
+	private static final String DEPENDS_ON = "http://desir.icm.edu.pl/dependsOn";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
-		     .appendPattern("yyyy")
-		     .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-		     .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-		     .toFormatter();
+			.appendPattern("yyyy")
+			.parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+			.parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+			.toFormatter();
 	private List<Actor> actors;
 	private List<Event> events;
+	private List<Relation> relations;
+	private List<PartOf> partOfs;
+	private List<Dependency> dependencies;
+	private List<Participation> participations;
 	private String filename;
-	
-	
+	private static final Logger LOG = Logger.getLogger(RdfModelExtractor.class);
+
 	public RdfModelExtractor(String filename) {
 		this.filename = filename;
+		this.relations = new ArrayList<Relation>();
+		this.partOfs = new ArrayList<PartOf>();
+		this.participations = new ArrayList<Participation>();
+		this.dependencies = new ArrayList<Dependency>();
 	}
 
 	public void parseInputData(InputStream in) throws IOException {
 
-		Map<String, Actor> actorsMap = new HashMap<String, Actor>();
-		Map<String, Event> eventsMap = new HashMap<String, Event>();
+		Map<String, Actor> actorsMap = new HashMap<>();
+		Map<String, Event> eventsMap = new HashMap<>();
 
 		Model model = ModelFactory.createDefaultModel();
 		String syntax = FileUtils.guessLang(filename) ;
-        if ( syntax == null || syntax.equals("") )
-            syntax = FileUtils.langXML ;
+		if ( syntax == null || syntax.equals("") )
+			syntax = FileUtils.langXML ;
 		RDFReader r = model.getReader(syntax);
 		r.setProperty("iri-rules", "strict");
 		r.setProperty("error-mode", "strict"); // Warning will be errors.
 		r.read(model, in, BASE_URI);
 		in.close();
-		
+
 		StmtIterator iter = model.listStatements();
 		try {
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
 
-				Resource s = stmt.getSubject();
-				Resource p = stmt.getPredicate();
-				RDFNode o = stmt.getObject();
+				Resource subject = stmt.getSubject();
+				Resource predicate = stmt.getPredicate();
+				RDFNode object = stmt.getObject();
 
-				if (p.toString().equals("http://desir.icm.edu.pl/hasName")) {
-					if (actorsMap.containsKey(s.toString())) {
-						actorsMap.get(s.toString()).setName(o.toString());
-					} else {
-						Actor actor = new Actor(null, null);
-						actor.setName(o.toString());
-						actorsMap.put(s.toString(), actor);
-					}
+				switch (predicate.getURI()) {
+					case HAS_NAME:
+						if (actorsMap.containsKey(subject.getURI())) {
+							actorsMap.get(subject.getURI()).setName(object.toString());
+						} else {
+							Actor actor = new Actor(subject.getLocalName(), object.toString());
+							actorsMap.put(subject.getURI(), actor);
+						}
+						break;
+					case HAS_TITLE:
+						if (eventsMap.containsKey(subject.getURI())) {
+							eventsMap.get(subject.getURI()).setName(object.toString());
+						} else {
+							Event event = new Event(subject.getLocalName(), object.toString(), null, null);
+							event.setName(object.toString());
+							eventsMap.put(subject.getURI(), event);
+						}
+						break;
+					case IS_PART_OF:
+						PartOf relation = null;
+						if(subject.getNameSpace().equals(ACTOR_NAMESPACE)) {
+							Actor target;
+							if (actorsMap.containsKey(object.toString())) {
+								target = actorsMap.get(object.toString());
+							} else {
+								target = new Actor(object.toString(), object.toString());
+								actorsMap.put(object.toString(), target);
+							}
+							Actor actorPartOf;
+							if (actorsMap.containsKey(subject.getURI())) {
+								actorPartOf = actorsMap.get(subject.getURI());
+							} else {
+								actorPartOf = new Actor(subject.getLocalName(), object.toString());
+								actorsMap.put(subject.getURI(), actorPartOf);
+							}
+							relation = new PartOf(actorPartOf, target);
+						} else if (subject.getNameSpace().equals(EVENT_NAMESPACE)) {
+							Event target;
+							if (eventsMap.containsKey(object.toString())) {
+								target = eventsMap.get(object.toString());
+							} else {
+								target = new Event(parseIdentifier(object.toString()), object.toString(), null, null);
+								eventsMap.put(object.toString(), target);
+							}
+							Event eventPartOf;
+							if (eventsMap.containsKey(subject.getURI())) {
+								eventPartOf = eventsMap.get(subject.getURI());
+							} else {
+								eventPartOf = new Event(subject.getLocalName(), object.toString(), null, null);
+								eventsMap.put(subject.getURI(), eventPartOf);
+							}
+							relation = new PartOf(eventPartOf, target);
+						}
+						relations.add(relation);
+						partOfs.add(relation);
+						break;
+					case OCCURS:
+						SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
+						ScaledTime st = new ScaledTime();
+						st.setLocalDate(LocalDate.parse(object.toString(), YEAR_FORMATTER));
+						stPoint.setCalendarTime(st);
+						if (eventsMap.containsKey(subject.getURI())) {
+							eventsMap.get(subject.getURI()).setStartPoint(stPoint);
+							eventsMap.get(subject.getURI()).setEndPoint(stPoint);
+						} else {
+							Event event = new Event(subject.getLocalName(), object.toString(), stPoint, stPoint);
+							eventsMap.put(subject.getURI(), event);
+						}
+						break;
+					case PARTICIPATES_IN:
+						Actor actor;
+						if (actorsMap.containsKey(subject.getURI())) {
+							actor = actorsMap.get(subject.getURI());
+						} else {
+							actor = new Actor(subject.getLocalName(), object.toString());
+						}
+
+						Event event = new Event(parseIdentifier(object.toString()), object.toString(), null, null);
+						if (eventsMap.containsKey(object.toString())) {
+							event = eventsMap.get(object.toString());
+						}
+						Participation participation = new Participation(actor, event, "");
+                        relations.add(participation);
+                        participations.add(participation);
+						actorsMap.put(subject.getURI(), actor);
+						eventsMap.put(object.toString(), event);
+						break;
+					case DEPENDS_ON:
+						Event target;
+						if (eventsMap.containsKey(object.toString())) {
+							target = eventsMap.get(object.toString());
+						} else {
+							target = new Event(parseIdentifier(object.toString()), object.toString(), null, null);
+							eventsMap.put(object.toString(), target);
+						}
+						Event eventDependsOn;
+						if (eventsMap.containsKey(subject.getURI())) {
+							eventDependsOn = eventsMap.get(subject.getURI());
+						} else {
+							eventDependsOn = new Event(subject.getLocalName(), object.toString(), null, null);
+							eventsMap.put(subject.getURI(), eventDependsOn);
+						}
+						Dependency dependency = new Dependency(eventDependsOn, target);
+						dependencies.add(dependency);
+						relations.add(dependency);
+						break;
 				}
-
-				if (p.toString().equals("http://desir.icm.edu.pl/hasTitle")) {
-					if (eventsMap.containsKey(s.toString())) {
-						eventsMap.get(s.toString()).setName(o.toString());
-					} else {
-						Event event = new Event(null, null);
-						event.setName(o.toString());
-						eventsMap.put(s.toString(), event);
-					}
-				}
-				if (p.toString().equals("http://desir.icm.edu.pl/occured")) {
-
-					SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
-					ScaledTime st = new ScaledTime();
-					st.setLocalDate(LocalDate.parse(o.toString(), YEAR_FORMATTER));
-                    stPoint.setCalendarTime(st);
-					if (eventsMap.containsKey(s.toString())) {
-						eventsMap.get(s.toString()).setStartPoint(stPoint);
-						eventsMap.get(s.toString()).setEndPoint(stPoint);
-					} else {
-						Event event = new Event(stPoint, stPoint);
-						eventsMap.put(s.toString(), event);
-					}
-
-				}
-
-				if (p.toString().equals("http://desir.icm.edu.pl/participatesIn")) {
-					Actor actor = new Actor(null, null);
-					actor.setEvents(new ArrayList<Event>());
-					
-					if (actorsMap.containsKey(s.toString())) {
-						actor = actorsMap.get(s.toString());
-					}
-
-					Event event = new Event(null, null);
-					if (eventsMap.containsKey(o.toString())) {
-						event = eventsMap.get(o.toString());
-					}
-					actor.getEvents().add(event);
-					actorsMap.put(s.toString(), actor);
-					eventsMap.put(o.toString(), event);
-				}
-
 			}
 		} finally {
 			if (iter != null)
 				iter.close();
 		}
-		
-		actors = new ArrayList<Actor>(actorsMap.values());
-		events = new ArrayList<Event>(eventsMap.values());
+
+		actors = new ArrayList<>(actorsMap.values());
+		events = new ArrayList<>(eventsMap.values());
+	}
+
+	private static String parseIdentifier(String fullIdentifier) {
+		return fullIdentifier.substring(fullIdentifier.lastIndexOf("#") + 1);
 	}
 
 	@Override
@@ -140,4 +211,23 @@ public class RdfModelExtractor implements ModelBuilder {
 		return events;
 	}
 
+	@Override
+	public List<Relation> getRelations() {
+		return relations;
+	}
+
+	@Override
+	public List<PartOf> getPartOfs() {
+		return partOfs;
+	}
+
+	@Override
+	public List<Dependency> getDependencies() {
+		return dependencies;
+	}
+
+	@Override
+	public List<Participation> getParticipations() {
+		return participations;
+	}
 }

@@ -24,7 +24,6 @@ package pl.edu.icm.desir.data.wrappermodel;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import org.bibsonomy.model.PersonName;
 
 
 /**

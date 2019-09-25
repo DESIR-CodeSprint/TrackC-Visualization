@@ -20,18 +20,12 @@
  * ***** END LICENSE BLOCK ***** */
 package pl.edu.icm.desir.data.graph;
 
-import java.nio.file.FileSystemException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.bibsonomy.model.PersonName;
 
 import org.springframework.stereotype.Service;
 import pl.edu.icm.desir.ForcePlacement.ConvertDESIRtoVisNow;
@@ -45,6 +39,7 @@ import pl.edu.icm.desir.data.exchange.ModelBuilder;
 import pl.edu.icm.desir.data.model.Actor;
 import pl.edu.icm.desir.data.model.Event;
 import pl.edu.icm.desir.data.model.Participation;
+import pl.edu.icm.desir.data.model.Relation;
 import pl.edu.icm.desir.data.wrappermodel.ActorWrapper;
 import pl.edu.icm.desir.data.wrappermodel.EventWrapper;
 import pl.edu.icm.desir.data.wrappermodel.ParticipationWrapper;
@@ -64,8 +59,6 @@ import pl.edu.icm.jscic.dataarrays.DataArrayType;
 import pl.edu.icm.jscic.dataarrays.IntDataArray;
 import pl.edu.icm.jscic.dataarrays.ObjectDataArray;
 import pl.edu.icm.jscic.dataarrays.StringDataArray;
-import pl.edu.icm.visnow.lib.basic.writers.FieldWriter.FieldWriterFileFormat;
-import pl.edu.icm.visnow.lib.utils.io.VisNowFieldWriter;
 import pl.edu.icm.visnow.lib.utils.numeric.minimization.ConjugateGradientsDoublePrecision;
 import pl.edu.icm.visnow.lib.utils.numeric.minimization.ConjugateGradientsParameters;
 
@@ -78,19 +71,11 @@ public class GraphGenerator {
 	private List<Participation> generateInteractionsModel(List<Actor> actors) {
 		List<Participation> edges = new ArrayList<>();
 		for (Actor actor : actors) {
-			for (Event event : actor.getEvents()) {
-                boolean found = false;
-                for(Participation edge : edges) {
-                    if(edge.getActor().getName().equals(actor.getName()) && 
-                        edge.getEvent().getName().equals(event.getName())) {
-                        found = true;
-                        break;
-                    }  
-                }
-                if(!found) {
-                    Participation relation = new Participation(actor, event, "");
-                    edges.add(relation);
-                }
+			for (Relation relation : actor.getRelations()) {
+				if(relation instanceof Participation) {
+					((Participation) relation).setRole("author");
+					edges.add((Participation) relation);
+				}
 			}
 		}
 		return edges;

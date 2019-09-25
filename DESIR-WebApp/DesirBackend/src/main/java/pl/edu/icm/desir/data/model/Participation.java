@@ -38,8 +38,7 @@ public class Participation extends Relation {
 	
 	
 	public Participation(Actor actor, Event event, String role) {
-		super();
-        this.id = "Participation"+(objectsCounter++);
+		super(actor, event);
 		this.actor = actor;
 		this.event = event;
 		this.role = role;

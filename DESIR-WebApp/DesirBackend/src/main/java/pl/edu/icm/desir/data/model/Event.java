@@ -8,7 +8,7 @@ package pl.edu.icm.desir.data.model;
  * points might be empty to represent events that have undefined start or end.
  * Needs a type common name that is a descriptive string what type of event 
  * this is (e.g. marriage, birth, publication, dialogue).
- * 
+ *
  * @author blazejc
  *
  */
@@ -16,17 +16,16 @@ public class Event extends Entity {
     
     private static long objectsCounter = 0;
 
-	String type;
-	
-	public Event(SpatiotemporalPoint startPoint, SpatiotemporalPoint endPoint) {
-		super(startPoint, endPoint);
-        this.id = "Event"+(objectsCounter++);
+	private String type;
+
+	public Event(String identifier, String name, SpatiotemporalPoint startPoint, SpatiotemporalPoint endPoint) {
+		super(identifier, name, startPoint, endPoint);
 	}
 
 	public boolean isMomentary() {
 		return false;
 	}
-	
+
 	public boolean isLasting() {
 		return false;
 	}
@@ -44,11 +43,11 @@ public class Event extends Entity {
 		this.type = type;
 	}
 
-    @Override
-    public float toFloat()
-    {
-        return 0;
-    }
-	
-	
+	@Override
+	public float toFloat()
+	{
+		return 0;
+	}
+
+
 }

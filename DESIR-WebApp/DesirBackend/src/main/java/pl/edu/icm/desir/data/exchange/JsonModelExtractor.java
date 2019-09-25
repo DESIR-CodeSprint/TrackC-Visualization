@@ -24,10 +24,7 @@ import org.bibsonomy.rest.renderer.RendererFactory;
 import org.bibsonomy.rest.renderer.RenderingFormat;
 import org.bibsonomy.rest.renderer.UrlRenderer;
 
-import pl.edu.icm.desir.data.model.Actor;
-import pl.edu.icm.desir.data.model.Event;
-import pl.edu.icm.desir.data.model.ScaledTime;
-import pl.edu.icm.desir.data.model.SpatiotemporalPoint;
+import pl.edu.icm.desir.data.model.*;
 import pl.edu.icm.desir.data.utils.DataUtils;
 
 public class JsonModelExtractor implements ModelBuilder {
@@ -48,20 +45,20 @@ public class JsonModelExtractor implements ModelBuilder {
 
 	@Override
 	public void parseInputData(InputStream in) throws IOException {
-        final RenderingFormat renderingFormat;
-        final UrlRenderer urlRenderer = new UrlRenderer("");
-        final RendererFactory rendererFactory = new RendererFactory(urlRenderer);
-        renderingFormat = RenderingFormat.JSON;
+		final RenderingFormat renderingFormat;
+		final UrlRenderer urlRenderer = new UrlRenderer("");
+		final RendererFactory rendererFactory = new RendererFactory(urlRenderer);
+		renderingFormat = RenderingFormat.JSON;
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(in, "utf-8"));
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(in, "utf-8"));
 
-        try {
-        	List<Post<? extends Resource>> posts =  rendererFactory.getRenderer(renderingFormat).parsePostList(reader, NoDataAccessor.getInstance());
-        	generateModelFromPosts(posts);
-        } catch (final InternServerException ex) {
-            reader.close();
-            throw new BadRequestOrResponseException(ex);
-        }
+		try {
+			List<Post<? extends Resource>> posts =  rendererFactory.getRenderer(renderingFormat).parsePostList(reader, NoDataAccessor.getInstance());
+			generateModelFromPosts(posts);
+		} catch (final InternServerException ex) {
+			reader.close();
+			throw new BadRequestOrResponseException(ex);
+		}
 
 	}
 
@@ -75,15 +72,34 @@ public class JsonModelExtractor implements ModelBuilder {
 		return events;
 	}
 
+	@Override
+	public List<Relation> getRelations() {
+		return null;
+	}
 
-    private void generateModelFromPosts(List<Post<? extends Resource>> posts) {
+	@Override
+	public List<PartOf> getPartOfs() {
+		return null;
+	}
+
+	@Override
+	public List<Dependency> getDependencies() {
+		return null;
+	}
+
+	@Override
+	public List<Participation> getParticipations() {
+		return null;
+	}
+
+	private void generateModelFromPosts(List<Post<? extends Resource>> posts) {
 
 		Map<String, Actor> actorsMap = new HashMap<String, Actor>();
 		Map<Post<BibTex>, Event> eventsMap = new HashMap<Post<BibTex>, Event>();
-    	
-    	actors = new ArrayList<>();
-        for (final Post<? extends Resource> apost : posts) {
-        	Post<BibTex> post = (Post<BibTex>) apost; 
+
+		actors = new ArrayList<>();
+		for (final Post<? extends Resource> apost : posts) {
+			Post<BibTex> post = (Post<BibTex>) apost;
             if(post.getResource().getAuthor().size() == 0)
                 continue;
             String title = post.getResource().getTitle();
@@ -97,30 +113,28 @@ public class JsonModelExtractor implements ModelBuilder {
             if(found)
                 continue;
             
-        	SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
+			SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 			ScaledTime st = new ScaledTime();
 			st.setLocalDate(LocalDate.parse(post.getResource().getYear(), YEAR_FORMATTER));
             stPoint.setCalendarTime(st);
-			Event event = new Event(stPoint, stPoint);
-			event.setName(post.getResource().getTitle());
+			Event event = new Event(DataUtils.createHashWithTimestamp(title),
+                                    title, stPoint, stPoint);
 			eventsMap.put(post, event);
-            for (PersonName personName:post.getResource().getAuthor()) {
-                String name = personName.getFirstName() + " " + personName.getLastName();
-            	if (actorsMap.containsKey(name)) {
-            		Actor actor = actorsMap.get(name);
-            		actor.getEvents().add(event);
-            	} else {
-                    Actor actor = new Actor(null, null);
-                    actor.setName(name);
-                    actor.setEvents(new ArrayList<Event>());
-                    actor.getEvents().add(event);
-                    actorsMap.put(name, actor);
+			for (PersonName personName:post.getResource().getAuthor()) {
+                Actor actor;
+				String name = personName.getFirstName() + " " + personName.getLastName();
+				if (actorsMap.containsKey(name)) {
+					actor = actorsMap.get(name);
+				} else {
+                    actor = new Actor(DataUtils.createHashWithTimestamp(name), name);
                 }
-            }
-        }
+				Participation participation = new Participation(actor, event, "");
+				actorsMap.put(name, actor);
+			}
+		}
 		actors = new ArrayList<Actor>(actorsMap.values());
 		events = new ArrayList<Event>(eventsMap.values());
 
-    }
+	}
 
 }

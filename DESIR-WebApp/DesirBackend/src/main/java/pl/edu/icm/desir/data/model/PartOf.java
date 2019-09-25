@@ -24,12 +24,11 @@ public class PartOf extends Relation {
 	Date end;
 	
 	String role;
-    
-    public PartOf() {
-        super();
-        this.id = "PartOf"+(objectsCounter++);
-    }
-	
+
+	public PartOf(Entity subject, Entity targetObject) {
+		super(subject, targetObject);
+	}
+
 	@Override
 	String getType() {
 		return PARTOF_TYPE;
