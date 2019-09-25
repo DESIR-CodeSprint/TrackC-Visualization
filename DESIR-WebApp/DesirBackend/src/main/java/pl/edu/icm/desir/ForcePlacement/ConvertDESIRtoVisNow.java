@@ -68,23 +68,23 @@ public class ConvertDESIRtoVisNow
         
         IrregularField outField = new IrregularField(nNodes);
         float[] coords = new float[3 * nNodes];
-        String[] authNames = new String[nNodes];
-        String[] docNames = new String[nNodes];
+        String[] actorNames = new String[nNodes];
+        String[] eventNames = new String[nNodes];
         int[] ranges = new int[nNodes];
         int[] itemIndices =  new int[nNodes];
         
-        Arrays.fill(authNames, "");
-        Arrays.fill(docNames, "");
+        Arrays.fill(actorNames, "");
+        Arrays.fill(eventNames, "");
         
         float tmin =  Float.MAX_VALUE;
         float tmax = -Float.MAX_VALUE;
         
         
         for (EventWrapper event: events) {
-            int iPub = event.getEventIndex();
-            coords[3 * iPub] =  coords[3 * iPub + 1] = 0;      // will be set to the center of actors
+            int iEvent = event.getEventIndex();
+            coords[3 * iEvent] =  coords[3 * iEvent + 1] = 0;      // will be set to the center of actors
             float t = event.getEntryTime();
-            coords[3 * iPub + 2] = t;
+            coords[3 * iEvent + 2] = t;
             tmin = Math.min(tmin, t);
             tmax = Math.max(tmax, t);
             String[] words = event.getName().split(" ");
@@ -99,23 +99,23 @@ public class ConvertDESIRtoVisNow
                 }
                 tBuilder.append(word + blank);
             }
-            docNames[iPub]    = tBuilder.toString();
-            ranges[iPub]      = event.getActors().size();
-            itemIndices[iPub] = iPub;
+            eventNames[iEvent]    = tBuilder.toString();
+            ranges[iEvent]      = event.getActors().size();
+            itemIndices[iEvent] = iEvent;
         }
         
         int[] participationEdges = new int[2 * nParticipations];
         int edge = 0;
         for (ParticipationWrapper participation : participations) {
             int iNode = nEvents + participation.getParticipationIndex();
-            int iAuth = participation.getActor().getActorIndex();
-            int iDoc  = participation.getEvent().getEventIndex();
+            int iActor = participation.getActor().getActorIndex();
+            int iEvent  = participation.getEvent().getEventIndex();
             for (int i = 0; i < 2; i++) {
-                coords[3 * iDoc + i]  = eventCoords[2 * iDoc + i];
-                coords[3 * iNode + i] = actorCoords[2 * iAuth + i];
+                coords[3 * iEvent + i]  = eventCoords[2 * iEvent + i];
+                coords[3 * iNode + i] = actorCoords[2 * iActor + i];
             }
             coords[3 * iNode + 2] = participation.getEvent().getEntryTime();
-            participationEdges[2 * edge] = iDoc;
+            participationEdges[2 * edge] = iEvent;
             participationEdges[2 * edge + 1] = iNode;
             edge += 1;
         }
@@ -125,23 +125,23 @@ public class ConvertDESIRtoVisNow
         int timelineEdge = 0;
         int iAuth = 0;
         for (ActorWrapper actor : actors) {
-            ParticipationWrapper[] cv = new ParticipationWrapper[actor.getParticipations().size()];
-            actor.getParticipations().toArray(cv);
-            if (cv.length > 1) {
-                Arrays.sort(cv);
-                itemIndices[nEvents + cv[0].getParticipationIndex()] = nEvents + cv[0].getParticipationIndex();
-                for (int i = 1; i < cv.length; i++) {
-                    actorsTimelineEdges[2 * timelineEdge]     = nEvents + cv[i - 1].getParticipationIndex();
-                    actorsTimelineEdges[2 * timelineEdge + 1] = nEvents + cv[i].getParticipationIndex();
+            ParticipationWrapper[] particips = new ParticipationWrapper[actor.getParticipations().size()];
+            actor.getParticipations().toArray(particips);
+            if (particips.length > 1) {
+                Arrays.sort(particips);
+                itemIndices[nEvents + particips[0].getParticipationIndex()] = nEvents + particips[0].getParticipationIndex();
+                for (int i = 1; i < particips.length; i++) {
+                    actorsTimelineEdges[2 * timelineEdge]     = nEvents + particips[i - 1].getParticipationIndex();
+                    actorsTimelineEdges[2 * timelineEdge + 1] = nEvents + particips[i].getParticipationIndex();
                     timelineEdge += 1;
-                    itemIndices[nEvents + cv[i].getParticipationIndex()] = nEvents + cv[0].getParticipationIndex();
+                    itemIndices[nEvents + particips[i].getParticipationIndex()] = nEvents + particips[0].getParticipationIndex();
                 }
             }
             else
-                itemIndices[nEvents + cv[0].getParticipationIndex()] = nEvents + cv[0].getParticipationIndex();
+                itemIndices[nEvents + particips[0].getParticipationIndex()] = nEvents + particips[0].getParticipationIndex();
             
-            authNames[nEvents + cv[0].getParticipationIndex()] = cv[0].getActor().getActorName();
-            authSetNodes[iAuth] = nEvents + cv[0].getParticipationIndex();
+            actorNames[nEvents + particips[0].getParticipationIndex()] = particips[0].getActor().getActorName();
+            authSetNodes[iAuth] = nEvents + particips[0].getParticipationIndex();
             iAuth += 1;
         }
         
@@ -149,9 +149,10 @@ public class ConvertDESIRtoVisNow
             coords[3 * i + 2] = 10 * (coords[3 * i + 2] - tmin) / (tmax - tmin);
         outField.setCurrentCoords(new FloatLargeArray(coords));
         
-        outField.addComponent(DataArray.create(authNames, 1, "actor name"));
-        outField.addComponent(DataArray.create(docNames, 1, "event name"));
+        outField.addComponent(DataArray.create(actorNames, 1, "actor_name"));
+        outField.addComponent(DataArray.create(eventNames, 1, "event_name"));
         outField.addComponent(DataArray.create(ranges, 1, "range"));
+        outField.addComponent(DataArray.create(itemIndices, 1, "item_index"));
         outField.setUserData(new String[] {String.format("%3d actors %3d events", nActors, nEvents)});
         
         CellSet participationCS = new CellSet("participations");
