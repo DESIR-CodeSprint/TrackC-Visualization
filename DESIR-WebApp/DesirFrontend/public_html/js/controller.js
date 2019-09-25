@@ -14,6 +14,7 @@ var eventPointsObject;
 var eventLinesObjects = [];
 var eventPointsGeometry;
 var participLinesObjects = [];
+var participQuadObjects = [];
 var raycaster;
 var currentIntersectedPoint;
 var currentIntersectedPointIndex;
@@ -454,6 +455,11 @@ function draw3D() {
             scene.remove(participLinesObjects[i]);
         participLinesObjects = [];
     }
+    if (participQuadObjects !== undefined) {
+        for (var i = 0; i < participQuadObjects.length; i++)
+            scene.remove(participQuadObjects[i]);
+        participQuadObjects = [];
+    }
     
     
     
@@ -651,10 +657,34 @@ function createRelationsParticipationGeometry() {
     
     //lasting participation - quads
     if(quads !== null && quads !== undefined) {
-        //TBD
-        
-        //draw a quad
-        
+  
+        var nQuads = quads.length/4;
+        var qi1, qi2, qi3, qi4;
+        for (var i = 0; i < nQuads; i++) {
+            qi0 = quads[4*i];
+            qi1 = quads[4*i+1];
+            qi2 = quads[4*i+2];
+            qi3 = quads[4*i+3];
+            
+            var quadGeometry = new THREE.Geometry();
+            quadGeometry.vertices.push(new THREE.Vector3(coords[3*qi0],coords[3*qi0+1],coords[3*qi0+2]));
+            quadGeometry.vertices.push(new THREE.Vector3(coords[3*qi1],coords[3*qi1+1],coords[3*qi1+2]));
+            quadGeometry.vertices.push(new THREE.Vector3(coords[3*qi2],coords[3*qi2+1],coords[3*qi2+2]));
+            quadGeometry.vertices.push(new THREE.Vector3(coords[3*qi3],coords[3*qi3+1],coords[3*qi3+2]));
+
+            quadGeometry.faces.push(new THREE.Face3(0, 2, 1));
+            quadGeometry.faces.push(new THREE.Face3(1, 2, 3));
+            quadGeometry.computeFaceNormals();
+            
+            var quadMaterial = new THREE.MeshBasicMaterial({
+                color: 0x999999,
+                side: THREE.DoubleSide
+            });
+            var quadObject = new THREE.Mesh(quadGeometry, quadMaterial);
+
+            participQuadObjects.push(quadObject);
+            scene.add(quadObject);
+        }
     }      
 }
 

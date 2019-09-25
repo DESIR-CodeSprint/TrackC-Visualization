@@ -85,16 +85,16 @@ public class Controller
 
             //year 2
             -1.0f,  0.0f,  6.0f, //A1Y2v 4
-             0.0f,  0.0f,  6.0f, //E3Y2s 5
+             0.0f,  0.5f,  6.0f, //E3Y2s 5
 
             //year 3        
              1.0f,  0.0f,  4.0f, //A2Y1v 6
-             0.0f,  0.0f,  4.0f, //E3Y2v 7
+             0.0f,  0.5f,  4.0f, //E3Y2v 7
              
             //year 4
             -1.0f,  0.0f,  2.0f, //A1Y2v 8
              1.0f,  0.0f,  2.0f, //A2Y1v 9
-             0.0f,  0.0f,  2.0f, //E3Y2e 10
+             0.0f,  0.5f,  2.0f, //E3Y2e 10
              
             //year 5
             -1.0f,  0.0f,  0.0f, //A1Y1e 11
