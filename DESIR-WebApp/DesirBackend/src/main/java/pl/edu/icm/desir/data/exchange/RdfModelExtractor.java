@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
@@ -23,10 +24,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.FileUtils;
 
 import org.apache.log4j.Logger;
-import pl.edu.icm.desir.data.model.Actor;
-import pl.edu.icm.desir.data.model.Event;
-import pl.edu.icm.desir.data.model.ScaledTime;
-import pl.edu.icm.desir.data.model.SpatiotemporalPoint;
+import pl.edu.icm.desir.data.model.*;
 
 public class RdfModelExtractor implements ModelBuilder {
 
@@ -35,6 +33,7 @@ public class RdfModelExtractor implements ModelBuilder {
 	private static final String EVENT_NAMESPACE = "http://desir.icm.edu.pl/event#";
 	private static final String HAS_NAME = "http://desir.icm.edu.pl/hasName";
 	private static final String HAS_TITLE = "http://desir.icm.edu.pl/hasTitle";
+	private static final String PART_OF = "http://desir.icm.edu.pl/partOf";
 	private static final String OCCURRED = "http://desir.icm.edu.pl/occurred";
 	private static final String PARTICIPATES_IN = "http://desir.icm.edu.pl/participatesIn";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
@@ -44,17 +43,25 @@ public class RdfModelExtractor implements ModelBuilder {
 			.toFormatter();
 	private List<Actor> actors;
 	private List<Event> events;
+	private List<Relation> relations;
+	private List<PartOf> partOfs;
+	private List<Dependency> dependencies;
+	private List<Participation> participations;
 	private String filename;
 	private static final Logger LOG = Logger.getLogger(RdfModelExtractor.class);
 
 	public RdfModelExtractor(String filename) {
 		this.filename = filename;
+		this.relations = new ArrayList<Relation>();
+		this.partOfs = new ArrayList<PartOf>();
 	}
 
 	public void parseInputData(InputStream in) throws IOException {
 
 		Map<String, Actor> actorsMap = new HashMap<>();
 		Map<String, Event> eventsMap = new HashMap<>();
+		Map<String, Dependency> dependenciesMap = new HashMap<>();
+		Map<String, Participation> participationsMap = new HashMap<>();
 
 		Model model = ModelFactory.createDefaultModel();
 		String syntax = FileUtils.guessLang(filename) ;
@@ -92,6 +99,25 @@ public class RdfModelExtractor implements ModelBuilder {
 							event.setName(object.toString());
 							eventsMap.put(subject.getURI(), event);
 						}
+						break;
+					case PART_OF:
+						Actor target;
+						if (actorsMap.containsKey(object.toString())) {
+							target = actorsMap.get(object.toString());
+						} else {
+							target = new Actor(object.toString(), object.toString());
+							actorsMap.put(subject.getURI(), target);
+						}
+						Actor actorPartOf;
+						if (actorsMap.containsKey(subject.getURI())) {
+							actorPartOf = actorsMap.get(subject.getURI());
+						} else {
+							actorPartOf = new Actor(subject.getLocalName(), object.toString());
+							actorsMap.put(subject.getURI(), actorPartOf);
+						}
+						PartOf relation = new PartOf(actorPartOf, target);
+						relations.add(relation);
+						partOfs.add(relation);
 						break;
 					case OCCURRED:
 						SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
@@ -141,5 +167,25 @@ public class RdfModelExtractor implements ModelBuilder {
 	@Override
 	public List<Event> getEvents() {
 		return events;
+	}
+
+	@Override
+	public List<Relation> getRelations() {
+		return relations;
+	}
+
+	@Override
+	public List<PartOf> getPartOfs() {
+		return partOfs;
+	}
+
+	@Override
+	public List<Dependency> getDependencies() {
+		return dependencies;
+	}
+
+	@Override
+	public List<Participation> getParticipations() {
+		return participations;
 	}
 }

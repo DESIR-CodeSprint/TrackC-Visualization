@@ -37,7 +37,7 @@ public class Participation extends Relation {
 	
 	
 	public Participation(Actor actor, Event event, String role) {
-		super();
+		super(actor, event);
 		this.actor = actor;
 		this.event = event;
 		this.role = role;

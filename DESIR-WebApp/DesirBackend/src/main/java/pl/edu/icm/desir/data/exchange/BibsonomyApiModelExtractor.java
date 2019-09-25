@@ -19,10 +19,7 @@ import org.bibsonomy.model.enums.Order;
 import org.bibsonomy.model.logic.LogicInterface;
 import org.bibsonomy.rest.client.RestLogicFactory;
 
-import pl.edu.icm.desir.data.model.Actor;
-import pl.edu.icm.desir.data.model.Event;
-import pl.edu.icm.desir.data.model.ScaledTime;
-import pl.edu.icm.desir.data.model.SpatiotemporalPoint;
+import pl.edu.icm.desir.data.model.*;
 import pl.edu.icm.desir.data.utils.DataUtils;
 
 public class BibsonomyApiModelExtractor implements ModelBuilder {
@@ -84,6 +81,25 @@ public class BibsonomyApiModelExtractor implements ModelBuilder {
 		return events;
 	}
 
+	@Override
+	public List<Relation> getRelations() {
+		return null;
+	}
+
+	@Override
+	public List<PartOf> getPartOfs() {
+		return null;
+	}
+
+	@Override
+	public List<Dependency> getDependencies() {
+		return null;
+	}
+
+	@Override
+	public List<Participation> getParticipations() {
+		return null;
+	}
 
 	private void generateModelFromPosts(List<Post<BibTex>> posts) {
 

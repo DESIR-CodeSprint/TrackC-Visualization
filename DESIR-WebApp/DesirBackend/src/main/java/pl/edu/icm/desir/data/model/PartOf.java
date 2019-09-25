@@ -23,7 +23,11 @@ public class PartOf extends Relation {
 	Date end;
 	
 	String role;
-	
+
+	public PartOf(Entity subject, Entity targetObject) {
+		super(subject, targetObject);
+	}
+
 	@Override
 	String getType() {
 		return PARTOF_TYPE;

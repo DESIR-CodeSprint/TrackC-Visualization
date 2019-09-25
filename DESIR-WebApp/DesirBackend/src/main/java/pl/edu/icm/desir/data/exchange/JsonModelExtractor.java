@@ -20,10 +20,7 @@ import org.bibsonomy.rest.renderer.RendererFactory;
 import org.bibsonomy.rest.renderer.RenderingFormat;
 import org.bibsonomy.rest.renderer.UrlRenderer;
 
-import pl.edu.icm.desir.data.model.Actor;
-import pl.edu.icm.desir.data.model.Event;
-import pl.edu.icm.desir.data.model.ScaledTime;
-import pl.edu.icm.desir.data.model.SpatiotemporalPoint;
+import pl.edu.icm.desir.data.model.*;
 import pl.edu.icm.desir.data.utils.DataUtils;
 
 public class JsonModelExtractor implements ModelBuilder {
@@ -65,6 +62,25 @@ public class JsonModelExtractor implements ModelBuilder {
 		return events;
 	}
 
+	@Override
+	public List<Relation> getRelations() {
+		return null;
+	}
+
+	@Override
+	public List<PartOf> getPartOfs() {
+		return null;
+	}
+
+	@Override
+	public List<Dependency> getDependencies() {
+		return null;
+	}
+
+	@Override
+	public List<Participation> getParticipations() {
+		return null;
+	}
 
 	private void generateModelFromPosts(List<Post<? extends Resource>> posts) {
 

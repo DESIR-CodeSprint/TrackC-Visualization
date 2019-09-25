@@ -21,7 +21,11 @@ public class Dependency extends Relation {
 	static final String DEPENDENCY_TYPE = "dependency";
 	
 	List<Entity> entities;
-	
+
+	public Dependency(Entity subject, Entity targetObject) {
+		super(subject, targetObject);
+	}
+
 	@Override
 	String getType() {
 		return DEPENDENCY_TYPE;
