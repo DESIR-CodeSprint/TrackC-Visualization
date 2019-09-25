@@ -17,8 +17,6 @@ var participLinesObjects = [];
 var raycaster;
 var currentIntersectedPoint;
 var currentIntersectedPointIndex;
-var lastIntersectedPoint;
-var lastIntersectedPointIndex;
 var currentIntersectedLine;
 var currentIntersectedLineIndex;
 var mouse;
@@ -191,11 +189,40 @@ function onDocumentMouseMove(event) {
     mousePos.innerHTML = mouse.x + ", " + mouse.y;
 
     raycaster.setFromCamera(mouse, camera);
-
-    if (currentIntersectedPointIndex >= 0) {
-        lastIntersectedPoint = currentIntersectedPoint;
-        lastIntersectedPointIndex = currentIntersectedPointIndex;
+    
+    //clear line hover if present 
+    if (currentIntersectedLine !== undefined) {
+        currentIntersectedLine.material.linewidth = 1;
+        currentIntersectedLine.material.color = new THREE.Color(0x999999);
     }
+    currentIntersectedLine = undefined;
+    currentIntersectedLineIndex = -1;
+    
+    //clear point hover if present 
+    if (currentIntersectedPointIndex >= 0 && isActorNode(currentIntersectedPointIndex)) {
+        var color;
+        if (nodeSelection[currentIntersectedPointIndex] === 0) {
+            color = cActorDefaultColor;
+        } else {
+            color = cActorSelectedColor;
+        }
+        color.toArray(actorPointsGeometry.attributes.ca.array, currentIntersectedPointIndex * 3);
+        actorPointsGeometry.attributes.ca.needsUpdate = true;
+    }
+    if (currentIntersectedPointIndex >= 0 && isEventNode(currentIntersectedPointIndex)) {
+        var color;
+        if (nodeSelection[currentIntersectedPointIndex] === 0) {
+            color = cEventDefaultColor;
+        } else {
+            color = cEventSelectedColor;
+        }
+        color.toArray(eventPointsGeometry.attributes.ca.array, currentIntersectedPointIndex * 3);
+        eventPointsGeometry.attributes.ca.needsUpdate = true;
+    }
+    currentIntersectedPoint = undefined;
+    currentIntersectedPointIndex = -1;
+                
+    
     
     
     //TODO
@@ -237,16 +264,8 @@ function onDocumentMouseMove(event) {
                 intersectionFound = true;
         }
         if (intersectionFound) { //this is what happens when a node is pointed with a mouse
-            if (currentIntersectedLine !== undefined) {
-                currentIntersectedLine.material.linewidth = 1;
-                currentIntersectedLine.material.color = new THREE.Color(0x999999);
-            }
-            currentIntersectedLine = undefined;
-            currentIntersectedLineIndex = -1;
-
             currentIntersectedPoint = intersects[imin].object;
             currentIntersectedPointIndex = intersects[imin].index;
-
             cActorHoverColor.toArray(actorPointsGeometry.attributes.ca.array, currentIntersectedPointIndex * 3);
             actorPointsGeometry.attributes.ca.needsUpdate = true;
 
@@ -270,18 +289,6 @@ function onDocumentMouseMove(event) {
 
             mouseText.style.visibility = 'visible';
         } else {
-            currentIntersectedPoint = undefined;
-            currentIntersectedPointIndex = -1;
-            if (lastIntersectedPointIndex >= 0 && isActorNode(lastIntersectedPointIndex)) {
-                var color;
-                if (nodeSelection[lastIntersectedPointIndex] === 0) {
-                    color = cActorDefaultColor;
-                } else {
-                    color = cActorSelectedColor;
-                }
-                color.toArray(actorPointsGeometry.attributes.ca.array, lastIntersectedPointIndex * 3);
-                actorPointsGeometry.attributes.ca.needsUpdate = true;
-            }
             mouseText.style.visibility = 'hidden';
         }
     }
@@ -316,16 +323,8 @@ function onDocumentMouseMove(event) {
                 intersectionFound = true;
         }
         if (intersectionFound) { //this is what happens when a node is pointed with a mouse
-            if (currentIntersectedLine !== undefined) {
-                currentIntersectedLine.material.linewidth = 1;
-                currentIntersectedLine.material.color = new THREE.Color(0x999999);
-            }
-            currentIntersectedLine = undefined;
-            currentIntersectedLineIndex = -1;
-
             currentIntersectedPoint = intersects[imin].object;
             currentIntersectedPointIndex = intersects[imin].index;
-
             cEventHoverColor.toArray(eventPointsGeometry.attributes.ca.array, currentIntersectedPointIndex * 3);
             eventPointsGeometry.attributes.ca.needsUpdate = true;
 
@@ -349,28 +348,12 @@ function onDocumentMouseMove(event) {
 
             mouseText.style.visibility = 'visible';
         } else {
-            currentIntersectedPoint = undefined;
-            currentIntersectedPointIndex = -1;
-            if (lastIntersectedPointIndex >= 0 && isEventNode(lastIntersectedPointIndex)) {
-                var color;
-                if (nodeSelection[lastIntersectedPointIndex] === 0) {
-                    color = cEventDefaultColor;
-                } else {
-                    color = cEventSelectedColor;
-                }
-                color.toArray(eventPointsGeometry.attributes.ca.array, lastIntersectedPointIndex * 3);
-                eventPointsGeometry.attributes.ca.needsUpdate = true;
-            }
             mouseText.style.visibility = 'hidden';
         }
     }    
 
     //====================== find intersections with actor lines ========================
     if (!intersectionFound && actorLinesObjects !== undefined) {
-        if (currentIntersectedLine !== undefined) {
-            currentIntersectedLine.material.linewidth = 1;
-            currentIntersectedLine.material.color = new THREE.Color(0x999999);
-        }
         intersects = raycaster.intersectObjects(actorLinesObjects);
         if (intersects.length > 0) {
             currentIntersectedLine = intersects[ 0 ].object;
@@ -404,22 +387,12 @@ function onDocumentMouseMove(event) {
 
             mouseText.style.visibility = 'visible';
         } else {
-            if (currentIntersectedLine !== undefined) {
-                currentIntersectedLine.material.linewidth = 1;
-                currentIntersectedLine.material.color = new THREE.Color(0x999999);
-            }
-            currentIntersectedLine = undefined;
-            currentIntersectedLineIndex = -1;
             mouseText.style.visibility = 'hidden';
         }
     }
 
     //====================== find intersections with event lines ========================
     if (!intersectionFound && eventLinesObjects !== undefined) {
-        if (currentIntersectedLine !== undefined) {
-                currentIntersectedLine.material.linewidth = 1;
-                currentIntersectedLine.material.color = new THREE.Color(0x999999);
-        }
         intersects = raycaster.intersectObjects(eventLinesObjects);
         if (intersects.length > 0) {
             currentIntersectedLine = intersects[ 0 ].object;
@@ -453,62 +426,10 @@ function onDocumentMouseMove(event) {
 
             mouseText.style.visibility = 'visible';
         } else {
-            if (currentIntersectedLine !== undefined) {
-                currentIntersectedLine.material.linewidth = 1;
-                currentIntersectedLine.material.color = new THREE.Color(0x999999);
-            }
-            currentIntersectedLine = undefined;
-            currentIntersectedLineIndex = -1;
             mouseText.style.visibility = 'hidden';
         }
     }
 
-// so far we have no data on participation segments so commented out    
-//    //====================== find intersections with participation lines ========================
-//    if (!intersectionFound && participLinesObjects !== undefined) {
-//        intersects = raycaster.intersectObjects(participLinesObjects);
-//        if (intersects.length > 0) {
-//            currentIntersectedLine = intersects[ 0 ].object;
-//            for (var i = 0; i < participLinesObjects.length; i++) {
-//                if (participLinesObjects[i] === currentIntersectedLine) {
-//                    currentIntersectedLineIndex = participSegmentIndices[i];           
-//                    break;
-//                }
-//            }
-//            intersectionFound = true;
-//        }
-//        if(intersectionFound) {
-//            currentIntersectedLine.material.linewidth = 10;
-//            currentIntersectedLine.material.color = new THREE.Color(0x990000);
-//            if (segmentDataIDs !== undefined && currentIntersectedLineIndex >= 0 && currentIntersectedLineIndex < segmentDataIDs.length) {
-//                mouseText.innerHTML = "" + segmentDataIDs[currentIntersectedLineIndex];
-//
-////                if (edgeMetadata !== undefined && edgeMetadata !== null) {
-////                    var md = edgeMetadata[currentIntersectedLineIndex];
-////                    if (md !== null && md !== "") {
-////                        var mdMap = new Map(Object.entries(JSON.parse(md)));
-////                        for (let [k, v] of mdMap) {
-////                            mouseText.innerHTML = mouseText.innerHTML + "<br>" + k + "=" + v;
-////                        }
-////                    }
-////                }
-//
-//            } else {
-//                mouseText.innerHTML = "no data";
-//            }
-//
-//            mouseText.style.visibility = 'visible';
-//        } else {
-//            if (currentIntersectedLine !== undefined) {
-//                currentIntersectedLine.material.linewidth = 1;
-//                currentIntersectedLine.material.color = new THREE.Color(0x999999);
-//            }
-//            currentIntersectedLine = undefined;
-//            currentIntersectedLineIndex = -1;
-//            mouseText.style.visibility = 'hidden';
-//        }
-//    }    
-    
     render();
 }
 
@@ -1081,7 +1002,7 @@ function barcharts() {
 function isActorNode(index) {
     if(actorNodeIndices !== null) {
         for (var i = 0; i < actorNodeIndices.length; i++) {
-            if(actorNodeIndices[i] == index)
+            if(actorNodeIndices[i] === index)
                 return true;
         }
     }
@@ -1091,7 +1012,7 @@ function isActorNode(index) {
 function isEventNode(index) {
     if(eventNodeIndices !== null) {
         for (var i = 0; i < eventNodeIndices.length; i++) {
-            if(eventNodeIndices[i] == index)
+            if(eventNodeIndices[i] === index)
                 return true;
         }
     }
