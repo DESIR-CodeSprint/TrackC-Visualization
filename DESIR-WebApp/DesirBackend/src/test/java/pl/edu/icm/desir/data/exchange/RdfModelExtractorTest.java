@@ -1,7 +1,11 @@
 package pl.edu.icm.desir.data.exchange;
 
-import static org.junit.Assert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.util.ResourceUtils;
+import pl.edu.icm.desir.data.model.Actor;
+import pl.edu.icm.desir.data.model.Event;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +20,8 @@ import org.springframework.util.ResourceUtils;
 import pl.edu.icm.desir.data.model.Actor;
 import pl.edu.icm.desir.data.model.Event;
 import pl.edu.icm.desir.data.model.Relation;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 public class RdfModelExtractorTest {
 
@@ -64,6 +70,8 @@ public class RdfModelExtractorTest {
         Assert.assertEquals("e2", events.get(1).getId());
         Assert.assertEquals("Very Interesting Article B on the Exemplary RDF Format", events.get(1).getName());
         Assert.assertEquals(2003, events.get(1).getStartPoint().getCalendarTime().getLocalDate().getYear());
+        Assert.assertEquals(1, events.get(1).getRelations().size());
+        Assert.assertEquals("e1", events.get(1).getRelations().get(0).getTargetObject().getId());
 
         Assert.assertEquals("e1", events.get(2).getId());
         Assert.assertEquals("Very Interesting Article A on the Exemplary RDF Format", events.get(2).getName());
@@ -76,6 +84,9 @@ public class RdfModelExtractorTest {
         Assert.assertEquals("e3", events.get(4).getId());
         Assert.assertEquals("Not So Interesting Article C on Something Else", events.get(4).getName());
         Assert.assertEquals(2007, events.get(4).getStartPoint().getCalendarTime().getLocalDate().getYear());
+        Assert.assertEquals(2, events.get(4).getRelations().size());
+        Assert.assertEquals("e2", events.get(4).getRelations().get(0).getTargetObject().getId());
+        Assert.assertEquals("e1", events.get(4).getRelations().get(1).getTargetObject().getId());
     }
 
 	@Test
@@ -137,6 +148,21 @@ public class RdfModelExtractorTest {
             	return relation.getSubject().getId().equals("dep1") && relation.getTargetObject().getId().equals("univ1");
             }
 		 });
+
+//		Actor foundActor1 = extractor.getActors().get(extractor.getActors().indexOf(actor1));
+//		assertTrue(foundActor1.getId() + " has wrong participation size: " + foundActor1.getParticipation().size(), foundActor1.getParticipation().size() == 2);
+//		assertTrue(foundActor1.getId() + " does not contain " + event1.getId(), foundActor1.getParticipation().contains(event1));
+//		assertTrue(foundActor1.getId() + "does not contain" + event2.getId(), foundActor1.getParticipation().contains(event2));
+//
+//		Actor foundActor2 = extractor.getActors().get(extractor.getActors().indexOf(actor2));
+//		assertTrue(foundActor2.getId() + " has wrong participation size: " + foundActor2.getParticipation().size(), foundActor2.getParticipation().size() == 2);
+//		assertTrue(foundActor2.getId() + "does not contain" + event1.getId(), foundActor2.getParticipation().contains(event1));
+//		assertTrue(foundActor2.getId() + "does not contain" + event3.getId(), foundActor2.getParticipation().contains(event3));
+//
+//		Actor foundActor3 = extractor.getActors().get(extractor.getActors().indexOf(actor3));
+//		assertTrue(foundActor3.getId() + " has wrong participation size: " + foundActor3.getParticipation().size(), foundActor3.getParticipation().size() == 1);
+//		assertTrue(foundActor3.getId() + "does not contain" + event2.getId(), foundActor3.getParticipation().contains(event2));
+
 
 		assertThat(extractor.getRelations()).areExactly(1, new Condition<Relation>() {
             public boolean matches(Relation relation) {

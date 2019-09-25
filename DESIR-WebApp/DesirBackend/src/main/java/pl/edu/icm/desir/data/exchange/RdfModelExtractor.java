@@ -8,12 +8,9 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
@@ -33,9 +30,10 @@ public class RdfModelExtractor implements ModelBuilder {
 	private static final String EVENT_NAMESPACE = "http://desir.icm.edu.pl/event#";
 	private static final String HAS_NAME = "http://desir.icm.edu.pl/hasName";
 	private static final String HAS_TITLE = "http://desir.icm.edu.pl/hasTitle";
-	private static final String PART_OF = "http://desir.icm.edu.pl/partOf";
+	private static final String IS_PART_OF = "http://desir.icm.edu.pl/isPartOf";
 	private static final String OCCURS = "http://desir.icm.edu.pl/occurs";
 	private static final String PARTICIPATES_IN = "http://desir.icm.edu.pl/participatesIn";
+	private static final String DEPENDS_ON = "http://desir.icm.edu.pl/dependsOn";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
 			.appendPattern("yyyy")
 			.parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
@@ -100,7 +98,7 @@ public class RdfModelExtractor implements ModelBuilder {
 							eventsMap.put(subject.getURI(), event);
 						}
 						break;
-					case PART_OF:
+					case IS_PART_OF:
 						PartOf relation = null;
 						if(subject.getNameSpace().equals(ACTOR_NAMESPACE)) {
 							Actor target;
@@ -168,6 +166,25 @@ public class RdfModelExtractor implements ModelBuilder {
                         participations.add(participation);
 						actorsMap.put(subject.getURI(), actor);
 						eventsMap.put(object.toString(), event);
+						break;
+					case DEPENDS_ON:
+						Event target;
+						if (eventsMap.containsKey(object.toString())) {
+							target = eventsMap.get(object.toString());
+						} else {
+							target = new Event(parseIdentifier(object.toString()), object.toString(), null, null);
+							eventsMap.put(object.toString(), target);
+						}
+						Event eventDependsOn;
+						if (eventsMap.containsKey(subject.getURI())) {
+							eventDependsOn = eventsMap.get(subject.getURI());
+						} else {
+							eventDependsOn = new Event(subject.getLocalName(), object.toString(), null, null);
+							eventsMap.put(subject.getURI(), eventDependsOn);
+						}
+						Dependency dependency = new Dependency(eventDependsOn, target);
+						dependencies.add(dependency);
+						relations.add(dependency);
 						break;
 				}
 			}

@@ -32,8 +32,8 @@ public class JsonModelExtractorTest {
 		assertThat(extractor.getActors()).areExactly(1, new Condition<Actor>() {
              public boolean matches(Actor actor) {
             	 if (actor.getName().equals("Loren G. Terveen")) {
-                	 if (actor.getParticipation().size() == 1) {
-                		 Event event = actor.getParticipation().get(0);
+                	 if (actor.getRelations().size() == 1) {
+                		 Event event = (Event) actor.getRelations().get(0).getTargetObject();
                 		 if (event.getName().equals("Evaluating collaborative filtering recommender systems")) {
                 			 return true;
                 		 }
