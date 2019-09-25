@@ -18,9 +18,9 @@
 "John Doe" .
 
 #author/actor #1 works for institution/actor #2 without time range
-<http://desir.icm.edu.pl/actor#a1>
-<http://desir.icm.edu.pl/isPartOf>
-<http://desir.icm.edu.pl/actor#dep1> .
+#<http://desir.icm.edu.pl/actor#a1>
+#<http://desir.icm.edu.pl/isPartOf>
+#<http://desir.icm.edu.pl/actor#dep1> .
 
 # Alternatively with time range:
 # i.e. John Doe worked for Department of Something from 1997 till 2018 as senior researcher

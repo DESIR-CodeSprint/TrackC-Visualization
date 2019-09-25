@@ -71,6 +71,7 @@ public abstract class Relation implements DataObjectInterface, Serializable {
 
 	public void setSubject(Entity subject) {
 		this.subject = subject;
+        this.subject.addRelation(this);
 	}
 
 	public Entity getTargetObject() {
@@ -79,6 +80,7 @@ public abstract class Relation implements DataObjectInterface, Serializable {
 
 	public void setTargetObject(Entity targetObject) {
 		this.targetObject = targetObject;
+        this.targetObject.addRelation(this);
 	}
 
 	public SpatiotemporalPoint getStartpoint() {
