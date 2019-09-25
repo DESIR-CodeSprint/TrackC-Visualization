@@ -150,20 +150,21 @@ public class GraphGenerator {
         for (Participation relation1:relations) {
 			for (Participation relation2:relations) {
 				if (!relation1.equals(relation2)) {
-					if (relation1.getEvent().equals(relation2.getEvent())) {
+					if (relation1.getTargetObject().equals(relation2.getTargetObject())) {
                         idx = -1;
                         for(Interaction e : edges) {
-                            if(e.getActors().get(0).equals(relation1.getActor()) && e.getActors().get(1).equals(relation2.getActor()) ||
-                                e.getActors().get(0).equals(relation2.getActor()) && e.getActors().get(1).equals(relation1.getActor())) {
+                            if(e.getActors().get(0).equals(relation1.getSubject().getName()) && e.getActors().get(1).equals(relation2.getSubject().getName()) ||
+                                e.getActors().get(0).equals(relation2.getSubject().getName()) && e.getActors().get(1).equals(relation1.getSubject().getName())) {
                                 idx = edges.indexOf(e);
                                 break;
                             }
                         }
                          if (idx > -1) {
-                            edges.get(idx).addName(relation1.getEvent().getName());
+                            edges.get(idx).addName(relation1.getTargetObject().getName());
                         } else {
-                            Interaction edge = new Interaction(relation1.getActor().getName(), relation2.getActor().getName());
-                            edge.addName(relation1.getEvent().getName());
+                            Interaction edge = new Interaction(relation1.getSubject().getName(),
+									relation2.getSubject().getName());
+                            edge.addName(relation1.getTargetObject().getName());
                             edges.add(edge);
                         }
 

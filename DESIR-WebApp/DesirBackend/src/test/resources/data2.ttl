@@ -110,13 +110,17 @@
 <http://desir.icm.edu.pl/event#e1> .
 
 #alternatively if we want to set some properties of the relation we can it as
-#<http://desir.icm.edu.pl/participation#p1>
-#<http://desir.icm.edu.pl/hasRole>
-#"author"^<http://www.w3.org/2001/XMLSchema#string>
-#
-#<http://desir.icm.edu.pl/actor#a1>
-#<http://desir.icm.edu.pl/participation#p1>
-#<http://desir.icm.edu.pl/event#e1>
+<http://desir.icm.edu.pl/participation#p1>
+<http://desir.icm.edu.pl/hasRole>
+"author" .
+
+<http://desir.icm.edu.pl/participation#p1>
+<http://desir.icm.edu.pl/hasActor>
+<http://desir.icm.edu.pl/actor#a1> .
+
+<http://desir.icm.edu.pl/participation#p1>
+<http://desir.icm.edu.pl/hasEvent>
+<http://desir.icm.edu.pl/event#e1> .
 
 <http://desir.icm.edu.pl/actor#a2>
 <http://desir.icm.edu.pl/participatesIn>

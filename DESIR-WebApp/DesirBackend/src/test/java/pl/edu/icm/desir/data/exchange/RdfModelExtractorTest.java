@@ -40,16 +40,17 @@ public class RdfModelExtractorTest {
         Assert.assertEquals("John Doe", actors.get(0).getName());
         List<Relation> relationsA1 = actors.get(0).getRelations();
         Relation relationsA1_0 = relationsA1.get(0);
-        Assert.assertEquals(4, relationsA1.size());
+        Assert.assertEquals(5, relationsA1.size());
         Assert.assertEquals("dep1", relationsA1_0.getTargetObject().getId());
         Assert.assertEquals(1997, relationsA1_0.getStartpoint().getCalendarTime().getLocalDate().getYear());
         Assert.assertEquals(2018, relationsA1_0.getEndpoint().getCalendarTime().getLocalDate().getYear());
         Assert.assertTrue(relationsA1_0 instanceof PartOf);
         Assert.assertEquals("senior researcher", ((PartOf)relationsA1_0).getRole());
 
-        Assert.assertEquals("e2", actors.get(0).getRelations().get(1).getTargetObject().getId());
-        Assert.assertEquals("e1", actors.get(0).getRelations().get(2).getTargetObject().getId());
-        Assert.assertEquals("dep1", actors.get(0).getRelations().get(3).getTargetObject().getId());
+        Assert.assertEquals("e1", actors.get(0).getRelations().get(1).getTargetObject().getId());
+        Assert.assertEquals("e2", actors.get(0).getRelations().get(2).getTargetObject().getId());
+        Assert.assertEquals("e1", actors.get(0).getRelations().get(3).getTargetObject().getId());
+        Assert.assertEquals("dep1", actors.get(0).getRelations().get(4).getTargetObject().getId());
 
         Assert.assertEquals("a2", actors.get(2).getId());
         Assert.assertEquals("Anthony Monster", actors.get(2).getName());

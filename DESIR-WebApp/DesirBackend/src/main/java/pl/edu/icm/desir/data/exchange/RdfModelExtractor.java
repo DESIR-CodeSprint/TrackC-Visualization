@@ -31,6 +31,8 @@ public class RdfModelExtractor implements ModelBuilder {
 	private static final String HAS_NAME = "http://desir.icm.edu.pl/hasName";
 	private static final String HAS_TITLE = "http://desir.icm.edu.pl/hasTitle";
 	private static final String HAS_ROLE = "http://desir.icm.edu.pl/hasRole";
+	private static final String HAS_ACTOR = "http://desir.icm.edu.pl/hasActor";
+	private static final String HAS_EVENT = "http://desir.icm.edu.pl/hasEvent";
 	private static final String START = "http://desir.icm.edu.pl/start";
 	private static final String END = "http://desir.icm.edu.pl/end";
 	private static final String SOURCE_ACTOR = "http://desir.icm.edu.pl/sourceActor";
@@ -39,6 +41,8 @@ public class RdfModelExtractor implements ModelBuilder {
 	private static final String OCCURS = "http://desir.icm.edu.pl/occurs";
 	private static final String PARTICIPATES_IN = "http://desir.icm.edu.pl/participatesIn";
 	private static final String DEPENDS_ON = "http://desir.icm.edu.pl/dependsOn";
+	private static final String PART_OF = "http://desir.icm.edu.pl/partOf";
+	private static final String PARTICIPATION = "http://desir.icm.edu.pl/participation";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
 			.appendPattern("yyyy")
 			.parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
@@ -193,14 +197,23 @@ public class RdfModelExtractor implements ModelBuilder {
 						relations.add(dependency);
 						break;
 					case HAS_ROLE:
-						PartOf partOfHasRole;
+						Relation relationHasRole;
 						if(relationsMap.containsKey(subject.getURI())) {
-							partOfHasRole = (PartOf) relationsMap.get(subject.getURI());
-							partOfHasRole.setRole(object.toString());
+							relationHasRole = relationsMap.get(subject.getURI());
+							if(relationHasRole instanceof PartOf)
+								((PartOf)relationHasRole).setRole(object.toString());
+							if(relationHasRole instanceof Participation)
+								((Participation)relationHasRole).setRole(object.toString());
 						} else {
-							partOfHasRole = new PartOf(subject.getLocalName());
-							partOfHasRole.setRole(object.toString());
-							relationsMap.put(subject.getURI(), partOfHasRole);
+							if(subject.getLocalName().equals(PART_OF)) {
+								relationHasRole = new PartOf(subject.getLocalName());
+								((PartOf)relationHasRole).setRole(object.toString());
+								relationsMap.put(subject.getURI(), relationHasRole);
+							} else if(subject.getLocalName().equals(PARTICIPATION)) {
+								relationHasRole = new Participation(subject.getLocalName());
+								((Participation)relationHasRole).setRole(object.toString());
+								relationsMap.put(subject.getURI(), relationHasRole);
+							}
 						}
 						break;
 					case START:
@@ -269,6 +282,42 @@ public class RdfModelExtractor implements ModelBuilder {
 							partOfTargetActor.setTargetObject(actorTarget);
 							relationsMap.put(subject.getURI(), partOfTargetActor);
 						}
+						break;
+					case HAS_ACTOR:
+						Participation participationHasActor;
+						Actor actorHasActor;
+						if (actorsMap.containsKey(object.toString())) {
+							actorHasActor = actorsMap.get(object.toString());
+						} else {
+							actorHasActor = new Actor(parseIdentifier(object.toString()), object.toString());
+						}
+						if(relationsMap.containsKey(subject.getURI())) {
+							participationHasActor = (Participation) relationsMap.get(subject.getURI());
+							participationHasActor.setSubject(actorHasActor);
+						} else {
+							participationHasActor = new Participation(subject.getLocalName());
+							participationHasActor.setSubject(actorHasActor);
+						}
+						actorHasActor.addRelation(participationHasActor);
+						relationsMap.put(subject.getURI(), participationHasActor);
+						break;
+					case HAS_EVENT:
+						Participation participationHasEvent;
+						Event eventHasEvent;
+						if (eventsMap.containsKey(object.toString())) {
+							eventHasEvent = eventsMap.get(object.toString());
+						} else {
+							eventHasEvent = new Event(parseIdentifier(object.toString()), object.toString(), null,
+									null);
+						}
+						if(relationsMap.containsKey(subject.getURI())) {
+							participationHasEvent = (Participation) relationsMap.get(subject.getURI());
+							participationHasEvent.setTargetObject(eventHasEvent);
+						} else {
+							participationHasEvent = new Participation(subject.getLocalName());
+							participationHasEvent.setTargetObject(eventHasEvent);
+						}
+						relationsMap.put(subject.getURI(), participationHasEvent);
 						break;
 				}
 			}
