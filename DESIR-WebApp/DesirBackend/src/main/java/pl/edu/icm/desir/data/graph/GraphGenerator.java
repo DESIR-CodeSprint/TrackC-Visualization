@@ -347,8 +347,7 @@ public class GraphGenerator {
         float[] coords = null; 
         int[] actorNodeIndices = null;    
         int[] eventNodeIndices = null;       
-        String[] nodeDataIDs = null;
-        
+        String[] nodeDataIDs = null;     
         int[] segments = null;
         int[] actorSegmentIndices = null;
         int[] eventSegmentIndices = null;
@@ -417,24 +416,61 @@ public class GraphGenerator {
         }
 
         CellSet participationsCellSet = field.getCellSet(0);
-        //participSegmentIndices = participationsCellSet.getCellArray(CellType.SEGMENT).getNodes(); getFaceIndices?
+        int[] csParticipationSegments = participationsCellSet.getCellArray(CellType.SEGMENT).getNodes(); 
         
         CellSet actorsCellSet = field.getCellSet(1);
-        //actorNodeIndices = actorsCellSet.getCellArray(CellType.POINT).getNodes();
-        //int nActors = actorNodeIndices.length; 
-        //actorSegmentIndices = actorsCellSet.getCellArray(CellType.SEGMENT).getNodes();
-        //actorNodeIndices = actorsCellSet.getCellArray(CellType.POINT).getDataIndices();
+        int[] csActorSegments = actorsCellSet.getCellArray(CellType.SEGMENT).getNodes();
         
-        
-        //TBD - translate segments to DataBlock
-        
+        int nParticipationSegments = csParticipationSegments.length/2;
+        int nActorSegments = csActorSegments.length/2;
+        int nSegments = nParticipationSegments + nActorSegments;
 
+        segments = new int[nSegments*2];
+        actorSegmentIndices = new int[nActorSegments];
+        participSegmentIndices = new int[nParticipationSegments];
+        
+        int j  = 0;
+        for (int i = 0; i < nParticipationSegments; i++, j++) {
+            segments[2*j  ] = csParticipationSegments[2*i  ];
+            segments[2*j+1] = csParticipationSegments[2*i+1];
+            participSegmentIndices[i] = j;
+        }
+        for (int i = 0; i < nActorSegments; i++, j++) {
+            segments[2*j  ] = csActorSegments[2*i  ];
+            segments[2*j+1] = csActorSegments[2*i+1];
+            actorSegmentIndices[i] = j;
+        }    
+        
+        segmentDataIDs = new String[nSegments];
+        int a,b;
+        boolean aIsInActors, bIsInActors;
+        for (int i = 0; i < nSegments; i++) {
+            a = segments[2*i];
+            b = segments[2*i+1];
+            aIsInActors = false;
+            bIsInActors = false;
+            for (int k = 0; k < csActorSegments.length; k++) {
+                if(csActorSegments[k] == a)
+                    aIsInActors = true;
+                if(csActorSegments[k] == b)
+                    bIsInActors = true;
+                if(aIsInActors && bIsInActors)
+                    break;
+            }
+            
+            if(aIsInActors && bIsInActors) {
+                //this is an actor segment
+                segmentDataIDs[i] = allActorNames[allItemIndices[a]];      
+            } else if((aIsInActors && !bIsInActors) || (!aIsInActors && bIsInActors)) {
+                //this is not actor segment, for now assume it is a participation segment
+                
+            }
+            
+
+        }
         
         
-        
-        
-        
-        
+        //create data block
         DataBlock db = new DataBlock("", "");
         db.setCoords(coords, true);
         db.setActorNodeIndices(actorNodeIndices);
