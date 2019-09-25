@@ -98,16 +98,14 @@ public class JsonModelExtractor implements ModelBuilder {
 			event.setName(post.getResource().getTitle());
 			eventsMap.put(post, event);
 			for (PersonName personName:post.getResource().getAuthor()) {
+				Actor actor;
 				if (actorsMap.containsKey(personName)) {
-					Actor actor = actorsMap.get(personName);
-
-					actor.getParticipation().add(event);
+					actor = actorsMap.get(personName);
 				}
-				Actor actor =
+				actor =
 						new Actor(DataUtils.createHashWithTimestamp(personName.getFirstName() + " " + personName.getLastName()),
 								personName.getFirstName() + " " + personName.getLastName());
-				actor.setParticipation(new ArrayList<Event>());
-				actor.getParticipation().add(event);
+				Participation participation = new Participation(actor, event, "");
 				actorsMap.put(personName, actor);
 			}
 		}
