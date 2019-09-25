@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +35,12 @@ public class JsonModelExtractor implements ModelBuilder {
 	private String filename;
 	private List<Actor> actors;
 	private List<Event> events;
+    
+    private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
+		     .appendPattern("yyyy")
+		     .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+		     .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+		     .toFormatter();
 
 	public JsonModelExtractor(String filename) {
 		this.filename = filename;
@@ -89,7 +99,7 @@ public class JsonModelExtractor implements ModelBuilder {
             
         	SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 			ScaledTime st = new ScaledTime();
-			st.setLocalDate(DataUtils.convertToLocalDate(post.getDate()));
+			st.setLocalDate(LocalDate.parse(post.getResource().getYear(), YEAR_FORMATTER));
             stPoint.setCalendarTime(st);
 			Event event = new Event(stPoint, stPoint);
 			event.setName(post.getResource().getTitle());

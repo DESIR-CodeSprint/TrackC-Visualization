@@ -336,9 +336,9 @@ public class GraphGenerator {
         }
 
         IrregularField field = ConvertDESIRtoVisNow.generateFieldFromCoparticipation(result);
-        //save VisNow field for testing
+//        //save VisNow field for testing
 //        try {
-//            VisNowFieldWriter.writeField(field, "/Users/babor/tmp/desir_crop.vns", FieldWriterFileFormat.SERIALIZED, true);
+//            VisNowFieldWriter.writeField(field, "/Users/babor/tmp/desir_simplest.vns", FieldWriterFileFormat.SERIALIZED, true);
 //        } catch (FileSystemException ex) {
 //            ex.printStackTrace();
 //        }
@@ -426,39 +426,9 @@ public class GraphGenerator {
         //actorNodeIndices = actorsCellSet.getCellArray(CellType.POINT).getDataIndices();
         
         
-        
-        
-        
-
-        
-        
+        //TBD - translate segments to DataBlock
         
 
-        
-        
-        //TBD - translate field to DataBlock
-        
-        
-//        //or.. don't use coords
-//        //move separate components to grid 
-//        for (ActorWrapper actor : wrappedActorsSet) {
-//            int i = actor.getActorIndex();
-//            int iComponent = actor.getComponentIndex();
-//            actor.getLocation()[0] = actor.getLocation()[0] + 2 * (iComponent % 10);
-//            actor.getLocation()[1] = actor.getLocation()[1] + 2 * (iComponent / 10);
-//        }
-//        
-//        for (EventWrapper event : wrappedEventsSet) {
-//            int i = event.getEventIndex();
-//            int iComponent = event.getComponentIndex();
-//            event.getLocation()[0] = event.getLocation()[0] + 2 * (iComponent % 10);
-//            event.getLocation()[1] = event.getLocation()[1] + 2 * (iComponent / 10);
-//        }
-//        //create coords from  events and participation events and set time as event.getEntryTime(); 
-//        
-//        
-//        //int nNodes =  events.size() + participations.size(); //this is true only for momentary events
-//        //TBD - create DataBlock from model with locations
         
         
         
