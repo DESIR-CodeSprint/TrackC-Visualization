@@ -20,64 +20,22 @@ import java.util.Date;
  *
  */
 public class Participation extends Relation {
-
 	static final String PARTICIPATION_TYPE = "participation";
-
-	Actor actor;
-	Event event;
 	
-	/*
-	 * actor can participate in lasting event only for certain period
-	 */
-	Date start;
-	Date end;
-	
-	String role;
-	
-	
+	private String role;
 	
 	public Participation(Actor actor, Event event, String role) {
-		super();
-		this.actor = actor;
-		this.event = event;
+		super(actor, event);
 		this.role = role;
+	}
+
+	public Participation(String identifier) {
+		super(identifier);
 	}
 
 	@Override
 	String getType() {
 		return PARTICIPATION_TYPE;
-	}
-
-	public Actor getActor() {
-		return actor;
-	}
-
-	public void setActor(Actor actor) {
-		this.actor = actor;
-	}
-
-	public Event getEvent() {
-		return event;
-	}
-
-	public void setEvent(Event event) {
-		this.event = event;
-	}
-
-	public Date getStart() {
-		return start;
-	}
-
-	public void setStart(Date start) {
-		this.start = start;
-	}
-
-	public Date getEnd() {
-		return end;
-	}
-
-	public void setEnd(Date end) {
-		this.end = end;
 	}
 
 	public String getRole() {
@@ -92,6 +50,14 @@ public class Participation extends Relation {
     public float toFloat()
     {
         return 0;
+    }
+    
+    public Actor getActor() {
+        return (Actor) this.subject;
+    }
+    
+    public Event getEvent() {
+        return (Event) this.targetObject;
     }
 
 

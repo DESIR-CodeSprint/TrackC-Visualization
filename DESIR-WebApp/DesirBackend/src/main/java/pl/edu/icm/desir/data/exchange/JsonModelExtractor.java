@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +24,7 @@ import org.bibsonomy.rest.renderer.RendererFactory;
 import org.bibsonomy.rest.renderer.RenderingFormat;
 import org.bibsonomy.rest.renderer.UrlRenderer;
 
-import pl.edu.icm.desir.data.model.Actor;
-import pl.edu.icm.desir.data.model.Event;
-import pl.edu.icm.desir.data.model.ScaledTime;
-import pl.edu.icm.desir.data.model.SpatiotemporalPoint;
+import pl.edu.icm.desir.data.model.*;
 import pl.edu.icm.desir.data.utils.DataUtils;
 
 public class JsonModelExtractor implements ModelBuilder {
@@ -31,6 +32,12 @@ public class JsonModelExtractor implements ModelBuilder {
 	private String filename;
 	private List<Actor> actors;
 	private List<Event> events;
+    
+    private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
+		     .appendPattern("yyyy")
+		     .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+		     .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+		     .toFormatter();
 
 	public JsonModelExtractor(String filename) {
 		this.filename = filename;
@@ -38,20 +45,20 @@ public class JsonModelExtractor implements ModelBuilder {
 
 	@Override
 	public void parseInputData(InputStream in) throws IOException {
-        final RenderingFormat renderingFormat;
-        final UrlRenderer urlRenderer = new UrlRenderer("");
-        final RendererFactory rendererFactory = new RendererFactory(urlRenderer);
-        renderingFormat = RenderingFormat.JSON;
+		final RenderingFormat renderingFormat;
+		final UrlRenderer urlRenderer = new UrlRenderer("");
+		final RendererFactory rendererFactory = new RendererFactory(urlRenderer);
+		renderingFormat = RenderingFormat.JSON;
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(in, "utf-8"));
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(in, "utf-8"));
 
-        try {
-        	List<Post<? extends Resource>> posts =  rendererFactory.getRenderer(renderingFormat).parsePostList(reader, NoDataAccessor.getInstance());
-        	generateModelFromPosts(posts);
-        } catch (final InternServerException ex) {
-            reader.close();
-            throw new BadRequestOrResponseException(ex);
-        }
+		try {
+			List<Post<? extends Resource>> posts =  rendererFactory.getRenderer(renderingFormat).parsePostList(reader, NoDataAccessor.getInstance());
+			generateModelFromPosts(posts);
+		} catch (final InternServerException ex) {
+			reader.close();
+			throw new BadRequestOrResponseException(ex);
+		}
 
 	}
 
@@ -65,37 +72,69 @@ public class JsonModelExtractor implements ModelBuilder {
 		return events;
 	}
 
+	@Override
+	public List<Relation> getRelations() {
+		return null;
+	}
 
-    private void generateModelFromPosts(List<Post<? extends Resource>> posts) {
+	@Override
+	public List<PartOf> getPartOfs() {
+		return null;
+	}
 
-		Map<PersonName, Actor> actorsMap = new HashMap<PersonName, Actor>();
+	@Override
+	public List<Dependency> getDependencies() {
+		return null;
+	}
+
+	@Override
+	public List<Participation> getParticipations() {
+		return null;
+	}
+
+	private void generateModelFromPosts(List<Post<? extends Resource>> posts) {
+
+		Map<String, Actor> actorsMap = new HashMap<String, Actor>();
 		Map<Post<BibTex>, Event> eventsMap = new HashMap<Post<BibTex>, Event>();
-    	
-    	actors = new ArrayList<>();
-        for (final Post<? extends Resource> apost : posts) {
-        	Post<BibTex> post = (Post<BibTex>) apost; 
-        	SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
-			ScaledTime st = new ScaledTime();
-			st.setLocalDate(DataUtils.convertToLocalDate(post.getDate()));
-			Event event = new Event(stPoint, stPoint);
-			event.setName(post.getResource().getTitle());
-			eventsMap.put(post, event);
-            for (PersonName personName:post.getResource().getAuthor()) {
-            	if (actorsMap.containsKey(personName)) {
-            		Actor actor = actorsMap.get(personName);
-            		
-            		actor.getParticipation().add(event);
-            	}
-            	Actor actor = new Actor(null, null);
-            	actor.setName(personName.getFirstName() + " " + personName.getLastName());
-				actor.setParticipation(new ArrayList<Event>());
-				actor.getParticipation().add(event);
-				actorsMap.put(personName, actor);
+
+		actors = new ArrayList<>();
+		for (final Post<? extends Resource> apost : posts) {
+			Post<BibTex> post = (Post<BibTex>) apost;
+            if(post.getResource().getAuthor().size() == 0)
+                continue;
+            String title = post.getResource().getTitle();
+            boolean found = false;
+            for(Event e : eventsMap.values()) {
+                if(e.getName().equals(title)) {
+                    found = true;
+                    break;
+                }
             }
-        }
+            if(found)
+                continue;
+            
+			SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
+			ScaledTime st = new ScaledTime();
+			st.setLocalDate(LocalDate.parse(post.getResource().getYear(), YEAR_FORMATTER));
+            stPoint.setCalendarTime(st);
+			Event event = new Event(DataUtils.createHashWithTimestamp(title),
+                                    title, stPoint, stPoint);
+			eventsMap.put(post, event);
+			for (PersonName personName:post.getResource().getAuthor()) {
+                Actor actor;
+				String name = personName.getFirstName() + " " + personName.getLastName();
+				if (actorsMap.containsKey(name)) {
+					actor = actorsMap.get(name);
+				} else {
+                    actor = new Actor(DataUtils.createHashWithTimestamp(name), name);
+                }
+				Participation participation = new Participation(actor, event, "");
+				actorsMap.put(name, actor);
+			}
+		}
 		actors = new ArrayList<Actor>(actorsMap.values());
 		events = new ArrayList<Event>(eventsMap.values());
 
-    }
+	}
 
 }

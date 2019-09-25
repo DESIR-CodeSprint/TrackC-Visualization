@@ -55,7 +55,7 @@ public class ReaderTest {
                 		events.put(s.toString(), event);
                 	}
                 }
-                if (p.toString().equals("<http://desir.icm.edu.pl/occured>")) {
+                if (p.toString().equals("<http://desir.icm.edu.pl/occurred>")) {
                 	
                 	if (events.containsKey(s.toString())) {
                 		events.get(s.toString()).setDate(o.toString());

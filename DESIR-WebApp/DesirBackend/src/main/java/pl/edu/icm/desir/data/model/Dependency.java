@@ -18,10 +18,15 @@ import java.util.List;
  */
 public class Dependency extends Relation {
 
+    private static long objectsCounter = 0;
 	static final String DEPENDENCY_TYPE = "dependency";
 	
 	List<Entity> entities;
-	
+
+	public Dependency(Entity subject, Entity targetObject) {
+		super(subject, targetObject);
+	}
+
 	@Override
 	String getType() {
 		return DEPENDENCY_TYPE;

@@ -10,4 +10,8 @@ public class DataUtils {
 		return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 	}
 
+	public static String createHashWithTimestamp(String text) {
+		return text.hashCode() + System.currentTimeMillis() + "";
+	}
+
 }
