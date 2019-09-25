@@ -1,0 +1,188 @@
+
+
+
+{
+   "posts": {
+      "post": [
+        {
+            "user": {
+               "name": "jaeschke",
+               "href": "https://www.bibsonomy.org/api/users/jaeschke"
+            },
+            "group": [
+               {
+                  "name": "public",
+                  "href": "https://www.bibsonomy.org/api/groups/public"
+               }
+            ],
+            "tag": [
+               {
+                  "name": "cf",
+                  "href": "https://www.bibsonomy.org/api/tags/cf"
+               },
+               {
+                  "name": "collaborative",
+                  "href": "https://www.bibsonomy.org/api/tags/collaborative"
+               },
+               {
+                  "name": "evaluation",
+                  "href": "https://www.bibsonomy.org/api/tags/evaluation"
+               },
+               {
+                  "name": "filtering",
+                  "href": "https://www.bibsonomy.org/api/tags/filtering"
+               },
+               {
+                  "name": "recommender",
+                  "href": "https://www.bibsonomy.org/api/tags/recommender"
+               }
+            ],
+            "bibtex": {
+               "title": "Evaluating collaborative filtering recommender systems",
+               "bibtexKey": "herlocker2004evaluating",
+               "misc": "issn = {1046-8188}, doi = {http://doi.acm.org/10.1145/963770.963772}",
+               "bibtexAbstract": "Recommender systems have been evaluated in many, often incomparable, ways. In this article, we review the key decisions in evaluating collaborative filtering recommender systems: the user tasks being evaluated, the types of analysis and datasets being used, the ways in which prediction quality is measured, the evaluation of prediction attributes other than quality, and the user-based evaluation of the system as a whole. In addition to reviewing the evaluation strategies used by prior researchers, we present empirical results from the analysis of various accuracy metrics on one content domain where all the tested metrics collapsed roughly into three equivalence classes. Metrics within each equivalency class were strongly correlated, while metrics from different equivalency classes were uncorrelated.",
+               "entrytype": "article",
+               "address": "New York, NY, USA",
+               "author": "Herlocker, Jonathan L. and Konstan, Joseph A. and Terveen, Loren G. and Riedl, John T.",
+               "journal": "ACM Trans. Inf. Syst.",
+               "number": "1",
+               "pages": "5--53",
+               "publisher": "ACM Press",
+               "volume": "22",
+               "year": "2004",
+               "url": "http://portal.acm.org/citation.cfm?id=963770.963772",
+               "intrahash": "bdd3980bb3c297d1b84ceb0c7729d397",
+               "interhash": "f8a70731d983634ac7105896d101c9d2",
+               "href": "https://www.bibsonomy.org/api/users/jaeschke/posts/bdd3980bb3c297d1b84ceb0c7729d397"
+            },
+            "description": "Evaluating collaborative filtering recommender systems",
+            "postingdate": "2007-05-02T18:13:06.000+02:00",
+            "changedate": "2014-07-28T15:57:31.000+02:00"
+         },
+        {
+            "user": {
+               "name": "jaeschke",
+               "href": "https://www.bibsonomy.org/api/users/jaeschke"
+            },
+            "group": [
+               {
+                  "name": "public",
+                  "href": "https://www.bibsonomy.org/api/groups/public"
+               }
+            ],
+            "tag": [
+               {
+                  "name": "cf",
+                  "href": "https://www.bibsonomy.org/api/tags/cf"
+               },
+               {
+                  "name": "collaborative",
+                  "href": "https://www.bibsonomy.org/api/tags/collaborative"
+               },
+               {
+                  "name": "explaining",
+                  "href": "https://www.bibsonomy.org/api/tags/explaining"
+               },
+               {
+                  "name": "filtering",
+                  "href": "https://www.bibsonomy.org/api/tags/filtering"
+               },
+               {
+                  "name": "recommender",
+                  "href": "https://www.bibsonomy.org/api/tags/recommender"
+               }
+            ],
+            "bibtex": {
+               "title": "Explaining collaborative filtering recommendations",
+               "bibtexKey": "herlocker2000explaining",
+               "misc": "location = {Philadelphia, Pennsylvania, United States}, isbn = {1-58113-222-0}, doi = {10.1145/358916.358995}",
+               "bibtexAbstract": "Automated collaborative filtering (ACF) systems predict a person's affinity for items or information by connecting that person's recorded interests with the recorded interests of a community of people and sharing ratings between like-minded persons. However, current recommender systems are black boxes, providing no transparency into the working of the recommendation. Explanations provide that transparency, exposing the reasoning and data behind a recommendation. In this paper, we address explanation interfaces for ACF systems - how they should be implemented and why they should be implemented. To explore how, we present a model for explanations based on the user's conceptual model of the recommendation process. We then present experimental results demonstrating what components of an explanation are the most compelling. To address why, we present experimental evidence that shows that providing explanations can improve the acceptance of ACF systems. We also describe some initial explorations into measuring how explanations can improve the filtering performance of users.",
+               "entrytype": "inproceedings",
+               "address": "New York, NY, USA",
+               "author": "Herlocker, Jonathan L. and Konstan, Joseph A. and Riedl, John",
+               "booktitle": "CSCW '00: Proceedings of the 2000 ACM Conference on Computer Supported Cooperative Work",
+               "pages": "241--250",
+               "publisher": "ACM",
+               "year": "2000",
+               "url": "http://portal.acm.org/citation.cfm?id=358995",
+               "intrahash": "85b8ec0aa805890a1e82156eebdb079b",
+               "interhash": "92273b87585b39bd394cb77f5a81ff1f",
+               "href": "https://www.bibsonomy.org/api/users/jaeschke/posts/85b8ec0aa805890a1e82156eebdb079b"
+            },
+            "description": "Explaining collaborative filtering recommendations",
+            "postingdate": "2009-11-17T11:02:14.000+01:00",
+            "changedate": "2014-07-28T15:57:31.000+02:00"
+         },
+        {
+            "user": {
+               "name": "jaeschke",
+               "href": "https://www.bibsonomy.org/api/users/jaeschke"
+            },
+            "group": [
+               {
+                  "name": "public",
+                  "href": "https://www.bibsonomy.org/api/groups/public"
+               }
+            ],
+            "tag": [
+               {
+                  "name": "hri",
+                  "href": "https://www.bibsonomy.org/api/tags/hri"
+               },
+               {
+                  "name": "human",
+                  "href": "https://www.bibsonomy.org/api/tags/human"
+               },
+               {
+                  "name": "interaction",
+                  "href": "https://www.bibsonomy.org/api/tags/interaction"
+               },
+               {
+                  "name": "paper",
+                  "href": "https://www.bibsonomy.org/api/tags/paper"
+               },
+               {
+                  "name": "publication",
+                  "href": "https://www.bibsonomy.org/api/tags/publication"
+               },
+               {
+                  "name": "recomender",
+                  "href": "https://www.bibsonomy.org/api/tags/recomender"
+               },
+               {
+                  "name": "recommender",
+                  "href": "https://www.bibsonomy.org/api/tags/recommender"
+               },
+               {
+                  "name": "research",
+                  "href": "https://www.bibsonomy.org/api/tags/research"
+               }
+            ],
+            "bibtex": {
+               "title": "Lessons on Applying Automated Recommender Systems to Information-seeking Tasks",
+               "bibtexKey": "konstan2006lessons",
+               "misc": "  location = {Boston, Massachusetts},\n  acmid = {1597458},\n  isbn = {978-1-57735-281-5},\n  numpages = {4}",
+               "bibtexAbstract": "Automated recommender systems predict user preferences by applying machine learning techniques to data on products, users, and past user preferences for products. Such systems have become increasingly popular in entertainment and e-commerce domains, but have thus far had little success in information-seeking domains such as identifying published research of interest. We report on several recent publications that show how recommenders can be extended to more effectively address information-seeking tasks by expanding the focus from accurate prediction of user preferences to identifying a useful set of items to recommend in response to the user's specific information need. Specific research demonstrates the value of diversity in recommendation lists, shows how users value lists of recommendations as something different from the sum of the individual recommendations within, and presents an analytic model for customizing a recommender to match user information-seeking needs.",
+               "entrytype": "inproceedings",
+               "author": "Konstan, Joseph A. and McNee, Sean M. and Ziegler, Cai-Nicolas and Torres, Roberto and Kapoor, Nishikant and Riedl, John T.",
+               "booktitle": "Proceedings of the 21st National Conference on Artificial Intelligence - Volume 2",
+               "pages": "1630--1633",
+               "publisher": "AAAI Press",
+               "series": "AAAI'06",
+               "year": "2006",
+               "url": "http://dl.acm.org/citation.cfm?id=1597348.1597458",
+               "intrahash": "b3c520bea4573c7ce3d6a1dabbb78614",
+               "interhash": "fe7af07b4d23c4dd86977c22ef2e026f",
+               "href": "https://www.bibsonomy.org/api/users/jaeschke/posts/b3c520bea4573c7ce3d6a1dabbb78614"
+            },
+            "postingdate": "2015-11-20T11:48:15.000+01:00",
+            "changedate": "2015-11-20T11:48:15.000+01:00"
+         }  
+      ],
+      "start": 0,
+      "end": 2
+   },
+   "stat": "ok"
+}
+
