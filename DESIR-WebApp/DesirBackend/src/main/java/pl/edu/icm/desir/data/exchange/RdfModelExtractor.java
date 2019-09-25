@@ -138,9 +138,8 @@ public class RdfModelExtractor implements ModelBuilder {
 						} else {
 							actor = new Actor(subject.getLocalName(), object.toString());
 						}
-						actor.setParticipation(new ArrayList<>());
 
-						Event event = new Event(subject.getLocalName(), object.toString(), null, null);
+						Event event = new Event(parseIdentifier(object.toString()), object.toString(), null, null);
 						if (eventsMap.containsKey(object.toString())) {
 							event = eventsMap.get(object.toString());
 						}
@@ -157,6 +156,10 @@ public class RdfModelExtractor implements ModelBuilder {
 
 		actors = new ArrayList<>(actorsMap.values());
 		events = new ArrayList<>(eventsMap.values());
+	}
+
+	private static String parseIdentifier(String fullIdentifier) {
+		return fullIdentifier.substring(fullIdentifier.lastIndexOf("#") + 1);
 	}
 
 	@Override
