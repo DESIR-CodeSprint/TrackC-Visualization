@@ -42,6 +42,8 @@ public class BibsonomyApiModelExtractor implements ModelBuilder {
 
 	private List<Actor> actors;
 	private List<Event> events;
+	private List<Relation> relations;
+	private List<Participation> participations;
 
 	public BibsonomyApiModelExtractor(String login, String apikey, GroupingEntity grouping, String groupingName, List<String> tags, String hash, String search, SearchType searchType, Set<Filter> filters, Order order, Date startDate, Date endDate, int start, int end) {
 		this.login = login;
@@ -116,21 +118,20 @@ public class BibsonomyApiModelExtractor implements ModelBuilder {
 			event.setName(post.getResource().getTitle());
 			eventsMap.put(post, event);
 			for (PersonName personName:post.getResource().getAuthor()) {
+				Actor actor;
 				if (actorsMap.containsKey(personName)) {
-					Actor actor = actorsMap.get(personName);
-
-					actor.getParticipation().add(event);
+					actor = actorsMap.get(personName);
 				}
-				Actor actor = new Actor(null, null); //todo: Yoann
+				actor = new Actor(DataUtils.createHashWithTimestamp(personName.getFirstName() + " " + personName.getLastName()), personName.getFirstName() + " " + personName.getLastName());
 				actor.setName(personName.getFirstName() + " " + personName.getLastName());
-				actor.setParticipation(new ArrayList<Event>());
-				actor.getParticipation().add(event);
+				Participation participation = new Participation(actor, event, "");
+				relations.add(participation);
+				participations.add(participation);
 				actorsMap.put(personName, actor);
 			}
 		}
 		actors = new ArrayList<Actor>(actorsMap.values());
 		events = new ArrayList<Event>(eventsMap.values());
-
 	}
 
 }

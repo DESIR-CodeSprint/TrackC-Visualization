@@ -31,6 +31,7 @@ import pl.edu.icm.desir.data.exchange.ModelBuilder;
 import pl.edu.icm.desir.data.model.Actor;
 import pl.edu.icm.desir.data.model.Event;
 import pl.edu.icm.desir.data.model.Participation;
+import pl.edu.icm.desir.data.model.Relation;
 import pl.edu.icm.jlargearrays.FloatLargeArray;
 import pl.edu.icm.jlargearrays.IntLargeArray;
 import pl.edu.icm.jlargearrays.LargeArrayType;
@@ -57,9 +58,11 @@ public class GraphGenerator {
 	private List<Participation> generateInteractionsModel(List<Actor> actors) {
 		List<Participation> edges = new ArrayList<>();
 		for (Actor actor : actors) {
-			for (Event event : actor.getParticipation()) {
-				Participation relation = new Participation(actor, event, "author");
-				edges.add(relation);
+			for (Relation relation : actor.getRelations()) {
+				if(relation instanceof Participation) {
+					((Participation) relation).setRole("author");
+					edges.add((Participation) relation);
+				}
 			}
 		}
 		return edges;

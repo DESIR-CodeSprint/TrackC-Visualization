@@ -79,6 +79,28 @@
 <http://desir.icm.edu.pl/occurs>
 "2007" .
 
+#event #4 title and date
+<http://desir.icm.edu.pl/event#e4>
+<http://desir.icm.edu.pl/hasTitle>
+"Book A which contains 1 chapter" .
+
+<http://desir.icm.edu.pl/event#e4>
+<http://desir.icm.edu.pl/occurs>
+"2007" .
+
+#event #5 title and date
+<http://desir.icm.edu.pl/event#e5>
+<http://desir.icm.edu.pl/hasTitle>
+"Chapter 1 of Book A" .
+
+<http://desir.icm.edu.pl/event#e5>
+<http://desir.icm.edu.pl/occurs>
+"2007" .
+
+<http://desir.icm.edu.pl/event#e5>
+<http://desir.icm.edu.pl/partOf>
+<http://desir.icm.edu.pl/event#e4> .
+
 #authorship relations / event participation
 #if we do not want directly to set any properties of the relation we do not have to directly pre-define its ID
 <http://desir.icm.edu.pl/actor#a1>

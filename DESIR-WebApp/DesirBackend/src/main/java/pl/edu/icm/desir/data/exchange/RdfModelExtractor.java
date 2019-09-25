@@ -34,7 +34,7 @@ public class RdfModelExtractor implements ModelBuilder {
 	private static final String HAS_NAME = "http://desir.icm.edu.pl/hasName";
 	private static final String HAS_TITLE = "http://desir.icm.edu.pl/hasTitle";
 	private static final String PART_OF = "http://desir.icm.edu.pl/partOf";
-	private static final String OCCURRED = "http://desir.icm.edu.pl/occurred";
+	private static final String OCCURS = "http://desir.icm.edu.pl/occurs";
 	private static final String PARTICIPATES_IN = "http://desir.icm.edu.pl/participatesIn";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
 			.appendPattern("yyyy")
@@ -54,14 +54,14 @@ public class RdfModelExtractor implements ModelBuilder {
 		this.filename = filename;
 		this.relations = new ArrayList<Relation>();
 		this.partOfs = new ArrayList<PartOf>();
+		this.participations = new ArrayList<Participation>();
+		this.dependencies = new ArrayList<Dependency>();
 	}
 
 	public void parseInputData(InputStream in) throws IOException {
 
 		Map<String, Actor> actorsMap = new HashMap<>();
 		Map<String, Event> eventsMap = new HashMap<>();
-		Map<String, Dependency> dependenciesMap = new HashMap<>();
-		Map<String, Participation> participationsMap = new HashMap<>();
 
 		Model model = ModelFactory.createDefaultModel();
 		String syntax = FileUtils.guessLang(filename) ;
@@ -101,28 +101,48 @@ public class RdfModelExtractor implements ModelBuilder {
 						}
 						break;
 					case PART_OF:
-						Actor target;
-						if (actorsMap.containsKey(object.toString())) {
-							target = actorsMap.get(object.toString());
-						} else {
-							target = new Actor(object.toString(), object.toString());
-							actorsMap.put(subject.getURI(), target);
+						PartOf relation = null;
+						if(subject.getNameSpace().equals(ACTOR_NAMESPACE)) {
+							Actor target;
+							if (actorsMap.containsKey(object.toString())) {
+								target = actorsMap.get(object.toString());
+							} else {
+								target = new Actor(object.toString(), object.toString());
+								actorsMap.put(object.toString(), target);
+							}
+							Actor actorPartOf;
+							if (actorsMap.containsKey(subject.getURI())) {
+								actorPartOf = actorsMap.get(subject.getURI());
+							} else {
+								actorPartOf = new Actor(subject.getLocalName(), object.toString());
+								actorsMap.put(subject.getURI(), actorPartOf);
+							}
+							relation = new PartOf(actorPartOf, target);
+						} else if (subject.getNameSpace().equals(EVENT_NAMESPACE)) {
+							Event target;
+							if (eventsMap.containsKey(object.toString())) {
+								target = eventsMap.get(object.toString());
+							} else {
+								target = new Event(parseIdentifier(object.toString()), object.toString(), null, null);
+								eventsMap.put(object.toString(), target);
+							}
+							Event eventPartOf;
+							if (eventsMap.containsKey(subject.getURI())) {
+								eventPartOf = eventsMap.get(subject.getURI());
+							} else {
+								eventPartOf = new Event(subject.getLocalName(), object.toString(), null, null);
+								eventsMap.put(subject.getURI(), eventPartOf);
+							}
+							relation = new PartOf(eventPartOf, target);
 						}
-						Actor actorPartOf;
-						if (actorsMap.containsKey(subject.getURI())) {
-							actorPartOf = actorsMap.get(subject.getURI());
-						} else {
-							actorPartOf = new Actor(subject.getLocalName(), object.toString());
-							actorsMap.put(subject.getURI(), actorPartOf);
-						}
-						PartOf relation = new PartOf(actorPartOf, target);
 						relations.add(relation);
 						partOfs.add(relation);
 						break;
-					case OCCURRED:
+					case OCCURS:
 						SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 						ScaledTime st = new ScaledTime();
 						st.setLocalDate(LocalDate.parse(object.toString(), YEAR_FORMATTER));
+						stPoint.setCalendarTime(st);
 						if (eventsMap.containsKey(subject.getURI())) {
 							eventsMap.get(subject.getURI()).setStartPoint(stPoint);
 							eventsMap.get(subject.getURI()).setEndPoint(stPoint);
@@ -143,7 +163,9 @@ public class RdfModelExtractor implements ModelBuilder {
 						if (eventsMap.containsKey(object.toString())) {
 							event = eventsMap.get(object.toString());
 						}
-						actor.getParticipation().add(event);
+						Participation participation = new Participation(actor, event, "");
+                        relations.add(participation);
+                        participations.add(participation);
 						actorsMap.put(subject.getURI(), actor);
 						eventsMap.put(object.toString(), event);
 						break;

@@ -25,25 +25,15 @@ import java.util.List;
 public class Actor extends Entity {
 	private Date timelifeStartPoint;
 	private Date timelifeEndPoint;
-	private List<Event> participation;
 	private String type;
 
 	public Actor(String identifier, String name) {
 		super(identifier, name);
-		this.participation = new ArrayList<>();
 	}
 
 	@Override
 	boolean isReal() {
 		return false;
-	}
-
-	public List<Event> getParticipation() {
-		return participation;
-	}
-
-	public void setParticipation(List<Event> participation) {
-		this.participation = participation;
 	}
 
 	public String getType() {
