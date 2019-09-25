@@ -8,12 +8,9 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
@@ -33,7 +30,7 @@ public class RdfModelExtractor implements ModelBuilder {
 	private static final String EVENT_NAMESPACE = "http://desir.icm.edu.pl/event#";
 	private static final String HAS_NAME = "http://desir.icm.edu.pl/hasName";
 	private static final String HAS_TITLE = "http://desir.icm.edu.pl/hasTitle";
-	private static final String PART_OF = "http://desir.icm.edu.pl/partOf";
+	private static final String IS_PART_OF = "http://desir.icm.edu.pl/isPartOf";
 	private static final String OCCURS = "http://desir.icm.edu.pl/occurs";
 	private static final String PARTICIPATES_IN = "http://desir.icm.edu.pl/participatesIn";
 	private static final String DEPENDS_ON = "http://desir.icm.edu.pl/dependsOn";
@@ -101,7 +98,7 @@ public class RdfModelExtractor implements ModelBuilder {
 							eventsMap.put(subject.getURI(), event);
 						}
 						break;
-					case PART_OF:
+					case IS_PART_OF:
 						PartOf relation = null;
 						if(subject.getNameSpace().equals(ACTOR_NAMESPACE)) {
 							Actor target;
