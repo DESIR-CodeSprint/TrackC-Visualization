@@ -75,82 +75,41 @@ public class Controller
 
     private static DataBlock createTest1(String id, String text)
     {
-
-//        float[] coords = new float[]{
-//            -1.0f, 0.0f, -1.0f,
-//            0.5f, 1.0f, 1.0f,
-//            -0.5f, -1.0f, 0.0f,
-//            0.0f, -1.0f, 0.5f,
-//            1.0f, 0.0f, 1.0f,};
-//        String[] nodeData = new String[]{
-//            "Branden Kutz",
-//            "Eboni Mantle",
-//            "Alysa Haigler",
-//            "Keena Dragoo",
-//            "Barbra Staller"
-//        };
-//
-//        int[] segments = new int[]{
-//            0, 1,
-//            2, 1,
-//            3, 4,
-//            3, 1,};
-//        String[] segmentData = new String[segments.length / 2];
-//        for (int i = 0; i < segmentData.length; i++) {
-//            segmentData[i] = nodeData[segments[2 * i]] + " <---> " + nodeData[segments[2 * i + 1]];
-//        }
-//        
-//        float[] segmentFData = new float[segments.length / 2];
-//        for (int i = 0; i < segmentFData.length; i++) {
-//            segmentFData[i] = (float) Math.random() * 100;   
-//        }
-//
-//        DataBlock db = new DataBlock(id, text);
-//        db.setCoords(coords, false);
-////        db.setNodeData(nodeData);
-////        db.setSegments(segments);
-////        db.setSegmentData(segmentData);
-////        db.setSegmentFData(segmentFData);
-//        
-//        //TBD
-//              
-//        return db;
-
          float[] coords = new float[]{
             
             //year 1
-            -1.0f,  0.0f,  8.0f, //A1Y1s
-             1.0f,  0.0f,  8.0f, //A2Y1s             
-            -2.0f,  1.0f,  8.0f, //E1Y1p
-             2.0f,  1.0f,  8.0f, //E2Y1p
+            -1.0f,  0.0f,  8.0f, //A1Y1s 0
+             1.0f,  0.0f,  8.0f, //A2Y1s 1           
+            -2.0f,  1.0f,  8.0f, //E1Y1p 2
+             2.0f,  1.0f,  8.0f, //E2Y1p 3
 
             //year 2
-            -1.0f,  0.0f,  6.0f, //A1Y2v
-             0.0f,  0.0f,  6.0f, //E3Y2s
+            -1.0f,  0.0f,  6.0f, //A1Y2v 4
+             0.0f,  0.0f,  6.0f, //E3Y2s 5
 
             //year 3        
-             1.0f,  0.0f,  4.0f, //A2Y1v 
-             0.0f,  0.0f,  4.0f, //E3Y2v
+             1.0f,  0.0f,  4.0f, //A2Y1v 6
+             0.0f,  0.0f,  4.0f, //E3Y2v 7
              
             //year 4
-            -1.0f,  0.0f,  2.0f, //A1Y2v
-             1.0f,  0.0f,  2.0f, //A2Y1v 
-             0.0f,  0.0f,  2.0f, //E3Y2e  
+            -1.0f,  0.0f,  2.0f, //A1Y2v 8
+             1.0f,  0.0f,  2.0f, //A2Y1v 9
+             0.0f,  0.0f,  2.0f, //E3Y2e 10
              
             //year 5
-            -1.0f,  0.0f,  0.0f, //A1Y1e
-             1.0f,  0.0f,  0.0f, //A2Y1e             
-            -2.0f, -1.0f,  0.0f, //E4Y1p
-             2.0f, -1.0f,  0.0f, //E5Y1p             
+            -1.0f,  0.0f,  0.0f, //A1Y1e 11
+             1.0f,  0.0f,  0.0f, //A2Y1e 12          
+            -2.0f, -1.0f,  0.0f, //E4Y1p 13
+             2.0f, -1.0f,  0.0f, //E5Y1p 14          
         };
         
         
         int[] actorNodeIndices = new int[] {
-            0,1,11,12
+            0,1,4,6,8,9,11,12
         };
         
         int[] eventNodeIndices = new int[] {
-            2,3,5,10,13,14
+            2,3,5,7,10,13,14
         };
         
         String[] nodeDataIDs = new String[]{
@@ -161,16 +120,16 @@ public class Controller
             "E2", //3
 
             //year 2
-            null, //4
+            "A1", //4
             "E3", //5
             
             //year 3
-            null, //6
-            null, //7
+            "A2", //6
+            "E3", //7
             
             //year 4
-            null, //8
-            null, //9
+            "A1", //8
+            "A2", //9
             "E3", //10
             
             //year 5
@@ -201,20 +160,25 @@ public class Controller
             12,14,
             
             //A1
-            0,11,
+            0,4,
+            4,8,
+            8,11,
             //A2
-            1,12,
+            1,6,
+            6,9,
+            9,12,
             
             //E3
-            5,10,
+            5,7,
+            7,10,
         };
         
         int[] actorSegmentIndices = new int[] {
-            8,9
+            8,9,10,11,12,13
         };
         
         int[] eventSegmentIndices = new int[] {
-            10
+            14,15
         };
         
         int[] participSegmentIndices = new int[] {
@@ -232,8 +196,13 @@ public class Controller
             "",
             
             "A1",
+            "A1",
+            "A1",
+            "A2",
+            "A2",
             "A2",
             
+            "E3",
             "E3",
         };
         
@@ -243,8 +212,8 @@ public class Controller
         };
         
         String[] quadDataIDs = new String[]{
-            "",
-            ""
+            "A1@E3",
+            "A2@E3"
         };
         
       
@@ -270,35 +239,35 @@ public class Controller
         float[] coords = new float[]{
             
             //year 1
-            -2.0f,  0.0f,  8.0f, //A1Y1
-             0.0f,  0.0f,  8.0f, //A2Y1
-            -1.0f, -2.0f,  8.0f, //A3Y1
+            -2.0f,  0.0f,  8.0f, //A1Y1 0
+             0.0f,  0.0f,  8.0f, //A2Y1 1
+            -1.0f, -2.0f,  8.0f, //A3Y1 2
              
-            -1.0f, -1.0f,  8.0f, //P1Y1
+            -1.0f, -1.0f,  8.0f, //P1Y1 3
 
             //year 2
-             0.0f,  0.0f,  4.0f, //A2Y2
-             2.0f,  0.0f,  4.0f, //A4Y2
-             1.0f, -2.0f,  4.0f, //A5Y2
+             0.0f,  0.0f,  4.0f, //A2Y2 4
+             2.0f,  0.0f,  4.0f, //A4Y2 5
+             1.0f, -2.0f,  4.0f, //A5Y2 6
              
-             1.0f, -1.0f,  4.0f, //P2Y2
+             1.0f, -1.0f,  4.0f, //P2Y2 7
 
 
             //year 3
-            -2.0f,  0.0f,  0.0f, //A1Y3
-             0.0f,  0.0f,  0.0f, //A2Y3
-             2.0f,  0.0f,  0.0f, //A4Y3
-             0.0f,  2.0f,  0.0f, //A6Y3
-             0.0f,  4.0f,  0.0f, //A7Y3
+            -2.0f,  0.0f,  0.0f, //A1Y3 8
+             0.0f,  0.0f,  0.0f, //A2Y3 9
+             2.0f,  0.0f,  0.0f, //A4Y3 10
+             0.0f,  2.0f,  0.0f, //A6Y3 11
+             0.0f,  4.0f,  0.0f, //A7Y3 12
              
-             0.0f,  1.0f,  0.0f, //P3Y3
-             0.5f,  3.0f,  0.0f, //P4Y3
+             0.0f,  1.0f,  0.0f, //P3Y3 13
+             0.5f,  3.0f,  0.0f, //P4Y3 14
              
         };
         
         
         int[] actorNodeIndices = new int[] {
-            0,1,2,5,6,8,9,10,11,12
+            0,1,2,4,5,6,8,9,10,11,12
         };
         
         int[] eventNodeIndices = new int[] {
@@ -314,7 +283,7 @@ public class Controller
             "P1", //3
 
             //year 2
-            null, //4
+            "A2", //4
             "A4", //5
             "A5", //6
              
@@ -354,13 +323,14 @@ public class Controller
             //A1
             0,8,
             //A2
-            1,9,
+            1,4,
+            4,9,
             //A4
             5,10,
         };
         
         int[] actorSegmentIndices = new int[] {
-            12,13,14
+            12,13,14,15
         };
         
         int[] eventSegmentIndices = null;
@@ -384,6 +354,7 @@ public class Controller
             "",
             
             "A1",
+            "A2",
             "A2",
             "A4",
         };
@@ -439,8 +410,9 @@ public class Controller
     }
     
     private DataBlock processModel(ModelBuilder builder, boolean doPlacement) {        
-        IrregularField outField = graphGenerator.generateGraphDataFromModel(builder);
-        return generateRelationsDataBlock(outField);     
+        //IrregularField outField = graphGenerator.generateGraphDataFromModel(builder);
+        //return generateRelationsDataBlock(outField);  
+        return graphGenerator.generatePlacedDataBlockFromModel(builder);
     }
 
     private DataBlock generateRelationsDataBlock(IrregularField outField) {
