@@ -211,7 +211,8 @@ function onDocumentMouseMove(event) {
             currentIntersectedLine.material.linewidth = 10;
             currentIntersectedLine.material.color = new THREE.Color(0x990000);
             if (edgeTexts !== undefined && currentIntersectedLineIndex >= 0 && currentIntersectedLineIndex < edgeTexts.length) {
-                mouseText.innerHTML = "" + currentIntersectedLineIndex + ": " + edgeTexts[currentIntersectedLineIndex];
+                mouseText.innerHTML = "common interactions: " + edgeTexts[currentIntersectedLineIndex];
+                //mouseText.innerHTML = "" + currentIntersectedLineIndex + ": " + edgeTexts[currentIntersectedLineIndex];
                 //mouseText.innerHTML = "" + nodeTexts[segments[2 * currentIntersectedLineIndex]] + " <-> " + nodeTexts[segments[2 * currentIntersectedLineIndex + 1]] + "<br>" +
                 //        "Common publications: " + edgeTexts[currentIntersectedLineIndex];
             } else {

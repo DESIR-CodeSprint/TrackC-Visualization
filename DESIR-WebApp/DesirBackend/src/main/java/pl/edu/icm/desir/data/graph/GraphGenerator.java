@@ -148,7 +148,15 @@ public class GraphGenerator {
 			for (Participation relation2:relations) {
 				if (!relation1.equals(relation2)) {
 					if (relation1.getEvent().equals(relation2.getEvent())) {
-                        if ((idx = edges.indexOf(new Interaction(relation1.getActor().getName(), relation2.getActor().getName()))) > -1) {
+                        idx = -1;
+                        for(Interaction e : edges) {
+                            if(e.getActors().get(0).equals(relation1.getActor()) && e.getActors().get(1).equals(relation2.getActor()) ||
+                                e.getActors().get(0).equals(relation2.getActor()) && e.getActors().get(1).equals(relation1.getActor())) {
+                                idx = edges.indexOf(e);
+                                break;
+                            }
+                        }
+                         if (idx > -1) {
                             edges.get(idx).addName(relation1.getEvent().getName());
                         } else {
                             Interaction edge = new Interaction(relation1.getActor().getName(), relation2.getActor().getName());
