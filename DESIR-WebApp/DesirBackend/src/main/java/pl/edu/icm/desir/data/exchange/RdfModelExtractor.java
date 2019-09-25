@@ -36,6 +36,7 @@ public class RdfModelExtractor implements ModelBuilder {
 	private static final String PART_OF = "http://desir.icm.edu.pl/partOf";
 	private static final String OCCURS = "http://desir.icm.edu.pl/occurs";
 	private static final String PARTICIPATES_IN = "http://desir.icm.edu.pl/participatesIn";
+	private static final String DEPENDS_ON = "http://desir.icm.edu.pl/dependsOn";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
 			.appendPattern("yyyy")
 			.parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
@@ -168,6 +169,25 @@ public class RdfModelExtractor implements ModelBuilder {
                         participations.add(participation);
 						actorsMap.put(subject.getURI(), actor);
 						eventsMap.put(object.toString(), event);
+						break;
+					case DEPENDS_ON:
+						Event target;
+						if (eventsMap.containsKey(object.toString())) {
+							target = eventsMap.get(object.toString());
+						} else {
+							target = new Event(parseIdentifier(object.toString()), object.toString(), null, null);
+							eventsMap.put(object.toString(), target);
+						}
+						Event eventDependsOn;
+						if (eventsMap.containsKey(subject.getURI())) {
+							eventDependsOn = eventsMap.get(subject.getURI());
+						} else {
+							eventDependsOn = new Event(subject.getLocalName(), object.toString(), null, null);
+							eventsMap.put(subject.getURI(), eventDependsOn);
+						}
+						Dependency dependency = new Dependency(eventDependsOn, target);
+						dependencies.add(dependency);
+						relations.add(dependency);
 						break;
 				}
 			}

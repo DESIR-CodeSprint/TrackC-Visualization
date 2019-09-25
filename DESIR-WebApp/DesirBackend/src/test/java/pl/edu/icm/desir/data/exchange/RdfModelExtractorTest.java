@@ -55,6 +55,8 @@ public class RdfModelExtractorTest {
         Assert.assertEquals("e2", events.get(1).getId());
         Assert.assertEquals("Very Interesting Article B on the Exemplary RDF Format", events.get(1).getName());
         Assert.assertEquals(2003, events.get(1).getStartPoint().getCalendarTime().getLocalDate().getYear());
+        Assert.assertEquals(1, events.get(1).getRelations().size());
+        Assert.assertEquals("e1", events.get(1).getRelations().get(0).getTargetObject().getId());
 
         Assert.assertEquals("e1", events.get(2).getId());
         Assert.assertEquals("Very Interesting Article A on the Exemplary RDF Format", events.get(2).getName());
@@ -67,6 +69,9 @@ public class RdfModelExtractorTest {
         Assert.assertEquals("e3", events.get(4).getId());
         Assert.assertEquals("Not So Interesting Article C on Something Else", events.get(4).getName());
         Assert.assertEquals(2007, events.get(4).getStartPoint().getCalendarTime().getLocalDate().getYear());
+        Assert.assertEquals(2, events.get(4).getRelations().size());
+        Assert.assertEquals("e2", events.get(4).getRelations().get(0).getTargetObject().getId());
+        Assert.assertEquals("e1", events.get(4).getRelations().get(1).getTargetObject().getId());
     }
 
 }
