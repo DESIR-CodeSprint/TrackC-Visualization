@@ -92,6 +92,7 @@ public class RdfModelExtractor implements ModelBuilder {
 					SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 					ScaledTime st = new ScaledTime();
 					st.setLocalDate(LocalDate.parse(o.toString(), YEAR_FORMATTER));
+                    stPoint.setCalendarTime(st);
 					if (eventsMap.containsKey(s.toString())) {
 						eventsMap.get(s.toString()).setStartPoint(stPoint);
 						eventsMap.get(s.toString()).setEndPoint(stPoint);
