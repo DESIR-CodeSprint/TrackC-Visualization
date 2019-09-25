@@ -22,6 +22,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.FileUtils;
 
+import org.apache.log4j.Logger;
 import pl.edu.icm.desir.data.model.Actor;
 import pl.edu.icm.desir.data.model.Event;
 import pl.edu.icm.desir.data.model.ScaledTime;
@@ -29,7 +30,13 @@ import pl.edu.icm.desir.data.model.SpatiotemporalPoint;
 
 public class RdfModelExtractor implements ModelBuilder {
 
-	static final String BASE_URI = "http://desir.icm.edu.pl/";
+	private static final String BASE_URI = "http://desir.icm.edu.pl/";
+	private static final String ACTOR_NAMESPACE = "http://desir.icm.edu.pl/actor#";
+	private static final String EVENT_NAMESPACE = "http://desir.icm.edu.pl/event#";
+	private static final String HAS_NAME_NAMESPACE = "http://desir.icm.edu.pl/hasName";
+	private static final String HAS_TITLE_NAMESPACE = "http://desir.icm.edu.pl/hasTitle";
+	private static final String OCCURRED_NAMESPACE = "http://desir.icm.edu.pl/occurred";
+	private static final String PARTICIPATES_IN_NAMESPACE = "http://desir.icm.edu.pl/participatesIn";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
 			.appendPattern("yyyy")
 			.parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
@@ -38,7 +45,7 @@ public class RdfModelExtractor implements ModelBuilder {
 	private List<Actor> actors;
 	private List<Event> events;
 	private String filename;
-
+	private static final Logger LOG = Logger.getLogger(RdfModelExtractor.class);
 
 	public RdfModelExtractor(String filename) {
 		this.filename = filename;
@@ -46,8 +53,8 @@ public class RdfModelExtractor implements ModelBuilder {
 
 	public void parseInputData(InputStream in) throws IOException {
 
-		Map<String, Actor> actorsMap = new HashMap<String, Actor>();
-		Map<String, Event> eventsMap = new HashMap<String, Event>();
+		Map<String, Actor> actorsMap = new HashMap<>();
+		Map<String, Event> eventsMap = new HashMap<>();
 
 		Model model = ModelFactory.createDefaultModel();
 		String syntax = FileUtils.guessLang(filename) ;
@@ -64,69 +71,66 @@ public class RdfModelExtractor implements ModelBuilder {
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
 
-				Resource s = stmt.getSubject();
-				Resource p = stmt.getPredicate();
-				RDFNode o = stmt.getObject();
+				Resource subject = stmt.getSubject();
+				Resource predicate = stmt.getPredicate();
+				RDFNode object = stmt.getObject();
 
-				if (p.toString().equals("http://desir.icm.edu.pl/hasName")) {
-					if (actorsMap.containsKey(s.toString())) {
-						actorsMap.get(s.toString()).setName(o.toString());
-					} else {
-						Actor actor = new Actor(parseIdentifier(s.toString()), o.toString());
-						actorsMap.put(s.toString(), actor);
-					}
+				switch (predicate.getNameSpace()) {
+					case HAS_NAME_NAMESPACE:
+						if (actorsMap.containsKey(subject.getURI())) {
+							actorsMap.get(subject.getURI()).setName(object.toString());
+						} else {
+							Actor actor = new Actor(subject.getLocalName(), object.toString());
+							actorsMap.put(subject.getURI(), actor);
+						}
+						break;
+					case HAS_TITLE_NAMESPACE:
+						if (eventsMap.containsKey(subject.getURI())) {
+							eventsMap.get(subject.getURI()).setName(object.toString());
+						} else {
+							Event event = new Event(subject.getLocalName(), object.toString(), null, null);
+							event.setName(object.toString());
+							eventsMap.put(subject.getURI(), event);
+						}
+						break;
+					case OCCURRED_NAMESPACE:
+						SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
+						ScaledTime st = new ScaledTime();
+						st.setLocalDate(LocalDate.parse(object.toString(), YEAR_FORMATTER));
+						if (eventsMap.containsKey(subject.getURI())) {
+							eventsMap.get(subject.getURI()).setStartPoint(stPoint);
+							eventsMap.get(subject.getURI()).setEndPoint(stPoint);
+						} else {
+							Event event = new Event(subject.getLocalName(), object.toString(), stPoint, stPoint);
+							eventsMap.put(subject.getURI(), event);
+						}
+						break;
+					case PARTICIPATES_IN_NAMESPACE:
+						Actor actor;
+						if (actorsMap.containsKey(subject.getURI())) {
+							actor = actorsMap.get(subject.getURI());
+						} else {
+							actor = new Actor(subject.getLocalName(), object.toString());
+						}
+						actor.setParticipation(new ArrayList<>());
+
+						Event event = new Event(subject.getLocalName(), object.toString(), null, null);
+						if (eventsMap.containsKey(object.toString())) {
+							event = eventsMap.get(object.toString());
+						}
+						actor.getParticipation().add(event);
+						actorsMap.put(subject.getURI(), actor);
+						eventsMap.put(object.toString(), event);
+						break;
 				}
-
-				if (p.toString().equals("http://desir.icm.edu.pl/hasTitle")) {
-					if (eventsMap.containsKey(s.toString())) {
-						eventsMap.get(s.toString()).setName(o.toString());
-					} else {
-						Event event = new Event(parseIdentifier(s.toString()), o.toString(), null, null);
-						event.setName(o.toString());
-						eventsMap.put(s.toString(), event);
-					}
-				}
-				if (p.toString().equals("http://desir.icm.edu.pl/occured")) {
-
-					SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
-					ScaledTime st = new ScaledTime();
-					st.setLocalDate(LocalDate.parse(o.toString(), YEAR_FORMATTER));
-					if (eventsMap.containsKey(s.toString())) {
-						eventsMap.get(s.toString()).setStartPoint(stPoint);
-						eventsMap.get(s.toString()).setEndPoint(stPoint);
-					} else {
-						Event event = new Event(parseIdentifier(s.toString()), o.toString(), stPoint, stPoint);
-						eventsMap.put(s.toString(), event);
-					}
-
-				}
-
-				if (p.toString().equals("http://desir.icm.edu.pl/participatesIn")) {
-					Actor actor;
-					if (actorsMap.containsKey(s.toString())) {
-						actor = actorsMap.get(s.toString());
-					} else {
-						actor = new Actor(parseIdentifier(s.toString()), o.toString());
-					}
-					actor.setParticipation(new ArrayList<>());
-
-					Event event = new Event(parseIdentifier(s.toString()), o.toString(), null, null);
-					if (eventsMap.containsKey(o.toString())) {
-						event = eventsMap.get(o.toString());
-					}
-					actor.getParticipation().add(event);
-					actorsMap.put(s.toString(), actor);
-					eventsMap.put(o.toString(), event);
-				}
-
 			}
 		} finally {
 			if (iter != null)
 				iter.close();
 		}
 
-		actors = new ArrayList<Actor>(actorsMap.values());
-		events = new ArrayList<Event>(eventsMap.values());
+		actors = new ArrayList<>(actorsMap.values());
+		events = new ArrayList<>(eventsMap.values());
 	}
 
 	@Override
@@ -137,9 +141,5 @@ public class RdfModelExtractor implements ModelBuilder {
 	@Override
 	public List<Event> getEvents() {
 		return events;
-	}
-
-	private static String parseIdentifier(String subject) {
-		return subject.substring(subject.lastIndexOf("#") + 1);
 	}
 }
