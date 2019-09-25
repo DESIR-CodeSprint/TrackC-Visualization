@@ -187,5 +187,21 @@ public abstract class Entity implements DataObjectInterface, Serializable {
 		this.metadata = metadata;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+
+		if (obj instanceof Entity) {
+			Entity entity = (Entity)obj;
+			if (!entity.getId().equals(this.getId())) {
+				return false;
+			}
+			if (!entity.getName().equals(this.getName())) {
+				return false;
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 }
