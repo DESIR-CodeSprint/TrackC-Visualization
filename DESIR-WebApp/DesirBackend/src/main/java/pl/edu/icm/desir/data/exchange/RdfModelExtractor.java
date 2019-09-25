@@ -34,7 +34,7 @@ public class RdfModelExtractor implements ModelBuilder {
 	private static final String HAS_NAME = "http://desir.icm.edu.pl/hasName";
 	private static final String HAS_TITLE = "http://desir.icm.edu.pl/hasTitle";
 	private static final String PART_OF = "http://desir.icm.edu.pl/partOf";
-	private static final String OCCURRED = "http://desir.icm.edu.pl/occurred";
+	private static final String OCCURS = "http://desir.icm.edu.pl/occurs";
 	private static final String PARTICIPATES_IN = "http://desir.icm.edu.pl/participatesIn";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
 			.appendPattern("yyyy")
@@ -119,10 +119,11 @@ public class RdfModelExtractor implements ModelBuilder {
 						relations.add(relation);
 						partOfs.add(relation);
 						break;
-					case OCCURRED:
+					case OCCURS:
 						SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 						ScaledTime st = new ScaledTime();
 						st.setLocalDate(LocalDate.parse(object.toString(), YEAR_FORMATTER));
+						stPoint.setCalendarTime(st);
 						if (eventsMap.containsKey(subject.getURI())) {
 							eventsMap.get(subject.getURI()).setStartPoint(stPoint);
 							eventsMap.get(subject.getURI()).setEndPoint(stPoint);
