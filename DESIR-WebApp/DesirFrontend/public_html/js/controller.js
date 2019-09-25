@@ -367,6 +367,10 @@ function onDocumentMouseMove(event) {
 
     //====================== find intersections with actor lines ========================
     if (!intersectionFound && actorLinesObjects !== undefined) {
+        if (currentIntersectedLine !== undefined) {
+            currentIntersectedLine.material.linewidth = 1;
+            currentIntersectedLine.material.color = new THREE.Color(0x999999);
+        }
         intersects = raycaster.intersectObjects(actorLinesObjects);
         if (intersects.length > 0) {
             currentIntersectedLine = intersects[ 0 ].object;
@@ -412,6 +416,10 @@ function onDocumentMouseMove(event) {
 
     //====================== find intersections with event lines ========================
     if (!intersectionFound && eventLinesObjects !== undefined) {
+        if (currentIntersectedLine !== undefined) {
+                currentIntersectedLine.material.linewidth = 1;
+                currentIntersectedLine.material.color = new THREE.Color(0x999999);
+        }
         intersects = raycaster.intersectObjects(eventLinesObjects);
         if (intersects.length > 0) {
             currentIntersectedLine = intersects[ 0 ].object;
