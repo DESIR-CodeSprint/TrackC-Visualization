@@ -373,6 +373,10 @@ public class GraphGenerator {
         int[] allItemIndices = ((IntDataArray)field.getComponent("item_index")).getRawArray().getData();
         
         coords = field.getCurrentCoords().getFloatData();
+        //tighten time axis - TBD: add time scaling to frontend UI
+        for (int i = 0; i < nNodes; i++) {
+            coords[3*i+2] = coords[3*i+2]/2; 
+        }
        
         int[] tmpNodeTypes = new int[nNodes];
         int nEventNodes = 0;      
