@@ -33,10 +33,10 @@ public class RdfModelExtractor implements ModelBuilder {
 	private static final String BASE_URI = "http://desir.icm.edu.pl/";
 	private static final String ACTOR_NAMESPACE = "http://desir.icm.edu.pl/actor#";
 	private static final String EVENT_NAMESPACE = "http://desir.icm.edu.pl/event#";
-	private static final String HAS_NAME_NAMESPACE = "http://desir.icm.edu.pl/hasName";
-	private static final String HAS_TITLE_NAMESPACE = "http://desir.icm.edu.pl/hasTitle";
-	private static final String OCCURRED_NAMESPACE = "http://desir.icm.edu.pl/occurred";
-	private static final String PARTICIPATES_IN_NAMESPACE = "http://desir.icm.edu.pl/participatesIn";
+	private static final String HAS_NAME = "http://desir.icm.edu.pl/hasName";
+	private static final String HAS_TITLE = "http://desir.icm.edu.pl/hasTitle";
+	private static final String OCCURRED = "http://desir.icm.edu.pl/occurred";
+	private static final String PARTICIPATES_IN = "http://desir.icm.edu.pl/participatesIn";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
 			.appendPattern("yyyy")
 			.parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
@@ -75,8 +75,8 @@ public class RdfModelExtractor implements ModelBuilder {
 				Resource predicate = stmt.getPredicate();
 				RDFNode object = stmt.getObject();
 
-				switch (predicate.getNameSpace()) {
-					case HAS_NAME_NAMESPACE:
+				switch (predicate.getURI()) {
+					case HAS_NAME:
 						if (actorsMap.containsKey(subject.getURI())) {
 							actorsMap.get(subject.getURI()).setName(object.toString());
 						} else {
@@ -84,7 +84,7 @@ public class RdfModelExtractor implements ModelBuilder {
 							actorsMap.put(subject.getURI(), actor);
 						}
 						break;
-					case HAS_TITLE_NAMESPACE:
+					case HAS_TITLE:
 						if (eventsMap.containsKey(subject.getURI())) {
 							eventsMap.get(subject.getURI()).setName(object.toString());
 						} else {
@@ -93,7 +93,7 @@ public class RdfModelExtractor implements ModelBuilder {
 							eventsMap.put(subject.getURI(), event);
 						}
 						break;
-					case OCCURRED_NAMESPACE:
+					case OCCURRED:
 						SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 						ScaledTime st = new ScaledTime();
 						st.setLocalDate(LocalDate.parse(object.toString(), YEAR_FORMATTER));
@@ -105,7 +105,7 @@ public class RdfModelExtractor implements ModelBuilder {
 							eventsMap.put(subject.getURI(), event);
 						}
 						break;
-					case PARTICIPATES_IN_NAMESPACE:
+					case PARTICIPATES_IN:
 						Actor actor;
 						if (actorsMap.containsKey(subject.getURI())) {
 							actor = actorsMap.get(subject.getURI());
