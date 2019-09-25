@@ -14,15 +14,9 @@ import java.util.Date;
  */
 public class PartOf extends Relation {
 
-	static final String PARTOF_TYPE = "part-of";
-
-	/**
-	 * Can depend on time
-	 */
-	Date start;
-	Date end;
+	private static final String PARTOF_TYPE = "part-of";
 	
-	String role;
+	private String role;
 
 	public PartOf(Entity subject, Entity targetObject) {
 		super(subject, targetObject);
@@ -31,22 +25,6 @@ public class PartOf extends Relation {
 	@Override
 	String getType() {
 		return PARTOF_TYPE;
-	}
-
-	public Date getStart() {
-		return start;
-	}
-
-	public void setStart(Date start) {
-		this.start = start;
-	}
-
-	public Date getEnd() {
-		return end;
-	}
-
-	public void setEnd(Date end) {
-		this.end = end;
 	}
 
 	public String getRole() {
