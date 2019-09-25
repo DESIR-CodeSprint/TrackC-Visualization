@@ -27,6 +27,12 @@ public abstract class Relation implements DataObjectInterface, Serializable {
 	SpatiotemporalPoint endpoint;
 	
 	Map<String, String> metadata;
+
+	public Relation(Entity subject, Entity targetObject) {
+		this.subject = subject;
+		this.targetObject = targetObject;
+		this.subject.addRelation(this);
+	}
 	
 	abstract String getType();
 

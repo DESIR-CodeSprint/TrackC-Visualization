@@ -38,6 +38,15 @@ public abstract class Entity implements DataObjectInterface, Serializable {
 	private SpatiotemporalPoint startPoint;
 	private SpatiotemporalPoint endPoint;
 
+	/*
+	 * Level of generalization (e.g. 0 - states and centuries,
+	 * 1 - years and armies etc.)
+	 */
+	private GeneralizationLevel level; //change to comparable enum, for the time being limit enum to single option e.g.
+	// "DEFAULT"
+	private List<Relation> relations;
+	private Map<String, String> metadata;
+
 
 	public Entity(String identifier, String name) {
 		this.id = identifier;
@@ -50,16 +59,6 @@ public abstract class Entity implements DataObjectInterface, Serializable {
 		this.startPoint = startPoint;
 		this.endPoint = endPoint;
 	}
-
-	/*
-	 * Level of generalization (e.g. 0 - states and centuries,
-	 * 1 - years and armies etc.)
-	 */
-	GeneralizationLevel level; //change to comparable enum, for the time being limit enum to single option e.g. "DEFAULT"
-
-	List<Relation> relations;
-
-	Map<String, String> metadata;
 
 	/**
 	 * That can start a philosophical

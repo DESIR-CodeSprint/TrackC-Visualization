@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
@@ -22,14 +23,19 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.FileUtils;
 
-import pl.edu.icm.desir.data.model.Actor;
-import pl.edu.icm.desir.data.model.Event;
-import pl.edu.icm.desir.data.model.ScaledTime;
-import pl.edu.icm.desir.data.model.SpatiotemporalPoint;
+import org.apache.log4j.Logger;
+import pl.edu.icm.desir.data.model.*;
 
 public class RdfModelExtractor implements ModelBuilder {
 
-	static final String BASE_URI = "http://desir.icm.edu.pl/";
+	private static final String BASE_URI = "http://desir.icm.edu.pl/";
+	private static final String ACTOR_NAMESPACE = "http://desir.icm.edu.pl/actor#";
+	private static final String EVENT_NAMESPACE = "http://desir.icm.edu.pl/event#";
+	private static final String HAS_NAME = "http://desir.icm.edu.pl/hasName";
+	private static final String HAS_TITLE = "http://desir.icm.edu.pl/hasTitle";
+	private static final String PART_OF = "http://desir.icm.edu.pl/partOf";
+	private static final String OCCURRED = "http://desir.icm.edu.pl/occurred";
+	private static final String PARTICIPATES_IN = "http://desir.icm.edu.pl/participatesIn";
 	private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
 			.appendPattern("yyyy")
 			.parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
@@ -37,17 +43,25 @@ public class RdfModelExtractor implements ModelBuilder {
 			.toFormatter();
 	private List<Actor> actors;
 	private List<Event> events;
+	private List<Relation> relations;
+	private List<PartOf> partOfs;
+	private List<Dependency> dependencies;
+	private List<Participation> participations;
 	private String filename;
-
+	private static final Logger LOG = Logger.getLogger(RdfModelExtractor.class);
 
 	public RdfModelExtractor(String filename) {
 		this.filename = filename;
+		this.relations = new ArrayList<Relation>();
+		this.partOfs = new ArrayList<PartOf>();
 	}
 
 	public void parseInputData(InputStream in) throws IOException {
 
-		Map<String, Actor> actorsMap = new HashMap<String, Actor>();
-		Map<String, Event> eventsMap = new HashMap<String, Event>();
+		Map<String, Actor> actorsMap = new HashMap<>();
+		Map<String, Event> eventsMap = new HashMap<>();
+		Map<String, Dependency> dependenciesMap = new HashMap<>();
+		Map<String, Participation> participationsMap = new HashMap<>();
 
 		Model model = ModelFactory.createDefaultModel();
 		String syntax = FileUtils.guessLang(filename) ;
@@ -64,69 +78,85 @@ public class RdfModelExtractor implements ModelBuilder {
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
 
-				Resource s = stmt.getSubject();
-				Resource p = stmt.getPredicate();
-				RDFNode o = stmt.getObject();
+				Resource subject = stmt.getSubject();
+				Resource predicate = stmt.getPredicate();
+				RDFNode object = stmt.getObject();
 
-				if (p.toString().equals("http://desir.icm.edu.pl/hasName")) {
-					if (actorsMap.containsKey(s.toString())) {
-						actorsMap.get(s.toString()).setName(o.toString());
-					} else {
-						Actor actor = new Actor(parseIdentifier(s.toString()), o.toString());
-						actorsMap.put(s.toString(), actor);
-					}
+				switch (predicate.getURI()) {
+					case HAS_NAME:
+						if (actorsMap.containsKey(subject.getURI())) {
+							actorsMap.get(subject.getURI()).setName(object.toString());
+						} else {
+							Actor actor = new Actor(subject.getLocalName(), object.toString());
+							actorsMap.put(subject.getURI(), actor);
+						}
+						break;
+					case HAS_TITLE:
+						if (eventsMap.containsKey(subject.getURI())) {
+							eventsMap.get(subject.getURI()).setName(object.toString());
+						} else {
+							Event event = new Event(subject.getLocalName(), object.toString(), null, null);
+							event.setName(object.toString());
+							eventsMap.put(subject.getURI(), event);
+						}
+						break;
+					case PART_OF:
+						Actor target;
+						if (actorsMap.containsKey(object.toString())) {
+							target = actorsMap.get(object.toString());
+						} else {
+							target = new Actor(object.toString(), object.toString());
+							actorsMap.put(subject.getURI(), target);
+						}
+						Actor actorPartOf;
+						if (actorsMap.containsKey(subject.getURI())) {
+							actorPartOf = actorsMap.get(subject.getURI());
+						} else {
+							actorPartOf = new Actor(subject.getLocalName(), object.toString());
+							actorsMap.put(subject.getURI(), actorPartOf);
+						}
+						PartOf relation = new PartOf(actorPartOf, target);
+						relations.add(relation);
+						partOfs.add(relation);
+						break;
+					case OCCURRED:
+						SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
+						ScaledTime st = new ScaledTime();
+						st.setLocalDate(LocalDate.parse(object.toString(), YEAR_FORMATTER));
+						if (eventsMap.containsKey(subject.getURI())) {
+							eventsMap.get(subject.getURI()).setStartPoint(stPoint);
+							eventsMap.get(subject.getURI()).setEndPoint(stPoint);
+						} else {
+							Event event = new Event(subject.getLocalName(), object.toString(), stPoint, stPoint);
+							eventsMap.put(subject.getURI(), event);
+						}
+						break;
+					case PARTICIPATES_IN:
+						Actor actor;
+						if (actorsMap.containsKey(subject.getURI())) {
+							actor = actorsMap.get(subject.getURI());
+						} else {
+							actor = new Actor(subject.getLocalName(), object.toString());
+						}
+						actor.setParticipation(new ArrayList<>());
+
+						Event event = new Event(subject.getLocalName(), object.toString(), null, null);
+						if (eventsMap.containsKey(object.toString())) {
+							event = eventsMap.get(object.toString());
+						}
+						actor.getParticipation().add(event);
+						actorsMap.put(subject.getURI(), actor);
+						eventsMap.put(object.toString(), event);
+						break;
 				}
-
-				if (p.toString().equals("http://desir.icm.edu.pl/hasTitle")) {
-					if (eventsMap.containsKey(s.toString())) {
-						eventsMap.get(s.toString()).setName(o.toString());
-					} else {
-						Event event = new Event(parseIdentifier(s.toString()), o.toString(), null, null);
-						event.setName(o.toString());
-						eventsMap.put(s.toString(), event);
-					}
-				}
-				if (p.toString().equals("http://desir.icm.edu.pl/occured")) {
-
-					SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
-					ScaledTime st = new ScaledTime();
-					st.setLocalDate(LocalDate.parse(o.toString(), YEAR_FORMATTER));
-					if (eventsMap.containsKey(s.toString())) {
-						eventsMap.get(s.toString()).setStartPoint(stPoint);
-						eventsMap.get(s.toString()).setEndPoint(stPoint);
-					} else {
-						Event event = new Event(parseIdentifier(s.toString()), o.toString(), stPoint, stPoint);
-						eventsMap.put(s.toString(), event);
-					}
-
-				}
-
-				if (p.toString().equals("http://desir.icm.edu.pl/participatesIn")) {
-					Actor actor;
-					if (actorsMap.containsKey(s.toString())) {
-						actor = actorsMap.get(s.toString());
-					} else {
-						actor = new Actor(parseIdentifier(s.toString()), o.toString());
-					}
-					actor.setParticipation(new ArrayList<>());
-
-					Event event = new Event(parseIdentifier(s.toString()), o.toString(), null, null);
-					if (eventsMap.containsKey(o.toString())) {
-						event = eventsMap.get(o.toString());
-					}
-					actor.getParticipation().add(event);
-					actorsMap.put(s.toString(), actor);
-					eventsMap.put(o.toString(), event);
-				}
-
 			}
 		} finally {
 			if (iter != null)
 				iter.close();
 		}
 
-		actors = new ArrayList<Actor>(actorsMap.values());
-		events = new ArrayList<Event>(eventsMap.values());
+		actors = new ArrayList<>(actorsMap.values());
+		events = new ArrayList<>(eventsMap.values());
 	}
 
 	@Override
@@ -139,7 +169,23 @@ public class RdfModelExtractor implements ModelBuilder {
 		return events;
 	}
 
-	private static String parseIdentifier(String subject) {
-		return subject.substring(subject.lastIndexOf("#") + 1);
+	@Override
+	public List<Relation> getRelations() {
+		return relations;
+	}
+
+	@Override
+	public List<PartOf> getPartOfs() {
+		return partOfs;
+	}
+
+	@Override
+	public List<Dependency> getDependencies() {
+		return dependencies;
+	}
+
+	@Override
+	public List<Participation> getParticipations() {
+		return participations;
 	}
 }
