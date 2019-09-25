@@ -68,29 +68,44 @@ public class JsonModelExtractor implements ModelBuilder {
 
     private void generateModelFromPosts(List<Post<? extends Resource>> posts) {
 
-		Map<PersonName, Actor> actorsMap = new HashMap<PersonName, Actor>();
+		Map<String, Actor> actorsMap = new HashMap<String, Actor>();
 		Map<Post<BibTex>, Event> eventsMap = new HashMap<Post<BibTex>, Event>();
     	
     	actors = new ArrayList<>();
         for (final Post<? extends Resource> apost : posts) {
         	Post<BibTex> post = (Post<BibTex>) apost; 
+            if(post.getResource().getAuthor().size() == 0)
+                continue;
+            String title = post.getResource().getTitle();
+            boolean found = false;
+            for(Event e : eventsMap.values()) {
+                if(e.getName().equals(title)) {
+                    found = true;
+                    break;
+                }
+            }
+            if(found)
+                continue;
+            
         	SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 			ScaledTime st = new ScaledTime();
 			st.setLocalDate(DataUtils.convertToLocalDate(post.getDate()));
+            stPoint.setCalendarTime(st);
 			Event event = new Event(stPoint, stPoint);
 			event.setName(post.getResource().getTitle());
 			eventsMap.put(post, event);
             for (PersonName personName:post.getResource().getAuthor()) {
-            	if (actorsMap.containsKey(personName)) {
-            		Actor actor = actorsMap.get(personName);
-            		
-            		actor.getParticipation().add(event);
-            	}
-            	Actor actor = new Actor(null, null);
-            	actor.setName(personName.getFirstName() + " " + personName.getLastName());
-				actor.setParticipation(new ArrayList<Event>());
-				actor.getParticipation().add(event);
-				actorsMap.put(personName, actor);
+                String name = personName.getFirstName() + " " + personName.getLastName();
+            	if (actorsMap.containsKey(name)) {
+            		Actor actor = actorsMap.get(name);
+            		actor.getEvents().add(event);
+            	} else {
+                    Actor actor = new Actor(null, null);
+                    actor.setName(name);
+                    actor.setEvents(new ArrayList<Event>());
+                    actor.getEvents().add(event);
+                    actorsMap.put(name, actor);
+                }
             }
         }
 		actors = new ArrayList<Actor>(actorsMap.values());

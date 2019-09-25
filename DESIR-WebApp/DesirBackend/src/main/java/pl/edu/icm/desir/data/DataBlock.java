@@ -4,15 +4,39 @@ import java.text.SimpleDateFormat;
 
 public class DataBlock {
     
+    public static final int NODE_TYPE_VIRTUAL = 0;
+    public static final int NODE_TYPE_ACTOR_POINT = 10;
+    public static final int NODE_TYPE_ACTOR_START = 11;
+    public static final int NODE_TYPE_ACTOR_END = 12;
+    public static final int NODE_TYPE_EVENT_POINT = 20;
+    public static final int NODE_TYPE_EVENT_START = 21;
+    public static final int NODE_TYPE_EVENT_END = 22;
+    
+    public static final int SEGMENT_TYPE_ACTOR = 101;
+    public static final int SEGMENT_TYPE_EVENT = 102;
+    public static final int SEGMENT_TYPE_PARTICIP = 103;
+    
     private final String id;
     private final String text;
     private final String timestamp;
+    
     private float[] coords = null;
-    private String[] nodeData = null;
-    private int[] nodeTypeData = null;
+    private int nNodes = 0;
+    
+    private int[] actorNodeIndices = null;
+    private int[] eventNodeIndices = null;
+    private String[] nodeDataIDs = null;
+    
     private int[] segments = null;
-    private String[] segmentData = null;
-    private float[] segmentFData = null;
+    private int[] actorSegmentIndices = null;
+    private int[] eventSegmentIndices = null;
+    private int[] participSegmentIndices = null;
+    private String[] segmentDataIDs = null;
+    
+    private int[] quads = null;
+    private String[] quadDataIDs = null;
+    
+    private String[] data = null;
     
     public DataBlock(String id, String text) {
         this.id = id;
@@ -44,6 +68,7 @@ public class DataBlock {
     public void setCoords(float[] coords, boolean normalize)
     {
         this.coords = coords;
+        this.nNodes = coords.length/3;
         if(normalize) {
             float[] min = new float[]{Float.MAX_VALUE,Float.MAX_VALUE,Float.MAX_VALUE};
             float[] max = new float[]{Float.MIN_VALUE,Float.MIN_VALUE,Float.MIN_VALUE};
@@ -73,12 +98,63 @@ public class DataBlock {
             }
         }
     }
-  
+    
+    /**
+     * @return the actorNodeIndices
+     */
+    public int[] getActorNodeIndices()
+    {
+        return actorNodeIndices;
+    }
+
+    /**
+     * @param actorNodeIndices the actorNodeIndices to set
+     */
+    public void setActorNodeIndices(int[] actorNodeIndices)
+    {
+        this.actorNodeIndices = actorNodeIndices;
+    }
+
+    /**
+     * @return the eventNodeIndices
+     */
+    public int[] getEventNodeIndices()
+    {
+        return eventNodeIndices;
+    }
+
+    /**
+     * @param eventNodeIndices the eventNodeIndices to set
+     */
+    public void setEventNodeIndices(int[] eventNodeIndices)
+    {
+        this.eventNodeIndices = eventNodeIndices;
+    }
+
+    /**
+     * @return the nodeDataIDs
+     */
+    public String[] getNodeDataIDs()
+    {
+        return nodeDataIDs;
+    }
+
+    /**
+     * @param nodeDataIDs the nodeDataIDs to set
+     */
+    public void setNodeDataIDs(String[] nodeDataIDs)
+    {
+        this.nodeDataIDs = nodeDataIDs;
+    }
+
+    /**
+     * @return the segments
+     */
     public int[] getSegments()
     {
         return segments;
     }
-    
+
     /**
      * @param segments the segments to set
      */
@@ -88,66 +164,125 @@ public class DataBlock {
     }
 
     /**
-     * @return the nodeData
+     * @return the actorSegmentIndices
      */
-    public String[] getNodeData()
+    public int[] getActorSegmentIndices()
     {
-        return nodeData;
+        return actorSegmentIndices;
     }
 
     /**
-     * @param nodeData the nodeData to set
+     * @param actorSegmentIndices the actorSegmentIndices to set
      */
-    public void setNodeData(String[] nodeData)
+    public void setActorSegmentIndices(int[] actorSegmentIndices)
     {
-        this.nodeData = nodeData;
+        this.actorSegmentIndices = actorSegmentIndices;
     }
 
     /**
-     * @return the segmentData
+     * @return the eventSegmentIndices
      */
-    public String[] getSegmentData()
+    public int[] getEventSegmentIndices()
     {
-        return segmentData;
+        return eventSegmentIndices;
     }
 
     /**
-     * @param segmentData the segmentData to set
+     * @param eventSegmentIndices the eventSegmentIndices to set
      */
-    public void setSegmentData(String[] segmentData)
+    public void setEventSegmentIndices(int[] eventSegmentIndices)
     {
-        this.segmentData = segmentData;
+        this.eventSegmentIndices = eventSegmentIndices;
     }
+
+    /**
+     * @return the participSegmentIndices
+     */
+    public int[] getParticipSegmentIndices()
+    {
+        return participSegmentIndices;
+    }
+
+    /**
+     * @param participSegmentIndices the participSegmentIndices to set
+     */
+    public void setParticipSegmentIndices(int[] participSegmentIndices)
+    {
+        this.participSegmentIndices = participSegmentIndices;
+    }
+
+    /**
+     * @return the segmentDataIDs
+     */
+    public String[] getSegmentDataIDs()
+    {
+        return segmentDataIDs;
+    }
+
+    /**
+     * @param segmentDataIDs the segmentDataIDs to set
+     */
+    public void setSegmentDataIDs(String[] segmentDataIDs)
+    {
+        this.segmentDataIDs = segmentDataIDs;
+    }
+
+    /**
+     * @return the quads
+     */
+    public int[] getQuads()
+    {
+        return quads;
+    }
+
+    /**
+     * @param quads the quads to set
+     */
+    public void setQuads(int[] quads)
+    {
+        this.quads = quads;
+    }
+
+    /**
+     * @return the quadDataIDs
+     */
+    public String[] getQuadDataIDs()
+    {
+        return quadDataIDs;
+    }
+
+    /**
+     * @param quadDataIDs the quadDataIDs to set
+     */
+    public void setQuadDataIDs(String[] quadDataIDs)
+    {
+        this.quadDataIDs = quadDataIDs;
+    }
+
+    /**
+     * @return the data
+     */
+    public String[] getData()
+    {
+        return data;
+    }
+
+    /**
+     * @param data the data to set
+     */
+    public void setData(String[] data)
+    {
+        this.data = data;
+    }
+
+    /**
+     * @return the nNodes
+     */
+    public int getnNodes()
+    {
+        return nNodes;
+    }
+  
     
-        /**
-     * @return the segmentData
-     */
-    public float[] getSegmentFData()
-    {
-        return segmentFData;
-    }
-
-    /**
-     * @param segmentFData the segmentData to set
-     */
-    public void setSegmentFData(float[] segmentFData)
-    {
-        this.segmentFData = segmentFData;
-    }
-
-    /**
-     * @return the nodeTypeData
-     */
-    public int[] getNodeTypeData()
-    {
-        return nodeTypeData;
-    }
-
-    /**
-     * @param nodeTypeData the nodeTypeData to set
-     */
-    public void setNodeTypeData(int[] nodeTypeData)
-    {
-        this.nodeTypeData = nodeTypeData;
-    }
+    
 }

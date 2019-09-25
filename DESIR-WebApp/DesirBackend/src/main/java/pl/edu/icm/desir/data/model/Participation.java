@@ -20,7 +20,8 @@ import java.util.Date;
  *
  */
 public class Participation extends Relation {
-
+    
+    private static long objectsCounter = 0;
 	static final String PARTICIPATION_TYPE = "participation";
 
 	Actor actor;
@@ -38,6 +39,7 @@ public class Participation extends Relation {
 	
 	public Participation(Actor actor, Event event, String role) {
 		super();
+        this.id = "Participation"+(objectsCounter++);
 		this.actor = actor;
 		this.event = event;
 		this.role = role;

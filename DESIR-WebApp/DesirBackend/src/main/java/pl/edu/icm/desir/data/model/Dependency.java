@@ -18,9 +18,15 @@ import java.util.List;
  */
 public class Dependency extends Relation {
 
+    private static long objectsCounter = 0;
 	static final String DEPENDENCY_TYPE = "dependency";
 	
 	List<Entity> entities;
+    
+    public Dependency() {
+        super();
+        this.id = "Dependency"+(objectsCounter++);
+    }
 	
 	@Override
 	String getType() {

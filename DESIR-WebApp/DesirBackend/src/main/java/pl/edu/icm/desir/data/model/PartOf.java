@@ -14,6 +14,7 @@ import java.util.Date;
  */
 public class PartOf extends Relation {
 
+    private static long objectsCounter = 0;
 	static final String PARTOF_TYPE = "part-of";
 
 	/**
@@ -23,6 +24,11 @@ public class PartOf extends Relation {
 	Date end;
 	
 	String role;
+    
+    public PartOf() {
+        super();
+        this.id = "PartOf"+(objectsCounter++);
+    }
 	
 	@Override
 	String getType() {

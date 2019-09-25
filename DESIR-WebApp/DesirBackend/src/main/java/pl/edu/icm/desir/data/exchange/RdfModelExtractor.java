@@ -104,7 +104,7 @@ public class RdfModelExtractor implements ModelBuilder {
 
 				if (p.toString().equals("http://desir.icm.edu.pl/participatesIn")) {
 					Actor actor = new Actor(null, null);
-					actor.setParticipation(new ArrayList<Event>());
+					actor.setEvents(new ArrayList<Event>());
 					
 					if (actorsMap.containsKey(s.toString())) {
 						actor = actorsMap.get(s.toString());
@@ -114,7 +114,7 @@ public class RdfModelExtractor implements ModelBuilder {
 					if (eventsMap.containsKey(o.toString())) {
 						event = eventsMap.get(o.toString());
 					}
-					actor.getParticipation().add(event);
+					actor.getEvents().add(event);
 					actorsMap.put(s.toString(), actor);
 					eventsMap.put(o.toString(), event);
 				}

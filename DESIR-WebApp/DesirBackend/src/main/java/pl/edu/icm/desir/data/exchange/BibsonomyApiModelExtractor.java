@@ -102,12 +102,12 @@ public class BibsonomyApiModelExtractor implements ModelBuilder {
             	if (actorsMap.containsKey(personName)) {
             		Actor actor = actorsMap.get(personName);
             		
-            		actor.getParticipation().add(event);
+            		actor.getEvents().add(event);
             	}
             	Actor actor = new Actor(null, null);
             	actor.setName(personName.getFirstName() + " " + personName.getLastName());
-				actor.setParticipation(new ArrayList<Event>());
-				actor.getParticipation().add(event);
+				actor.setEvents(new ArrayList<Event>());
+				actor.getEvents().add(event);
 				actorsMap.put(personName, actor);
             }
         }

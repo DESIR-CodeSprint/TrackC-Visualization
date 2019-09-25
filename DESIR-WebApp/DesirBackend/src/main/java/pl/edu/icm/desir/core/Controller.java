@@ -2,6 +2,7 @@ package pl.edu.icm.desir.core;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bibsonomy.common.enums.GroupingEntity;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import pl.edu.icm.desir.ForcePlacement.PlacementCore;
 import pl.edu.icm.desir.data.DataBlock;
 import pl.edu.icm.desir.data.exchange.BibsonomyApiModelExtractor;
 import pl.edu.icm.desir.data.exchange.JsonModelExtractor;
@@ -25,6 +25,7 @@ import pl.edu.icm.desir.data.model.Actor;
 import pl.edu.icm.jlargearrays.ObjectLargeArray;
 import pl.edu.icm.jscic.IrregularField;
 import pl.edu.icm.jscic.cells.CellType;
+import org.json.JSONObject;
 
 @RestController
 public class Controller
@@ -75,98 +76,197 @@ public class Controller
     private static DataBlock createTest1(String id, String text)
     {
 
-        float[] coords = new float[]{
-            -1.0f, 0.0f, -1.0f,
-            0.5f, 1.0f, 1.0f,
-            -0.5f, -1.0f, 0.0f,
-            0.0f, -1.0f, 0.5f,
-            1.0f, 0.0f, 1.0f,};
-        String[] nodeData = new String[]{
-            "Branden Kutz",
-            "Eboni Mantle",
-            "Alysa Haigler",
-            "Keena Dragoo",
-            "Barbra Staller"
-        };
-
-        int[] segments = new int[]{
-            0, 1,
-            2, 1,
-            3, 4,
-            3, 1,};
-        String[] segmentData = new String[segments.length / 2];
-        for (int i = 0; i < segmentData.length; i++) {
-            segmentData[i] = nodeData[segments[2 * i]] + " <---> " + nodeData[segments[2 * i + 1]];
-        }
-        
-        float[] segmentFData = new float[segments.length / 2];
-        for (int i = 0; i < segmentFData.length; i++) {
-            segmentFData[i] = (float) Math.random() * 100;   
-        }
-
-        DataBlock db = new DataBlock(id, text);
-        db.setCoords(coords, false);
-        db.setNodeData(nodeData);
-        db.setSegments(segments);
-        db.setSegmentData(segmentData);
-        db.setSegmentFData(segmentFData);
-
-        return db;
-    }
-
-    private static DataBlock createTest2(String id, String text)
-    {
-
 //        float[] coords = new float[]{
-//            0.0f, 0.0f, 0.0f,
-//            2.0f, 0.0f, 0.0f,
-//            2.0f, 2.0f, 0.0f,
-//            0.0f, 2.0f, 0.0f,
-//            0.0f, 0.0f, 2.0f,
-//            2.0f, 0.0f, 2.0f,
-//            2.0f, 2.0f, 2.0f,
-//            0.0f, 2.0f, 2.0f,};
+//            -1.0f, 0.0f, -1.0f,
+//            0.5f, 1.0f, 1.0f,
+//            -0.5f, -1.0f, 0.0f,
+//            0.0f, -1.0f, 0.5f,
+//            1.0f, 0.0f, 1.0f,};
 //        String[] nodeData = new String[]{
-//            "A",
-//            "B",
-//            "C",
-//            "D",
-//            "E",
-//            "F",
-//            "G",
-//            "H",};
+//            "Branden Kutz",
+//            "Eboni Mantle",
+//            "Alysa Haigler",
+//            "Keena Dragoo",
+//            "Barbra Staller"
+//        };
 //
 //        int[] segments = new int[]{
 //            0, 1,
-//            1, 2,
-//            2, 3,
-//            3, 0,
-//            4, 5,
-//            5, 6,
-//            6, 7,
-//            7, 4,};
-//        String[] segmentData = new String[]{
-//            "A<->B",
-//            "B<->C",
-//            "C<->D",
-//            "D<->A",
-//            "E<->F",
-//            "F<->G",
-//            "G<->H",
-//            "H<->E",};
+//            2, 1,
+//            3, 4,
+//            3, 1,};
+//        String[] segmentData = new String[segments.length / 2];
+//        for (int i = 0; i < segmentData.length; i++) {
+//            segmentData[i] = nodeData[segments[2 * i]] + " <---> " + nodeData[segments[2 * i + 1]];
+//        }
+//        
 //        float[] segmentFData = new float[segments.length / 2];
 //        for (int i = 0; i < segmentFData.length; i++) {
 //            segmentFData[i] = (float) Math.random() * 100;   
 //        }
 //
 //        DataBlock db = new DataBlock(id, text);
-//        db.setCoords(coords, true);
-//        db.setNodeData(nodeData);
-//        db.setSegments(segments);
-//        db.setSegmentData(segmentData);
-//        db.setSegmentFData(segmentFData);
+//        db.setCoords(coords, false);
+////        db.setNodeData(nodeData);
+////        db.setSegments(segments);
+////        db.setSegmentData(segmentData);
+////        db.setSegmentFData(segmentFData);
+//        
+//        //TBD
+//              
 //        return db;
+
+         float[] coords = new float[]{
+            
+            //year 1
+            -1.0f,  0.0f,  8.0f, //A1Y1s
+             1.0f,  0.0f,  8.0f, //A2Y1s             
+            -2.0f,  1.0f,  8.0f, //E1Y1p
+             2.0f,  1.0f,  8.0f, //E2Y1p
+
+            //year 2
+            -1.0f,  0.0f,  6.0f, //A1Y2v
+             0.0f,  0.0f,  6.0f, //E3Y2s
+
+            //year 3        
+             1.0f,  0.0f,  4.0f, //A2Y1v 
+             0.0f,  0.0f,  4.0f, //E3Y2v
+             
+            //year 4
+            -1.0f,  0.0f,  2.0f, //A1Y2v
+             1.0f,  0.0f,  2.0f, //A2Y1v 
+             0.0f,  0.0f,  2.0f, //E3Y2e  
+             
+            //year 5
+            -1.0f,  0.0f,  0.0f, //A1Y1e
+             1.0f,  0.0f,  0.0f, //A2Y1e             
+            -2.0f, -1.0f,  0.0f, //E4Y1p
+             2.0f, -1.0f,  0.0f, //E5Y1p             
+        };
         
+        
+        int[] actorNodeIndices = new int[] {
+            0,1,11,12
+        };
+        
+        int[] eventNodeIndices = new int[] {
+            2,3,5,10,13,14
+        };
+        
+        String[] nodeDataIDs = new String[]{
+             //year 1
+            "A1", //0
+            "A2", //1
+            "E1", //2
+            "E2", //3
+
+            //year 2
+            null, //4
+            "E3", //5
+            
+            //year 3
+            null, //6
+            null, //7
+            
+            //year 4
+            null, //8
+            null, //9
+            "E3", //10
+            
+            //year 5
+            "A1", //11
+            "A2", //12
+            "E4", //13
+            "E5", //14         
+        };
+        
+
+        int[] segments = new int[]{
+            //year1
+            0,2,
+            1,3,
+
+            //year2
+            4,5,
+            
+            //year3
+            6,7,
+            
+            //year4
+            8,10,
+            9,10,    
+            
+            //year5
+            11,13,
+            12,14,
+            
+            //A1
+            0,11,
+            //A2
+            1,12,
+            
+            //E3
+            5,10,
+        };
+        
+        int[] actorSegmentIndices = new int[] {
+            8,9
+        };
+        
+        int[] eventSegmentIndices = new int[] {
+            10
+        };
+        
+        int[] participSegmentIndices = new int[] {
+            0,1,2,3,4,5,6,7
+        };
+        
+        String[] segmentDataIDs = new String[]{
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            
+            "A1",
+            "A2",
+            
+            "E3",
+        };
+        
+        int[] quads = new int[] {
+            4,5,8,10,
+            6,7,9,10
+        };
+        
+        String[] quadDataIDs = new String[]{
+            "",
+            ""
+        };
+        
+      
+        DataBlock db = new DataBlock(id, text);
+        db.setCoords(coords, true);
+        db.setActorNodeIndices(actorNodeIndices);
+        db.setEventNodeIndices(eventNodeIndices);
+        db.setNodeDataIDs(nodeDataIDs);
+        db.setSegments(segments);
+        db.setActorSegmentIndices(actorSegmentIndices);
+        db.setEventSegmentIndices(eventSegmentIndices);
+        db.setParticipSegmentIndices(participSegmentIndices);
+        db.setSegmentDataIDs(segmentDataIDs);
+        db.setQuads(quads);
+        db.setQuadDataIDs(quadDataIDs);
+ 
+        return db;
+
+    }
+
+    private static DataBlock createTest2(String id, String text)
+    {
         float[] coords = new float[]{
             
             //year 1
@@ -196,52 +296,29 @@ public class Controller
              
         };
         
-        int VIRTUAL = 0;
-        int ACTOR_POINT = 10;
-        int ACTOR_START = 11;
-        int ACTOR_END = 12;
-        int EVENT_POINT = 20;
         
-         int[] nodeType = new int[]{
-             //year 1
-            ACTOR_START, //"A1Y1"
-            ACTOR_START, //"A2Y1"
-            ACTOR_POINT, //"A3Y1"
-             
-            EVENT_POINT, //"P1Y1"
-
-            //year 2
-            VIRTUAL, //"A2Y2"
-            ACTOR_START, //"A4Y2"
-            ACTOR_POINT, //"A5Y2"
-             
-            EVENT_POINT, //"P2Y2"
-
-            //year 3
-            ACTOR_END, //"A1Y3"
-            ACTOR_END, //"A2Y3"
-            ACTOR_END, //"A4Y3"
-            ACTOR_POINT, //"A6Y3"
-            ACTOR_POINT, //"A7Y3"
-             
-            EVENT_POINT, //"P3Y3"
-            EVENT_POINT, //"P4Y3"          
-        };   
+        int[] actorNodeIndices = new int[] {
+            0,1,2,5,6,8,9,10,11,12
+        };
         
-        String[] nodeData = new String[]{
+        int[] eventNodeIndices = new int[] {
+            3,7,13,14
+        };
+        
+        String[] nodeDataIDs = new String[]{
              //year 1
             "A1", //0
             "A2", //1
             "A3", //2
              
-            "P1 @ YEAR1", //3
+            "P1", //3
 
             //year 2
-            "A2", //4
+            null, //4
             "A4", //5
             "A5", //6
              
-            "P2 @ YEAR2", //7
+            "P2", //7
 
             //year 3
             "A1", //8
@@ -250,10 +327,10 @@ public class Controller
             "A6", //11
             "A7", //12
              
-            "P3 @ YEAR3", //13
-            "P4 @ YEAR3", //14           
+            "P3", //13
+            "P4", //14           
         };
-           
+        
 
         int[] segments = new int[]{
             //year1
@@ -280,12 +357,19 @@ public class Controller
             1,9,
             //A4
             5,10,
-            
-            
-            
         };
         
-        String[] segmentData = new String[]{
+        int[] actorSegmentIndices = new int[] {
+            12,13,14
+        };
+        
+        int[] eventSegmentIndices = null;
+        
+        int[] participSegmentIndices = new int[] {
+            0,1,2,3,4,5,6,7,8,9,10,11
+        };
+        
+        String[] segmentDataIDs = new String[]{
             "",
             "",
             "",
@@ -304,19 +388,24 @@ public class Controller
             "A4",
         };
         
-        float[] segmentFData = new float[segments.length / 2];
-        for (int i = 0; i < segmentFData.length; i++) {
-            segmentFData[i] = (float) Math.random() * 100;   
-        }
-
+        int[] quads = null;
+        String[] quadDataIDs = null;
+        
+      
         DataBlock db = new DataBlock(id, text);
         db.setCoords(coords, true);
-        db.setNodeData(nodeData);
+        db.setActorNodeIndices(actorNodeIndices);
+        db.setEventNodeIndices(eventNodeIndices);
+        db.setNodeDataIDs(nodeDataIDs);
         db.setSegments(segments);
-        db.setSegmentData(segmentData);
-        db.setSegmentFData(segmentFData);
+        db.setActorSegmentIndices(actorSegmentIndices);
+        db.setEventSegmentIndices(eventSegmentIndices);
+        db.setParticipSegmentIndices(participSegmentIndices);
+        db.setSegmentDataIDs(segmentDataIDs);
+        db.setQuads(quads);
+        db.setQuadDataIDs(quadDataIDs);
+ 
         return db;
-        
         
     }
 
@@ -350,18 +439,9 @@ public class Controller
     }
     
     private DataBlock processModel(ModelBuilder builder, boolean doPlacement) {        
-//        IrregularField outField = graphGenerator.generateGraphDataFromModel(builder);
-//        if(doPlacement)
-//            outField = PlacementCore.optimizePlacement(outField,
-//                                                      (float) .7, 1, 100,
-//                                                      1, 4, (float) .001, 0,
-//                                                      null);
-//        return generateRelationsDataBlock(outField);   
-            
-            return graphGenerator.generateDataBlockFromModel(builder);
+        IrregularField outField = graphGenerator.generateGraphDataFromModel(builder);
+        return generateRelationsDataBlock(outField);     
     }
-    
-
 
     private DataBlock generateRelationsDataBlock(IrregularField outField) {
         float[] coords = outField.getCurrentCoords().getData();
@@ -392,11 +472,14 @@ public class Controller
         //create data block
         DataBlock db = new DataBlock("", "");
         db.setCoords(coords, true);
-        db.setNodeData(nodeData);
-        db.setSegments(segments);
-        db.setSegmentData(segmentData);
-        db.setSegmentFData(segmentFData);
+//        db.setNodeData(nodeData);
+//        db.setSegments(segments);
+//        db.setSegmentData(segmentData);
+//        db.setSegmentFData(segmentFData);
+
+        //TBD
 
         return db;
     }
+    
 }

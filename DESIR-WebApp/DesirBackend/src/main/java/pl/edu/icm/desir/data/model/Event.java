@@ -13,14 +13,14 @@ package pl.edu.icm.desir.data.model;
  *
  */
 public class Event extends Entity {
+    
+    private static long objectsCounter = 0;
 
 	String type;
 	
-	SpatiotemporalPoint startPoint;
-	SpatiotemporalPoint endPoint;
-	
 	public Event(SpatiotemporalPoint startPoint, SpatiotemporalPoint endPoint) {
 		super(startPoint, endPoint);
+        this.id = "Event"+(objectsCounter++);
 	}
 
 	public boolean isMomentary() {
@@ -42,22 +42,6 @@ public class Event extends Entity {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public SpatiotemporalPoint getStartPoint() {
-		return startPoint;
-	}
-
-	public void setStartPoint(SpatiotemporalPoint startPoint) {
-		this.startPoint = startPoint;
-	}
-
-	public SpatiotemporalPoint getEndPoint() {
-		return endPoint;
-	}
-
-	public void setEndPoint(SpatiotemporalPoint endPoint) {
-		this.endPoint = endPoint;
 	}
 
     @Override

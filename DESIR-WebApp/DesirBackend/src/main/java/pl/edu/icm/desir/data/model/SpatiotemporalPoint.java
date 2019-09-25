@@ -1,8 +1,5 @@
 package pl.edu.icm.desir.data.model;
 
-import java.util.Calendar;
-import java.util.Date;
-
 import pl.edu.icm.desir.data.model.ScaledTime.Scale;
 
 /**

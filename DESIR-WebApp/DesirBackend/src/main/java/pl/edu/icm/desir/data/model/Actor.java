@@ -22,16 +22,19 @@ import java.util.List;
  *
  */
 public class Actor extends Entity {
+    
+    private static long objectsCounter = 0;
 
 	Date timelifeStartPoint;
 	Date timelifeEndPoint;
 	
-	List<Event> participation;
+	List<Event> events;
 	
 	String type;
 
 	public Actor(SpatiotemporalPoint startPoint, SpatiotemporalPoint endPoint) {
 		super(startPoint, endPoint);
+        this.id = "Actor"+(objectsCounter++);
 	}
 
 	@Override
@@ -39,12 +42,12 @@ public class Actor extends Entity {
 		return false;
 	}
 
-	public List<Event> getParticipation() {
-		return participation;
+	public List<Event> getEvents() {
+		return events;
 	}
 
-	public void setParticipation(List<Event> participation) {
-		this.participation = participation;
+	public void setEvents(List<Event> events) {
+		this.events = events;
 	}
 
 	public String getType() {

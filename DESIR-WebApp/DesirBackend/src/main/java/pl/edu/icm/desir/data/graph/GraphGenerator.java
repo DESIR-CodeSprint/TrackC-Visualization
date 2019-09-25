@@ -20,10 +20,24 @@
  * ***** END LICENSE BLOCK ***** */
 package pl.edu.icm.desir.data.graph;
 
+import java.nio.file.FileSystemException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.bibsonomy.model.PersonName;
 
 import org.springframework.stereotype.Service;
+import pl.edu.icm.desir.ForcePlacement.ConvertDESIRtoVisNow;
+import pl.edu.icm.desir.ForcePlacement.DESIRGradValDP;
+import pl.edu.icm.desir.ForcePlacement.DESIRcoparticipation;
+import pl.edu.icm.desir.ForcePlacement.GraphComponents;
 
 import pl.edu.icm.desir.ForcePlacement.IntVectorHeapSort;
 import pl.edu.icm.desir.data.DataBlock;
@@ -31,6 +45,9 @@ import pl.edu.icm.desir.data.exchange.ModelBuilder;
 import pl.edu.icm.desir.data.model.Actor;
 import pl.edu.icm.desir.data.model.Event;
 import pl.edu.icm.desir.data.model.Participation;
+import pl.edu.icm.desir.data.wrappermodel.ActorWrapper;
+import pl.edu.icm.desir.data.wrappermodel.EventWrapper;
+import pl.edu.icm.desir.data.wrappermodel.ParticipationWrapper;
 import pl.edu.icm.jlargearrays.FloatLargeArray;
 import pl.edu.icm.jlargearrays.IntLargeArray;
 import pl.edu.icm.jlargearrays.LargeArrayType;
@@ -47,6 +64,10 @@ import pl.edu.icm.jscic.dataarrays.DataArrayType;
 import pl.edu.icm.jscic.dataarrays.IntDataArray;
 import pl.edu.icm.jscic.dataarrays.ObjectDataArray;
 import pl.edu.icm.jscic.dataarrays.StringDataArray;
+import pl.edu.icm.visnow.lib.basic.writers.FieldWriter.FieldWriterFileFormat;
+import pl.edu.icm.visnow.lib.utils.io.VisNowFieldWriter;
+import pl.edu.icm.visnow.lib.utils.numeric.minimization.ConjugateGradientsDoublePrecision;
+import pl.edu.icm.visnow.lib.utils.numeric.minimization.ConjugateGradientsParameters;
 
 @Service
 public class GraphGenerator {
@@ -57,9 +78,19 @@ public class GraphGenerator {
 	private List<Participation> generateInteractionsModel(List<Actor> actors) {
 		List<Participation> edges = new ArrayList<>();
 		for (Actor actor : actors) {
-			for (Event event : actor.getParticipation()) {
-				Participation relation = new Participation(actor, event, "author");
-				edges.add(relation);
+			for (Event event : actor.getEvents()) {
+                boolean found = false;
+                for(Participation edge : edges) {
+                    if(edge.getActor().getName().equals(actor.getName()) && 
+                        edge.getEvent().getName().equals(event.getName())) {
+                        found = true;
+                        break;
+                    }  
+                }
+                if(!found) {
+                    Participation relation = new Participation(actor, event, "");
+                    edges.add(relation);
+                }
 			}
 		}
 		return edges;
@@ -163,12 +194,229 @@ public class GraphGenerator {
 		return edges;
 	}
     
-    public DataBlock generateDataBlockFromModel(ModelBuilder builder) {
-        System.out.println("huhu");
+    public DataBlock generatePlacedDataBlockFromModel(ModelBuilder modelBuilder) {
+        ActorWrapper.init();
+        EventWrapper.init();
+        ParticipationWrapper.init();
+        
+		List<Actor> actors = modelBuilder.getActors();
+		List<Event> events = modelBuilder.getEvents();
+   		List<Participation> participations = generateInteractionsModel(actors);
+		//List<Interaction> interactions = generateInteractionsFromModel(participations);
+        
+        for(Participation p : participations) {
+            Event e = p.getEvent();
+            if(!events.contains(e)) {
+                System.out.println("huhu: "+e.toString());
+            }
+        }
+        
+        
+        Map<Actor,ActorWrapper> actorsMap = new HashMap<>();
+        Map<Event,EventWrapper> eventsMap = new HashMap<>();
+        Map<Participation,ParticipationWrapper> participationsMap = new HashMap<>();
+        
+        //wrap model
+        for(Participation participation : participations) {
+            if(participationsMap.containsKey(participation))
+                continue;
+            
+            Actor actor = participation.getActor();
+            ActorWrapper wrappedActor = actorsMap.get(actor);
+            if(wrappedActor == null) {
+                wrappedActor = new ActorWrapper(actor.getName());
+                actorsMap.put(actor, wrappedActor);
+            }
+              
+            Event event = participation.getEvent();
+            EventWrapper wrappedEvent = eventsMap.get(event);
+            if(wrappedEvent == null) {
+                wrappedEvent = new EventWrapper(event.getName(), event.getStartPoint().getCalendarTime().getLocalDate()); 
+                //WHOOPS! wrapped events work only for LocalDates :(
+                eventsMap.put(event, wrappedEvent);
+            }
+            if(!wrappedEvent.getActors().contains(wrappedActor.getName()))
+                wrappedEvent.addActor(wrappedActor);
+            
+            ParticipationWrapper wrappedParticipation = new ParticipationWrapper(wrappedActor, wrappedEvent);
+            if(!wrappedActor.getParticipations().contains(wrappedParticipation))
+                wrappedActor.addParticipation(wrappedParticipation); 
+            participationsMap.put(participation, wrappedParticipation);
+        }
+        
+        
+        for(Actor actor : actors) {
+            if(actorsMap.containsKey(actor))
+                continue;
+            ActorWrapper wrappedActor = new ActorWrapper(actor.getName());
+            actorsMap.put(actor, wrappedActor);
+        }
+        
+        for(Event event : events) {
+            if(eventsMap.containsKey(event))
+                continue;
+            EventWrapper wrappedEvent = new EventWrapper(event.getName(), event.getStartPoint().getCalendarTime().getLocalDate()); 
+            //WHOOPS! wrapped events work only for LocalDates :(
+            eventsMap.put(event, wrappedEvent);
+        }
+        
+        
+        Set<ActorWrapper> wrappedActorsSet = new HashSet<>(actorsMap.values());
+        Set<EventWrapper> wrappedEventsSet = new HashSet<>(eventsMap.values());
+        Set<ParticipationWrapper> wrappedParticipationsSet = new HashSet<>(participationsMap.values()); 
         
         
         
-        return null;
+        //check wrapping
+        if(actors.size() != wrappedActorsSet.size()) {
+            System.err.println("ERROR while wrapping actors");
+            return null;
+        }
+        if(events.size() != wrappedEventsSet.size()) {
+            System.err.println("ERROR while wrapping events");
+            return null;
+        }
+        if(participations.size() != wrappedParticipationsSet.size()) {
+            System.err.println("ERROR while wrapping participations");
+            return null;
+        }
+
+        
+        DESIRcoparticipation result = new DESIRcoparticipation(wrappedActorsSet, wrappedEventsSet, wrappedParticipationsSet);
+        GraphComponents.createComponentIndices(result); 
+        //graph is ready but has no placement
+        
+
+        //prepare for placement
+        double[] pointCoords = new double[2 * (result.getNActors() + result.getNEvents())];
+
+        //optimization parameters
+        float CONNECTED_R = .4f;
+        float CONNECTED_C = 1.f;
+        float UNCONNECTED_C = .1f;
+        float CENTER_SHIFT_C = 1.f;
+            
+        DESIRGradValDP gradVal = new DESIRGradValDP(result,CONNECTED_R, CONNECTED_C,CENTER_SHIFT_C, UNCONNECTED_C);
+
+        for (EventWrapper event : wrappedEventsSet) {
+            int l = event.getEventIndex();
+            float[] location = event.getLocation();
+            for (int i = 0; i < location.length; i++)
+                pointCoords[2 * l + i] = location[i];
+        }
+
+        for (ActorWrapper actor : wrappedActorsSet) {
+            int l = actor.getActorIndex() + events.size();
+            float[] location = actor.getLocation();
+            for (int i = 0; i < location.length; i++)
+                pointCoords[2 * l + i] = location[i];
+        }
+
+        //do placement optimization
+        ConjugateGradientsParameters cgParams = new ConjugateGradientsParameters();
+        double[] val = new double[1];
+        double[] h = new double[] {.01};
+
+        ConjugateGradientsDoublePrecision cg = new ConjugateGradientsDoublePrecision(cgParams, pointCoords.length);
+        cg.minimum_cg(pointCoords, val, .1, .1, .1, h, new int[] {100}, 5, gradVal);
+
+        //copy coords from placement to wrapped model
+        for (EventWrapper event : wrappedEventsSet) {
+            int l = event.getEventIndex();
+            float[] location = event.getLocation();
+            for (int i = 0; i < location.length; i++)
+                location[i] = (float)pointCoords[2 * l + i];
+        }
+
+        for (ActorWrapper actor : wrappedActorsSet) {
+            int l = actor.getActorIndex() + events.size();
+            float[] location = actor.getLocation();
+            for (int i = 0; i < location.length; i++)
+                location[i] = (float)pointCoords[2 * l + i];
+        }
+
+        IrregularField field = ConvertDESIRtoVisNow.generateFieldFromCoparticipation(result);
+        //save VisNow field for testing
+//        try {
+//            VisNowFieldWriter.writeField(field, "/Users/babor/tmp/desir_crop.vns", FieldWriterFileFormat.SERIALIZED, true);
+//        } catch (FileSystemException ex) {
+//            ex.printStackTrace();
+//        }
+        
+        //needed for DataBLock
+        float[] coords = null; 
+        int[] actorNodeIndices = null;    
+        
+        int[] eventNodeIndices = null;
+        String[] nodeDataIDs = null;
+        int[] segments = null;
+        int[] actorSegmentIndices = null;
+        int[] eventSegmentIndices = null;
+        int[] participSegmentIndices = null;
+        String[] segmentDataIDs = null;
+        int[] quads = null;
+        String[] quadDataIDs = null;
+
+        //use field to generate DataBlock 
+        coords = field.getCurrentCoords().getFloatData();
+        CellSet participationsCellSet = field.getCellSet(0);
+        //participSegmentIndices = participationsCellSet.getCellArray(CellType.SEGMENT).getNodes(); getFaceIndices?
+        
+        CellSet actorsCellSet = field.getCellSet(1);
+        actorNodeIndices = actorsCellSet.getCellArray(CellType.POINT).getNodes();
+        //actorSegmentIndices = actorsCellSet.getCellArray(CellType.SEGMENT).getNodes();
+        int[] actorsDataIndices = actorsCellSet.getCellArray(CellType.POINT).getDataIndices();
+        
+        String[] allActorNames = ((StringDataArray)field.getComponent("actor name")).getRawArray().getData();
+        String[] allEventNames = ((StringDataArray)field.getComponent("event name")).getRawArray().getData();
+        
+
+        
+        
+        //TBD - translate field to DataBlock
+        
+        
+//        //or.. don't use coords
+//        //move separate components to grid 
+//        for (ActorWrapper actor : wrappedActorsSet) {
+//            int i = actor.getActorIndex();
+//            int iComponent = actor.getComponentIndex();
+//            actor.getLocation()[0] = actor.getLocation()[0] + 2 * (iComponent % 10);
+//            actor.getLocation()[1] = actor.getLocation()[1] + 2 * (iComponent / 10);
+//        }
+//        
+//        for (EventWrapper event : wrappedEventsSet) {
+//            int i = event.getEventIndex();
+//            int iComponent = event.getComponentIndex();
+//            event.getLocation()[0] = event.getLocation()[0] + 2 * (iComponent % 10);
+//            event.getLocation()[1] = event.getLocation()[1] + 2 * (iComponent / 10);
+//        }
+//        //create coords from  events and participation events and set time as event.getEntryTime(); 
+//        
+//        
+//        //int nNodes =  events.size() + participations.size(); //this is true only for momentary events
+//        //TBD - create DataBlock from model with locations
+        
+        
+        
+        
+        
+        
+        DataBlock db = new DataBlock("", "");
+        db.setCoords(coords, true);
+        db.setActorNodeIndices(actorNodeIndices);
+        db.setEventNodeIndices(eventNodeIndices);
+        db.setNodeDataIDs(nodeDataIDs);
+        db.setSegments(segments);
+        db.setActorSegmentIndices(actorSegmentIndices);
+        db.setEventSegmentIndices(eventSegmentIndices);
+        db.setParticipSegmentIndices(participSegmentIndices);
+        db.setSegmentDataIDs(segmentDataIDs);
+        db.setQuads(quads);
+        db.setQuadDataIDs(quadDataIDs);
+ 
+        return db;
     }
+    
 
 }
