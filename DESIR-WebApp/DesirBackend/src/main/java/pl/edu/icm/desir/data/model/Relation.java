@@ -34,6 +34,10 @@ public abstract class Relation implements DataObjectInterface, Serializable {
 		this.subject.addRelation(this);
         this.targetObject.addRelation(this);
 	}
+
+	public Relation(String identifier) {
+		this.id = identifier;
+	}
 	
 	abstract String getType();
 

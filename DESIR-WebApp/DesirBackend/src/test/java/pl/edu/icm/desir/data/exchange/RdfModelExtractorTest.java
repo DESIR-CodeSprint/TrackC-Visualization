@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.springframework.util.ResourceUtils;
 import pl.edu.icm.desir.data.model.Actor;
 import pl.edu.icm.desir.data.model.Event;
+import pl.edu.icm.desir.data.model.PartOf;
+import pl.edu.icm.desir.data.model.Relation;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,20 +28,29 @@ public class RdfModelExtractorTest {
         Assert.assertEquals(5, actors.size());
         Assert.assertEquals(5, events.size());
 
-        Assert.assertEquals("univ1", actors.get(0).getId());
-        Assert.assertEquals("University of Somewhere", actors.get(0).getName());
+        Assert.assertEquals("univ1", actors.get(1).getId());
+        Assert.assertEquals("University of Somewhere", actors.get(1).getName());
 
         Assert.assertEquals("dep1", actors.get(4).getId());
         Assert.assertEquals("Department of Something", actors.get(4).getName());
         Assert.assertEquals(2, actors.get(4).getRelations().size());
         Assert.assertEquals("univ1", actors.get(4).getRelations().get(0).getTargetObject().getId());
 
-        Assert.assertEquals("a1", actors.get(1).getId());
-        Assert.assertEquals("John Doe", actors.get(1).getName());
-        Assert.assertEquals(3, actors.get(1).getRelations().size());
-        Assert.assertEquals("e2", actors.get(1).getRelations().get(0).getTargetObject().getId());
-        Assert.assertEquals("e1", actors.get(1).getRelations().get(1).getTargetObject().getId());
-        Assert.assertEquals("dep1", actors.get(1).getRelations().get(2).getTargetObject().getId());
+        Assert.assertEquals("a1", actors.get(0).getId());
+        Assert.assertEquals("John Doe", actors.get(0).getName());
+        List<Relation> relationsA1 = actors.get(0).getRelations();
+        Relation relationsA1_0 = relationsA1.get(0);
+        Assert.assertEquals(5, relationsA1.size());
+        Assert.assertEquals("dep1", relationsA1_0.getTargetObject().getId());
+        Assert.assertEquals(1997, relationsA1_0.getStartpoint().getCalendarTime().getLocalDate().getYear());
+        Assert.assertEquals(2018, relationsA1_0.getEndpoint().getCalendarTime().getLocalDate().getYear());
+        Assert.assertTrue(relationsA1_0 instanceof PartOf);
+        Assert.assertEquals("senior researcher", ((PartOf)relationsA1_0).getRole());
+
+        Assert.assertEquals("e1", actors.get(0).getRelations().get(1).getTargetObject().getId());
+        Assert.assertEquals("e2", actors.get(0).getRelations().get(2).getTargetObject().getId());
+        Assert.assertEquals("e1", actors.get(0).getRelations().get(3).getTargetObject().getId());
+        Assert.assertEquals("dep1", actors.get(0).getRelations().get(4).getTargetObject().getId());
 
         Assert.assertEquals("a2", actors.get(2).getId());
         Assert.assertEquals("Anthony Monster", actors.get(2).getName());

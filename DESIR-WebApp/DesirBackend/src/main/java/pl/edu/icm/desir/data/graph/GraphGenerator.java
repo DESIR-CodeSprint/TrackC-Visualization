@@ -163,20 +163,21 @@ public class GraphGenerator {
         for (Participation relation1:relations) {
 			for (Participation relation2:relations) {
 				if (!relation1.equals(relation2)) {
-					if (relation1.getEvent().equals(relation2.getEvent())) {
+					if (relation1.getTargetObject().equals(relation2.getTargetObject())) {
                         idx = -1;
                         for(Interaction e : edges) {
-                            if(e.getActors().get(0).equals(relation1.getActor()) && e.getActors().get(1).equals(relation2.getActor()) ||
-                                e.getActors().get(0).equals(relation2.getActor()) && e.getActors().get(1).equals(relation1.getActor())) {
+                            if(e.getActors().get(0).equals(relation1.getSubject().getName()) && e.getActors().get(1).equals(relation2.getSubject().getName()) ||
+                                e.getActors().get(0).equals(relation2.getSubject().getName()) && e.getActors().get(1).equals(relation1.getSubject().getName())) {
                                 idx = edges.indexOf(e);
                                 break;
                             }
                         }
                          if (idx > -1) {
-                            edges.get(idx).addName(relation1.getEvent().getName());
+                            edges.get(idx).addName(relation1.getTargetObject().getName());
                         } else {
-                            Interaction edge = new Interaction(relation1.getActor().getName(), relation2.getActor().getName());
-                            edge.addName(relation1.getEvent().getName());
+                            Interaction edge = new Interaction(relation1.getSubject().getName(),
+									relation2.getSubject().getName());
+                            edge.addName(relation1.getTargetObject().getName());
                             edges.add(edge);
                         }
 
@@ -194,8 +195,46 @@ public class GraphGenerator {
         
 		List<Actor> actors = modelBuilder.getActors();
 		List<Event> events = modelBuilder.getEvents();
-   		List<Participation> participations = generateInteractionsModel(actors);
+   		List<Participation> participations = generateInteractionsModel(actors); //we shouldn do taht anymore probably for RDF, but should for JSON FIXME 
 		//List<Interaction> interactions = generateInteractionsFromModel(participations);
+        
+        //drop actors without participations
+        List<Actor> notParticipatingActors = new ArrayList<>();
+        for(Actor actor : actors) {
+            boolean found = false;
+            for(Participation participation : participations) {
+                if(participation.getActor().equals(actor)) {
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                notParticipatingActors.add(actor);
+            }
+        }
+        for(Actor actor : notParticipatingActors) {
+            actors.remove(actor);
+        }
+        
+        //drop events without participations
+        List<Event> notParticipatingEvents = new ArrayList<>();
+        for(Event event : events) {
+            boolean found = false;
+            for(Participation participation : participations) {
+                if(participation.getEvent().equals(event)) {
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                notParticipatingEvents.add(event);
+            }
+        }
+        for(Event event : notParticipatingEvents) {
+            events.remove(event);
+        }
+        
+        
         
         for(Participation p : participations) {
             Event e = p.getEvent();
