@@ -346,29 +346,92 @@ public class GraphGenerator {
         //needed for DataBLock
         float[] coords = null; 
         int[] actorNodeIndices = null;    
-        
-        int[] eventNodeIndices = null;
+        int[] eventNodeIndices = null;       
         String[] nodeDataIDs = null;
+        
         int[] segments = null;
         int[] actorSegmentIndices = null;
         int[] eventSegmentIndices = null;
         int[] participSegmentIndices = null;
         String[] segmentDataIDs = null;
+        
         int[] quads = null;
         String[] quadDataIDs = null;
+        
+        
+        //field
+        //nNodes = nEvent + nParticipations
+        //component "actor name" has actor names over nodes (on actor nodes, "" on other)
+        //component "event name" has event names over nodes (on event nodes, "" on other)
+        //component "range" has number of event participants over nodes (on event nodes, 0 on actor nodes)
+        
 
-        //use field to generate DataBlock 
+        //use field to generate DataBlock
+        int nNodes = (int) field.getNNodes();
+        String[] allActorNames = ((StringDataArray)field.getComponent("actor_name")).getRawArray().getData();
+        String[] allEventNames = ((StringDataArray)field.getComponent("event_name")).getRawArray().getData();
+        int[] allEventRanges = ((IntDataArray)field.getComponent("range")).getRawArray().getData();
+        int[] allItemIndices = ((IntDataArray)field.getComponent("item_index")).getRawArray().getData();
+        
         coords = field.getCurrentCoords().getFloatData();
+       
+        int[] tmpNodeTypes = new int[nNodes];
+        int nEventNodes = 0;      
+        for (int i = 0; i < nNodes; i++) {
+            if(!allEventNames[i].isEmpty())
+                nEventNodes++;
+        }
+        int nActorNodes = nNodes - nEventNodes;  
+        for (int i = 0; i < nEventNodes; i++) {
+            tmpNodeTypes[i] = DataBlock.NODE_TYPE_EVENT_POINT;
+        }
+        for (int i = nEventNodes; i < nNodes; i++) {
+            tmpNodeTypes[i] = DataBlock.NODE_TYPE_ACTOR_POINT;
+        }
+        
+        if(nEventNodes > 0) {
+            eventNodeIndices = new int[nEventNodes];
+            for (int i = 0, j = 0; i < nNodes; i++) {
+                if(tmpNodeTypes[i] == DataBlock.NODE_TYPE_EVENT_POINT)
+                    eventNodeIndices[j++] = i;
+            }
+        }
+        if(nActorNodes > 0) {
+            actorNodeIndices = new int[nActorNodes];
+            for (int i = 0, j = 0; i < nNodes; i++) {
+                if(tmpNodeTypes[i] == DataBlock.NODE_TYPE_ACTOR_POINT)
+                    actorNodeIndices[j++] = i;
+            }
+        }
+        
+        nodeDataIDs = new String[nNodes];
+        for (int i = 0; i < nNodes; i++) {
+            switch(tmpNodeTypes[i]) {
+                case DataBlock.NODE_TYPE_EVENT_POINT:
+                    nodeDataIDs[i] = allEventNames[allItemIndices[i]];
+                    break;
+                case DataBlock.NODE_TYPE_ACTOR_POINT:
+                    nodeDataIDs[i] = allActorNames[allItemIndices[i]];
+                    break;                    
+            }
+        }
+
         CellSet participationsCellSet = field.getCellSet(0);
         //participSegmentIndices = participationsCellSet.getCellArray(CellType.SEGMENT).getNodes(); getFaceIndices?
         
         CellSet actorsCellSet = field.getCellSet(1);
-        actorNodeIndices = actorsCellSet.getCellArray(CellType.POINT).getNodes();
+        //actorNodeIndices = actorsCellSet.getCellArray(CellType.POINT).getNodes();
+        //int nActors = actorNodeIndices.length; 
         //actorSegmentIndices = actorsCellSet.getCellArray(CellType.SEGMENT).getNodes();
-        int[] actorsDataIndices = actorsCellSet.getCellArray(CellType.POINT).getDataIndices();
+        //actorNodeIndices = actorsCellSet.getCellArray(CellType.POINT).getDataIndices();
         
-        String[] allActorNames = ((StringDataArray)field.getComponent("actor name")).getRawArray().getData();
-        String[] allEventNames = ((StringDataArray)field.getComponent("event name")).getRawArray().getData();
+        
+        
+        
+        
+
+        
+        
         
 
         
