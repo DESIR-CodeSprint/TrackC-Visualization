@@ -374,11 +374,3 @@ public class RdfModelExtractor implements ModelBuilder {
 		return participations;
 	}
 }
-
-/**
- * Only could visualize the co-authorship graph, not the timeline. (Only in test was it possible)
- * Modification of frontend
- * Improvement of model
- * I did RDF to model mapping and extension
- * Mapping the new model to frontend
- **/
