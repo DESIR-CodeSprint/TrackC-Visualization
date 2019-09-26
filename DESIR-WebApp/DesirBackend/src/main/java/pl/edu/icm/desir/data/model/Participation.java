@@ -51,6 +51,14 @@ public class Participation extends Relation {
     {
         return 0;
     }
+    
+    public Actor getActor() {
+        return (Actor) this.subject;
+    }
+    
+    public Event getEvent() {
+        return (Event) this.targetObject;
+    }
 
 
 

@@ -269,7 +269,7 @@ public class RdfModelExtractor implements ModelBuilder {
 							partOfSourceActor.setSubject(actorSource);
 							relationsMap.put(subject.getURI(), partOfSourceActor);
 						}
-						actorSource.addRelation(partOfSourceActor);
+						//actorSource.addRelation(partOfSourceActor);
 						actorsMap.put(object.toString(), actorSource);
 						relations.add(partOfSourceActor);
 						break;
@@ -289,6 +289,8 @@ public class RdfModelExtractor implements ModelBuilder {
 							partOfTargetActor.setTargetObject(actorTarget);
 							relationsMap.put(subject.getURI(), partOfTargetActor);
 						}
+                        actorsMap.put(object.toString(), actorTarget);
+						relations.add(partOfTargetActor);
 						break;
 					case HAS_ACTOR:
 						Participation participationHasActor;
@@ -305,7 +307,7 @@ public class RdfModelExtractor implements ModelBuilder {
 							participationHasActor = new Participation(subject.getLocalName());
 							participationHasActor.setSubject(actorHasActor);
 						}
-						actorHasActor.addRelation(participationHasActor);
+						//actorHasActor.addRelation(participationHasActor);
 						relationsMap.put(subject.getURI(), participationHasActor);
 						break;
 					case HAS_EVENT:

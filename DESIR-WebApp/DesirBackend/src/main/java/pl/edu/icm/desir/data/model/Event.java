@@ -13,6 +13,8 @@ package pl.edu.icm.desir.data.model;
  *
  */
 public class Event extends Entity {
+    
+    private static long objectsCounter = 0;
 
 	private String type;
 

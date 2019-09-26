@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +32,12 @@ public class JsonModelExtractor implements ModelBuilder {
 	private String filename;
 	private List<Actor> actors;
 	private List<Event> events;
+    
+    private static final DateTimeFormatter YEAR_FORMATTER = new DateTimeFormatterBuilder()
+		     .appendPattern("yyyy")
+		     .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+		     .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+		     .toFormatter();
 
 	public JsonModelExtractor(String filename) {
 		this.filename = filename;
@@ -84,29 +94,42 @@ public class JsonModelExtractor implements ModelBuilder {
 
 	private void generateModelFromPosts(List<Post<? extends Resource>> posts) {
 
-		Map<PersonName, Actor> actorsMap = new HashMap<PersonName, Actor>();
+		Map<String, Actor> actorsMap = new HashMap<String, Actor>();
 		Map<Post<BibTex>, Event> eventsMap = new HashMap<Post<BibTex>, Event>();
 
 		actors = new ArrayList<>();
 		for (final Post<? extends Resource> apost : posts) {
 			Post<BibTex> post = (Post<BibTex>) apost;
+            if(post.getResource().getAuthor().size() == 0)
+                continue;
+            String title = post.getResource().getTitle();
+            boolean found = false;
+            for(Event e : eventsMap.values()) {
+                if(e.getName().equals(title)) {
+                    found = true;
+                    break;
+                }
+            }
+            if(found)
+                continue;
+            
 			SpatiotemporalPoint stPoint = new SpatiotemporalPoint();
 			ScaledTime st = new ScaledTime();
-			st.setLocalDate(DataUtils.convertToLocalDate(post.getDate()));
-			Event event = new Event(DataUtils.createHashWithTimestamp(post.getResource().getTitle()),
-					post.getResource().getTitle(), stPoint, stPoint);
-			event.setName(post.getResource().getTitle());
+			st.setLocalDate(LocalDate.parse(post.getResource().getYear(), YEAR_FORMATTER));
+            stPoint.setCalendarTime(st);
+			Event event = new Event(DataUtils.createHashWithTimestamp(title),
+                                    title, stPoint, stPoint);
 			eventsMap.put(post, event);
 			for (PersonName personName:post.getResource().getAuthor()) {
-				Actor actor;
-				if (actorsMap.containsKey(personName)) {
-					actor = actorsMap.get(personName);
-				}
-				actor =
-						new Actor(DataUtils.createHashWithTimestamp(personName.getFirstName() + " " + personName.getLastName()),
-								personName.getFirstName() + " " + personName.getLastName());
+                Actor actor;
+				String name = personName.getFirstName() + " " + personName.getLastName();
+				if (actorsMap.containsKey(name)) {
+					actor = actorsMap.get(name);
+				} else {
+                    actor = new Actor(DataUtils.createHashWithTimestamp(name), name);
+                }
 				Participation participation = new Participation(actor, event, "");
-				actorsMap.put(personName, actor);
+				actorsMap.put(name, actor);
 			}
 		}
 		actors = new ArrayList<Actor>(actorsMap.values());

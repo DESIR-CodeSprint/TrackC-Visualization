@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class Dependency extends Relation {
 
+    private static long objectsCounter = 0;
 	static final String DEPENDENCY_TYPE = "dependency";
 	
 	List<Entity> entities;

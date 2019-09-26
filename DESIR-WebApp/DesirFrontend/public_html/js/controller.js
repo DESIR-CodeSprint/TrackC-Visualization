@@ -1,6 +1,5 @@
 
 var app = angular.module('desirApp', []);
-
 var dataobject;
 var scene;
 var camera;
@@ -8,30 +7,72 @@ var renderer;
 var container3D;
 var ambientLight;
 var directionalLight;
-var pointsObject;
-var pointSpheres = [];
-var lineObjects = [];
+var actorPointsObject;
+var actorLinesObjects = [];
+var actorPointsGeometry;
+var eventPointsObject;
+var eventLinesObjects = [];
+var eventPointsGeometry;
+var participLinesObjects = [];
+var participQuadObjects = [];
 var raycaster;
 var currentIntersectedPoint;
 var currentIntersectedPointIndex;
 var currentIntersectedLine;
 var currentIntersectedLineIndex;
 var mouse;
-var hooverPointSphere;
 var pointSize = 0.1;
 var mouseText;
 
-var nodeSelection;
-var nodeTexts;
-var nodeTypes;
-var edgeTexts;
+
+var coords;
+var nNodes = 0;
+var actorNodeIndices;
+var eventNodeIndices;
+var nodeDataIDs;
 var segments;
+var actorSegmentIndices;
+var eventSegmentIndices;
+var participSegmentIndices;
+var segmentDataIDs;
+var quads;
+var quadDataIDs;
+var data;
+var nodeSelection;
+var nodeSizes;
+var nodeColors;
+
+//variables for object visibility
+var visibleActors;
+var visibleEvents;
+var visibleRelationsParticipation;
+var visibleRelationsDependency;
+
+//variables for global colors
+var cActorDefaultColor;
+var cActorHoverColor;
+var cActorSelectedColor;
+
+var cEventDefaultColor;
+var cEventHoverColor;
+var cEventSelectedColor;
+
+var cParticipDefaultColor;
+var cParticipHoverColor;
+var cParticipSelectedColor;
+
 
 window.onload = function () {
     if (!Detector.webgl)
         Detector.addGetWebGLMessage();
 
     container3D = document.getElementById('Container3D');
+
+    setupColors();
+    visibleActors = true;
+    visibleEvents = true;
+    visibleRelationsParticipation = true;
+    visibleRelationsDependency = false;
 
     var width = window.innerWidth - 340;
     var height = window.innerHeight;
@@ -63,6 +104,7 @@ window.onload = function () {
 
     //mouse coordinates
     mouse = new THREE.Vector2();
+    //mouse events
     container3D.addEventListener('mousemove', onDocumentMouseMove, false);
     //container3D.addEventListener('click', onDocumentMouseClick, false);
 
@@ -90,6 +132,7 @@ window.onload = function () {
     updateCharts();
 
     render();
+    //animate();
 };
 
 function updateCharts() {
@@ -101,17 +144,29 @@ function updateCharts() {
 }
 
 function onDocumentMouseClick(event) {
+    //TBD fix click event - press+drag+release should not be a click for point selection?
     if (currentIntersectedPointIndex < 0)
         return;
+    if (nodeSelection === null || nodeSelection === undefined)
+        return;
 
-    if (nodeSelection[currentIntersectedPointIndex] === 0)
+    var color;
+    if (nodeSelection[currentIntersectedPointIndex] === 0) {
         nodeSelection[currentIntersectedPointIndex] = 1;
-    else
+        color = cActorSelectedColor;
+    } else {
         nodeSelection[currentIntersectedPointIndex] = 0;
+        color = cActorDefaultColor;
+    }
 
-    draw3D();
+    color.toArray(actorPointsGeometry.attributes.ca.array, currentIntersectedPointIndex * 3);
+    actorPointsGeometry.attributes.ca.needsUpdate = true;
+
+    color.toArray(eventPointsGeometry.attributes.ca.array, currentIntersectedPointIndex * 3);
+    eventPointsGeometry.attributes.ca.needsUpdate = true;
+
+    render();
 }
-
 
 function onDocumentMouseMove(event) {
     event.preventDefault();
@@ -135,25 +190,70 @@ function onDocumentMouseMove(event) {
     mousePos.innerHTML = mouse.x + ", " + mouse.y;
 
     raycaster.setFromCamera(mouse, camera);
+    
+    //clear line hover if present 
+    if (currentIntersectedLine !== undefined) {
+        currentIntersectedLine.material.linewidth = 1;
+        currentIntersectedLine.material.color = new THREE.Color(0x999999);
+    }
+    currentIntersectedLine = undefined;
+    currentIntersectedLineIndex = -1;
+    
+    //clear point hover if present 
+    if (currentIntersectedPointIndex >= 0 && isActorNode(currentIntersectedPointIndex)) {
+        var color;
+        if (nodeSelection[currentIntersectedPointIndex] === 0) {
+            color = cActorDefaultColor;
+        } else {
+            color = cActorSelectedColor;
+        }
+        color.toArray(actorPointsGeometry.attributes.ca.array, currentIntersectedPointIndex * 3);
+        actorPointsGeometry.attributes.ca.needsUpdate = true;
+    }
+    if (currentIntersectedPointIndex >= 0 && isEventNode(currentIntersectedPointIndex)) {
+        var color;
+        if (nodeSelection[currentIntersectedPointIndex] === 0) {
+            color = cEventDefaultColor;
+        } else {
+            color = cEventSelectedColor;
+        }
+        color.toArray(eventPointsGeometry.attributes.ca.array, currentIntersectedPointIndex * 3);
+        eventPointsGeometry.attributes.ca.needsUpdate = true;
+    }
+    currentIntersectedPoint = undefined;
+    currentIntersectedPointIndex = -1;
+                
+    
+    
+    
+    //TODO
+    //rewrite intersectioning to use objectID and highlight all geometries with this ID 
+    //keep currentDataID instead of pointIndex
+    //highlight all geometries with dataIDs == currentDataID
+    //rewrite line appearance change utilizing BufferedGeometry and shaders, add line trasparency, etc.
+    //how shall we represent time in 3D view? color? axis?
+    //solve point scale problem? add UI for changing
+    //enable choosing subcomponents on optimized location grid
 
-    var ok = false;
-    if (pointsObject !== undefined) {
-        // find intersections with points
-        var intersects = raycaster.intersectObject(pointsObject);
+    //====================== find intersections with actor points ========================
+    var intersectionFound = false;
+    if (actorPointsObject !== undefined) {
+        var intersects = raycaster.intersectObject(actorPointsObject);
         var pp;
-        var imin;
+        var imin = 0;
 
         //nie koniecznie [0], pętla po wszystkich i min odległości
         if (intersects.length > 0) {
             //distance
-            var geometry = pointsObject.geometry;
+            var geometry = actorPointsObject.geometry;
             var attributes = geometry.attributes;
             var coords = attributes.position.array;
             var minD = 2 * pointSize;
             //TBD check only N=?10 first points sorted by distance from camera
             for (var i = 0; i < intersects.length; i++) {
                 var ip = intersects[i].point;
-                var p = new THREE.Vector3(coords[3 * intersects[i].index], coords[3 * intersects[i].index + 1], coords[3 * intersects[i].index + 2]);
+                var ipi = intersects[i].index;
+                var p = new THREE.Vector3(coords[3 * ipi], coords[3 * ipi + 1], coords[3 * ipi + 2]);
                 var d = ip.distanceTo(p);
                 if (d < minD) {
                     minD = d;
@@ -162,70 +262,171 @@ function onDocumentMouseMove(event) {
                 }
             }
             if (minD < pointSize / 16)
-                ok = true;
+                intersectionFound = true;
         }
-        if (ok) {
-            if (currentIntersectedLine !== undefined) {
-                currentIntersectedLine.material.linewidth = 1;
-                currentIntersectedLine.material.color = new THREE.Color(0x999999);
-            }
-            currentIntersectedLine = undefined;
-            currentIntersectedLineIndex = -1;
-
+        if (intersectionFound) { //this is what happens when a node is pointed with a mouse
             currentIntersectedPoint = intersects[imin].object;
             currentIntersectedPointIndex = intersects[imin].index;
-            hooverPointSphere.position.copy(pp);
-            hooverPointSphere.visible = true;
+            cActorHoverColor.toArray(actorPointsGeometry.attributes.ca.array, currentIntersectedPointIndex * 3);
+            actorPointsGeometry.attributes.ca.needsUpdate = true;
 
-            if (nodeTexts !== undefined && currentIntersectedPointIndex >= 0 && currentIntersectedPointIndex < nodeTexts.length)
-                mouseText.innerHTML = "" + currentIntersectedPointIndex + ": " + nodeTexts[currentIntersectedPointIndex];
-            else
-                mouseText.innerHTML = "no data";
+            if (nodeDataIDs !== undefined && currentIntersectedPointIndex >= 0 && currentIntersectedPointIndex < nodeDataIDs.length) {
+                mouseText.innerHTML = "" + nodeDataIDs[currentIntersectedPointIndex];
 
-            mouseText.style.visibility = 'visible';
-        } else {
-            currentIntersectedPoint = undefined;
-            currentIntersectedPointIndex = -1;
-            hooverPointSphere.visible = false;
-            mouseText.style.visibility = 'hidden';
-        }
-    }
+//                if (nodeMetadata !== undefined && nodeMetadata !== null) {
+//                    var md = nodeMetadata[currentIntersectedPointIndex];
+//                    if (md !== null && md !== "") {
+//                        var mdMap = new Map(Object.entries(JSON.parse(md)));
+//                        for (let [k, v] of mdMap) {
+//                            mouseText.innerHTML = mouseText.innerHTML + "<br>" + k + "=" + v;
+//                        }
+//                    }
+//                }
 
-    // find intersections with lines
-    if (!ok && lineObjects !== undefined) {
-        intersects = raycaster.intersectObjects(lineObjects);
-        if (intersects.length > 0) {
-            if (currentIntersectedLine !== undefined) {
-                currentIntersectedLine.material.linewidth = 1;
-                currentIntersectedLine.material.color = new THREE.Color(0x999999);
-                currentIntersectedLineIndex = -1;
-            }
-            currentIntersectedLine = intersects[ 0 ].object;
-            for (var i = 0; i < lineObjects.length; i++) {
-                if (lineObjects[i] === currentIntersectedLine) {
-                    currentIntersectedLineIndex = i;
-                    break;
-                }
-            }
-
-            currentIntersectedLine.material.linewidth = 10;
-            currentIntersectedLine.material.color = new THREE.Color(0x990000);
-            if (edgeTexts !== undefined && currentIntersectedLineIndex >= 0 && currentIntersectedLineIndex < edgeTexts.length) {
-                mouseText.innerHTML = "common interactions: " + edgeTexts[currentIntersectedLineIndex];
-                //mouseText.innerHTML = "" + currentIntersectedLineIndex + ": " + edgeTexts[currentIntersectedLineIndex];
-                //mouseText.innerHTML = "" + nodeTexts[segments[2 * currentIntersectedLineIndex]] + " <-> " + nodeTexts[segments[2 * currentIntersectedLineIndex + 1]] + "<br>" +
-                //        "Common publications: " + edgeTexts[currentIntersectedLineIndex];
+                //mouseText.innerHTML = "" + currentIntersectedPointIndex + ": " + nodeTexts[currentIntersectedPointIndex];
             } else {
                 mouseText.innerHTML = "no data";
             }
 
             mouseText.style.visibility = 'visible';
         } else {
-            if (currentIntersectedLine !== undefined) {
-                currentIntersectedLine.material.linewidth = 1;
-                currentIntersectedLine.material.color = new THREE.Color(0x999999);
+            mouseText.style.visibility = 'hidden';
+        }
+    }
+    
+    //====================== find intersections with events points ========================
+    if (!intersectionFound && eventPointsObject !== undefined) {
+        // find intersections with event points
+        var intersects = raycaster.intersectObject(eventPointsObject);
+        var pp;
+        var imin = 0;
+
+        //nie koniecznie [0], pętla po wszystkich i min odległości
+        if (intersects.length > 0) {
+            //distance
+            var geometry = eventPointsObject.geometry;
+            var attributes = geometry.attributes;
+            var coords = attributes.position.array;
+            var minD = 2 * pointSize;
+            //TBD check only N=?10 first points sorted by distance from camera
+            for (var i = 0; i < intersects.length; i++) {
+                var ip = intersects[i].point;
+                var ipi = intersects[i].index;
+                var p = new THREE.Vector3(coords[3 * ipi], coords[3 * ipi + 1], coords[3 * ipi + 2]);
+                var d = ip.distanceTo(p);
+                if (d < minD) {
+                    minD = d;
+                    imin = i;
+                    pp = p;
+                }
             }
-            currentIntersectedLine = undefined;
+            if (minD < pointSize / 16)
+                intersectionFound = true;
+        }
+        if (intersectionFound) { //this is what happens when a node is pointed with a mouse
+            currentIntersectedPoint = intersects[imin].object;
+            currentIntersectedPointIndex = intersects[imin].index;
+            cEventHoverColor.toArray(eventPointsGeometry.attributes.ca.array, currentIntersectedPointIndex * 3);
+            eventPointsGeometry.attributes.ca.needsUpdate = true;
+
+            if (nodeDataIDs !== undefined && currentIntersectedPointIndex >= 0 && currentIntersectedPointIndex < nodeDataIDs.length) {
+                mouseText.innerHTML = "" + nodeDataIDs[currentIntersectedPointIndex];
+
+//                if (nodeMetadata !== undefined && nodeMetadata !== null) {
+//                    var md = nodeMetadata[currentIntersectedPointIndex];
+//                    if (md !== null && md !== "") {
+//                        var mdMap = new Map(Object.entries(JSON.parse(md)));
+//                        for (let [k, v] of mdMap) {
+//                            mouseText.innerHTML = mouseText.innerHTML + "<br>" + k + "=" + v;
+//                        }
+//                    }
+//                }
+
+                //mouseText.innerHTML = "" + currentIntersectedPointIndex + ": " + nodeTexts[currentIntersectedPointIndex];
+            } else {
+                mouseText.innerHTML = "no data";
+            }
+
+            mouseText.style.visibility = 'visible';
+        } else {
+            mouseText.style.visibility = 'hidden';
+        }
+    }    
+
+    //====================== find intersections with actor lines ========================
+    if (!intersectionFound && actorLinesObjects !== undefined) {
+        intersects = raycaster.intersectObjects(actorLinesObjects);
+        if (intersects.length > 0) {
+            currentIntersectedLine = intersects[ 0 ].object;
+            for (var i = 0; i < actorLinesObjects.length; i++) {
+                if (actorLinesObjects[i] === currentIntersectedLine) {
+                    currentIntersectedLineIndex = actorSegmentIndices[i];           
+                    break;
+                }
+            }
+            intersectionFound = true;
+        }
+        if(intersectionFound) {
+            currentIntersectedLine.material.linewidth = 10;
+            currentIntersectedLine.material.color = new THREE.Color(0x990000);
+            if (segmentDataIDs !== undefined && currentIntersectedLineIndex >= 0 && currentIntersectedLineIndex < segmentDataIDs.length) {
+                mouseText.innerHTML = "" + segmentDataIDs[currentIntersectedLineIndex];
+
+//                if (edgeMetadata !== undefined && edgeMetadata !== null) {
+//                    var md = edgeMetadata[currentIntersectedLineIndex];
+//                    if (md !== null && md !== "") {
+//                        var mdMap = new Map(Object.entries(JSON.parse(md)));
+//                        for (let [k, v] of mdMap) {
+//                            mouseText.innerHTML = mouseText.innerHTML + "<br>" + k + "=" + v;
+//                        }
+//                    }
+//                }
+
+            } else {
+                mouseText.innerHTML = "no data";
+            }
+
+            mouseText.style.visibility = 'visible';
+        } else {
+            mouseText.style.visibility = 'hidden';
+        }
+    }
+
+    //====================== find intersections with event lines ========================
+    if (!intersectionFound && eventLinesObjects !== undefined) {
+        intersects = raycaster.intersectObjects(eventLinesObjects);
+        if (intersects.length > 0) {
+            currentIntersectedLine = intersects[ 0 ].object;
+            for (var i = 0; i < eventLinesObjects.length; i++) {
+                if (eventLinesObjects[i] === currentIntersectedLine) {
+                    currentIntersectedLineIndex = eventSegmentIndices[i];           
+                    break;
+                }
+            }
+            intersectionFound = true;
+        }
+        if(intersectionFound) {
+            currentIntersectedLine.material.linewidth = 10;
+            currentIntersectedLine.material.color = new THREE.Color(0x990000);
+            if (segmentDataIDs !== undefined && currentIntersectedLineIndex >= 0 && currentIntersectedLineIndex < segmentDataIDs.length) {
+                mouseText.innerHTML = "" + segmentDataIDs[currentIntersectedLineIndex];
+
+//                if (edgeMetadata !== undefined && edgeMetadata !== null) {
+//                    var md = edgeMetadata[currentIntersectedLineIndex];
+//                    if (md !== null && md !== "") {
+//                        var mdMap = new Map(Object.entries(JSON.parse(md)));
+//                        for (let [k, v] of mdMap) {
+//                            mouseText.innerHTML = mouseText.innerHTML + "<br>" + k + "=" + v;
+//                        }
+//                    }
+//                }
+
+            } else {
+                mouseText.innerHTML = "no data";
+            }
+
+            mouseText.style.visibility = 'visible';
+        } else {
             mouseText.style.visibility = 'hidden';
         }
     }
@@ -234,109 +435,344 @@ function onDocumentMouseMove(event) {
 }
 
 function draw3D() {
-    if (pointsObject !== undefined)
-        scene.remove(pointsObject);
-    if (lineObjects !== undefined) {
-        for (var i = 0; i < lineObjects.length; i++)
-            scene.remove(lineObjects[i]);
-        lineObjects = [];
+    //cleanup scene
+    if (actorPointsObject !== undefined)
+        scene.remove(actorPointsObject);
+    if (actorLinesObjects !== undefined) {
+        for (var i = 0; i < actorLinesObjects.length; i++)
+            scene.remove(actorLinesObjects[i]);
+        actorLinesObjects = [];
     }
-    if (hooverPointSphere !== undefined)
-        scene.remove(hooverPointSphere);
-    if (pointSpheres !== undefined) {
-        for (var i = 0; i < pointSpheres.length; i++)
-            scene.remove(pointSpheres[i]);
-        pointSpheres = [];
+    if (eventPointsObject !== undefined)
+        scene.remove(eventPointsObject);
+    if (eventLinesObjects !== undefined) {
+        for (var i = 0; i < eventLinesObjects.length; i++)
+            scene.remove(eventLinesObjects[i]);
+        eventLinesObjects = [];
     }
-
-    //get object data from scope
-    var coords = dataobject.coords;
-    segments = dataobject.segments;
-    var nNodes = coords.length / 3;
-
-
-    //create nodes geometry
-    var pointsGeometry = new THREE.BufferGeometry();
-    pointsGeometry.addAttribute('position', new THREE.Float32BufferAttribute(coords, 3));
-
-    //get scene geometric extents
-    pointsGeometry.computeBoundingSphere();
-    pointsGeometry.computeBoundingBox();
-    var bb = pointsGeometry.boundingBox;
-    var bbcenter = bb.getCenter();
-    var bbsize = bb.getSize();
-    //set camera position to view the whole scene
-    var maxDim = Math.max(bbsize.x, bbsize.y, bbsize.z);
-    var fov = camera.fov * (Math.PI / 180);
-    var cameraZ = Math.abs(maxDim / (2 * Math.tan(fov / 2))) * 2.0;
-    camera.position.set(bbcenter.x, bbcenter.y, cameraZ);
-
-    //create points at nodes of certain types
-    //0=virtual, 10=actor_point, 11=actor_start, 12=actor_end, 20=event_point
-    pointSize = 0.1 * maxDim;
-    //var pointsMaterial = new THREE.PointsMaterial({color: 0x0000ff, size: pointSize});
-    var pointsMaterial = new THREE.PointsMaterial({
-        //vertexColors: true,
-        size: 10 * pointSize,
-        color: 0xffffff,
-        map: new THREE.TextureLoader().load('img/xs-stars.png'), // '2.jpg' 
-        transparent: true,
-        side: THREE.DoubleSide,
-        depthTest: false
-    });
-
-    //jak stworzyć różne typy materiału na punktach 
-    pointsObject = new THREE.Points(pointsGeometry, pointsMaterial);
-    scene.add(pointsObject);
-    raycaster.linePrecision = pointSize / 8;
-
-    //create sphere for point hoover
-    var sphereGeometry = new THREE.SphereGeometry(pointSize / 16, 32, 32);
-    var sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
-    hooverPointSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    hooverPointSphere.visible = false;
-    scene.add(hooverPointSphere);
-
-    //create spheres for point selection
-    for (var i = 0; i < nNodes; i++) {
-        if (nodeSelection[i] === 0)
-            continue;
-
-        var sphereGeometry = new THREE.SphereGeometry(pointSize / 16, 32, 32);
-        var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x00ff00});
-        pointSpheres[i] = new THREE.Mesh(sphereGeometry, sphereMaterial);
-        pointSpheres[i].visible = true;
-        pointSpheres[i].position.x = coords[3 * i];
-        pointSpheres[i].position.y = coords[3 * i + 1];
-        pointSpheres[i].position.z = coords[3 * i + 2];
-        scene.add(pointSpheres[i]);
+    if (participLinesObjects !== undefined) {
+        for (var i = 0; i < participLinesObjects.length; i++)
+            scene.remove(participLinesObjects[i]);
+        participLinesObjects = [];
+    }
+    if (participQuadObjects !== undefined) {
+        for (var i = 0; i < participQuadObjects.length; i++)
+            scene.remove(participQuadObjects[i]);
+        participQuadObjects = [];
+    }
+    
+    
+    
+    if (visibleActors) {
+        createActorsGeometry();
+    }
+    
+    if(visibleEvents) {
+        createEventsGeometry();
+    }
+    
+    if(visibleRelationsParticipation) {
+        createRelationsParticipationGeometry();
     }
 
-    //create segments geometry and lines
-    var nSegments = segments.length / 2;
-    var a, b;
-    for (var i = 0; i < nSegments; i++) {
-        var linesGeometry = new THREE.Geometry();
-        a = segments[2 * i];
-        b = segments[2 * i + 1];
-        linesGeometry.vertices.push(new THREE.Vector3(coords[3 * a], coords[3 * a + 1], coords[3 * a + 2]));
-        linesGeometry.vertices.push(new THREE.Vector3(coords[3 * b], coords[3 * b + 1], coords[3 * b + 2]));
-        //var linesMaterial = new THREE.LineBasicMaterial({color: 0xff0000, linewidth: 1});
-        var linesMaterial = new THREE.LineBasicMaterial({
-            color: 0x999999,
-            linewidth: 1,
-            opacity: 0.7,
-            blending: THREE.AdditiveBlending,
-            transparent: true
-        });
-
-        var lineObject = new THREE.LineSegments(linesGeometry, linesMaterial);
-        lineObjects.push(lineObject);
-        scene.add(lineObject);
+    if(visibleRelationsDependency) {
+        createRelationsDependencyGeometry();
     }
+    
+    
 
     //barcharts();
+    render();
+    doSceneSetup();
+}
 
+function createActorsGeometry() {
+    if(nNodes < 1)
+        return;
+    if(coords === null || coords === undefined)
+        return;
+    if(nodeSizes === null || nodeSizes === undefined)
+        return;
+    if(nodeColors === null || nodeColors === undefined)
+        return;
+    
+    if(actorNodeIndices !== null && actorNodeIndices !== undefined) {
+        //create indexed nodes geometry
+        actorPointsGeometry = new THREE.BufferGeometry();
+        actorPointsGeometry.addAttribute('position', new THREE.Float32BufferAttribute(coords, 3)); 
+        actorPointsGeometry.addAttribute('size', new THREE.BufferAttribute(nodeSizes, 1));
+        actorPointsGeometry.addAttribute('ca', new THREE.BufferAttribute(nodeColors, 3));
+        actorPointsGeometry.setIndex(actorNodeIndices);
+
+        //create actor node appearance using texture
+        var texture = new THREE.TextureLoader().load("img/ball.png"); //('img/xs-stars.png');
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        var actorPointsMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                color: {value: new THREE.Color(0xffffff)},
+                pointTexture: {value: texture}
+            },
+            vertexShader: document.getElementById('vertexshader').textContent,
+            fragmentShader: document.getElementById('fragmentshader').textContent,
+            //transparent: false,
+            //side: THREE.DoubleSide,
+            //depthTest: true
+            //why lines are drawn over node texture?
+            depthWrite: true
+        });
+
+        //create actor nodes object
+        actorPointsObject = new THREE.Points(actorPointsGeometry, actorPointsMaterial);
+        scene.add(actorPointsObject);
+    }
+
+    if(actorSegmentIndices !== null && actorSegmentIndices !== undefined) {
+        //create actor segments geometry and lines
+        var nSegments = actorSegmentIndices.length;
+        var a, b;
+        for (var i = 0; i < nSegments; i++) {
+            var actorLinesGeometry = new THREE.Geometry();
+            a = segments[2 * actorSegmentIndices[i]];
+            b = segments[2 * actorSegmentIndices[i] + 1];
+            actorLinesGeometry.vertices.push(new THREE.Vector3(coords[3 * a], coords[3 * a + 1], coords[3 * a + 2]));
+            actorLinesGeometry.vertices.push(new THREE.Vector3(coords[3 * b], coords[3 * b + 1], coords[3 * b + 2]));
+            var actorLinesMaterial = new THREE.LineBasicMaterial({
+                color: 0x999999,
+                linewidth: 1,
+                opacity: 0.7,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                //depthWrite: true
+            });
+
+            var actorLineObject = new THREE.LineSegments(actorLinesGeometry, actorLinesMaterial);
+            actorLinesObjects.push(actorLineObject);
+            scene.add(actorLineObject);
+        }
+    }
+    
+}
+
+function createEventsGeometry() {
+    if(nNodes < 1)
+        return;
+    if(coords === null || coords === undefined)
+        return;
+    if(nodeSizes === null || nodeSizes === undefined)
+        return;
+    if(nodeColors === null || nodeColors === undefined)
+        return;
+    
+    if(eventNodeIndices !== null && eventNodeIndices !== undefined) {
+        //create indexed nodes geometry
+        eventPointsGeometry = new THREE.BufferGeometry();
+        eventPointsGeometry.addAttribute('position', new THREE.Float32BufferAttribute(coords, 3)); 
+        eventPointsGeometry.addAttribute('size', new THREE.BufferAttribute(nodeSizes, 1));
+        eventPointsGeometry.addAttribute('ca', new THREE.BufferAttribute(nodeColors, 3));
+        eventPointsGeometry.setIndex(eventNodeIndices);
+
+
+        //create event node appearance using texture
+        var texture = new THREE.TextureLoader().load("img/ball.png"); //('img/xs-stars.png');
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        var eventPointsMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                color: {value: new THREE.Color(0xffffff)},
+                pointTexture: {value: texture}
+            },
+            vertexShader: document.getElementById('vertexshader').textContent,
+            fragmentShader: document.getElementById('fragmentshader').textContent,
+            //transparent: false,
+            //side: THREE.DoubleSide,
+            //depthTest: true
+            //why lines are drawn over node texture?
+            depthWrite: true
+        });
+
+        //create event nodes object
+        eventPointsObject = new THREE.Points(eventPointsGeometry, eventPointsMaterial);
+        scene.add(eventPointsObject);
+    }
+    
+    if(eventSegmentIndices !== null && eventSegmentIndices !== undefined) {
+        //create event segments geometry and lines
+        var nSegments = eventSegmentIndices.length;
+        var a, b;
+        for (var i = 0; i < nSegments; i++) {
+            var eventLinesGeometry = new THREE.Geometry();
+            a = segments[2 * eventSegmentIndices[i]];
+            b = segments[2 * eventSegmentIndices[i] + 1];
+            eventLinesGeometry.vertices.push(new THREE.Vector3(coords[3 * a], coords[3 * a + 1], coords[3 * a + 2]));
+            eventLinesGeometry.vertices.push(new THREE.Vector3(coords[3 * b], coords[3 * b + 1], coords[3 * b + 2]));
+            var eventLinesMaterial = new THREE.LineBasicMaterial({
+                color: 0x999999,
+                linewidth: 1,
+                opacity: 0.7,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                //depthWrite: true
+            });
+
+            var eventLineObject = new THREE.LineSegments(eventLinesGeometry, eventLinesMaterial);
+            eventLinesObjects.push(eventLineObject);
+            scene.add(eventLineObject);
+        }
+    }
+    
+}
+
+function createRelationsParticipationGeometry() {
+    if(nNodes < 2)
+        return;
+    if(coords === null || coords === undefined)
+        return;
+    
+    //momentary participation - segments
+    if(participSegmentIndices !== null && participSegmentIndices !== undefined) {
+        //create participation segments geometry and lines
+        var nSegments = participSegmentIndices.length;
+        var a, b;
+        for (var i = 0; i < nSegments; i++) {
+            var participLinesGeometry = new THREE.Geometry();
+            a = segments[2 * participSegmentIndices[i]];
+            b = segments[2 * participSegmentIndices[i] + 1];
+            participLinesGeometry.vertices.push(new THREE.Vector3(coords[3 * a], coords[3 * a + 1], coords[3 * a + 2]));
+            participLinesGeometry.vertices.push(new THREE.Vector3(coords[3 * b], coords[3 * b + 1], coords[3 * b + 2]));
+            var participLinesMaterial = new THREE.LineBasicMaterial({
+                color: 0x999999,
+                linewidth: 1,
+                opacity: 0.7,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                //depthWrite: true
+            });
+
+            var participLineObject = new THREE.LineSegments(participLinesGeometry, participLinesMaterial);
+            participLinesObjects.push(participLineObject);
+            scene.add(participLineObject);
+        }        
+    }  
+    
+    //lasting participation - quads
+    if(quads !== null && quads !== undefined) {
+  
+        var nQuads = quads.length/4;
+        var qi1, qi2, qi3, qi4;
+        for (var i = 0; i < nQuads; i++) {
+            qi0 = quads[4*i];
+            qi1 = quads[4*i+1];
+            qi2 = quads[4*i+2];
+            qi3 = quads[4*i+3];
+            
+            var quadGeometry = new THREE.Geometry();
+            quadGeometry.vertices.push(new THREE.Vector3(coords[3*qi0],coords[3*qi0+1],coords[3*qi0+2]));
+            quadGeometry.vertices.push(new THREE.Vector3(coords[3*qi1],coords[3*qi1+1],coords[3*qi1+2]));
+            quadGeometry.vertices.push(new THREE.Vector3(coords[3*qi2],coords[3*qi2+1],coords[3*qi2+2]));
+            quadGeometry.vertices.push(new THREE.Vector3(coords[3*qi3],coords[3*qi3+1],coords[3*qi3+2]));
+
+            quadGeometry.faces.push(new THREE.Face3(0, 2, 1));
+            quadGeometry.faces.push(new THREE.Face3(1, 2, 3));
+            quadGeometry.computeFaceNormals();
+            
+            var quadMaterial = new THREE.MeshBasicMaterial({
+                color: 0x999999,
+                side: THREE.DoubleSide
+            });
+            var quadObject = new THREE.Mesh(quadGeometry, quadMaterial);
+
+            participQuadObjects.push(quadObject);
+            scene.add(quadObject);
+        }
+    }      
+}
+
+function createRelationsDependencyGeometry() {
+    //TBD
+}
+
+function doSceneSetup() {
+    //get scene geometric extents 
+    var boundingBoxes = [];
+    
+    if(actorPointsGeometry !== undefined && actorPointsGeometry !== null) {
+        actorPointsGeometry.computeBoundingSphere();
+        actorPointsGeometry.computeBoundingBox(); 
+        boundingBoxes.push(actorPointsGeometry.boundingBox);  
+    }
+    if(eventPointsGeometry !== undefined && eventPointsGeometry !== null) {
+        eventPointsGeometry.computeBoundingSphere();
+        eventPointsGeometry.computeBoundingBox(); 
+        boundingBoxes.push(eventPointsGeometry.boundingBox);  
+    }
+    
+    var rangeMax = new THREE.Vector3();
+    var rangeMin = new THREE.Vector3();
+    
+    rangeMax.x = Number.NEGATIVE_INFINITY;
+    rangeMax.y = Number.NEGATIVE_INFINITY;
+    rangeMax.z = Number.NEGATIVE_INFINITY;
+    rangeMin.x = Number.POSITIVE_INFINITY;
+    rangeMin.y = Number.POSITIVE_INFINITY;
+    rangeMin.z = Number.POSITIVE_INFINITY;
+    
+    for (var i = 0; i < boundingBoxes.length; i++) {
+        var bbcenter = boundingBoxes[i].getCenter();
+        var bbsize = boundingBoxes[i].getSize();
+        
+        var mx = bbcenter.x + bbsize.x/2;
+        if(mx > rangeMax.x)
+            rangeMax.x = mx;
+        var my = bbcenter.y + bbsize.y/2;
+        if(my > rangeMax.y)
+            rangeMax.y = my;
+        var mz = bbcenter.z + bbsize.z/2;
+        if(mz > rangeMax.z)
+            rangeMax.z = mz;
+        
+        var mx = bbcenter.x - bbsize.x/2;
+        if(mx < rangeMin.x)
+            rangeMin.x = mx;
+        var my = bbcenter.y - bbsize.y/2;
+        if(my < rangeMin.y)
+            rangeMin.y = my;
+        var mz = bbcenter.z - bbsize.z/2;
+        if(mz < rangeMin.z)
+            rangeMin.z = mz;        
+        
+    } 
+    var trueSize = new THREE.Vector3();
+    var trueCenter = new THREE.Vector3();
+    
+    trueSize.x = rangeMax.x - rangeMin.x;
+    trueSize.y = rangeMax.y - rangeMin.y;
+    trueSize.z = rangeMax.z - rangeMin.z;
+    
+    trueCenter.x = (rangeMax.x + rangeMin.x)/2;
+    trueCenter.y = (rangeMax.y + rangeMin.y)/2;
+    trueCenter.z = (rangeMax.z + rangeMin.z)/2;
+
+
+    //set camera position to view the whole scene
+    var maxDim = Math.max(trueSize.x, trueSize.y, trueSize.z);
+    var fov = camera.fov * (Math.PI / 180);
+    var cameraZ = Math.abs(maxDim / (2 * Math.tan(fov / 2))) * 1.5;
+    camera.position.set(trueCenter.x, trueCenter.y, cameraZ);
+    controls.update();
+
+    //resize nodes accordingly to scene dimensions
+    pointSize = 0.1 * maxDim;
+    for (var i = 0; i < nodeSizes.length; i++) {
+        nodeSizes[i] = nodeSizes[i] * 20 * pointSize;
+    }
+    raycaster.linePrecision = pointSize / 8;   
+    
+    if(actorPointsGeometry !== undefined && actorPointsGeometry !== null)
+        actorPointsGeometry.attributes.size.needsUpdate = true;
+    if(eventPointsGeometry !== undefined && eventPointsGeometry !== null)
+        eventPointsGeometry.attributes.size.needsUpdate = true;
+    
     render();
 }
 
@@ -347,13 +783,23 @@ function render() {
     renderer.render(scene, camera);
 }
 
+function animate() {
+    requestAnimationFrame(animate);
+    render();
+    stats.update();
+}
+
 function barcharts() {
     var filteredData = crossfilter(dataobject);
     var all = filteredData.groupAll();
-    var fdata = filteredData.dimension(function(d) { return  d.segmentFData; });
-    var fdatas = fdata.group(function(d) { return Math.floor(d); });
+    var fdata = filteredData.dimension(function (d) {
+        return  d.segmentFData;
+    });
+    var fdatas = fdata.group(function (d) {
+        return Math.floor(d);
+    });
 
-    
+
     var charts = [barChart()
                 .dimension(fdata)
                 .group(fdatas)
@@ -583,19 +1029,94 @@ function barcharts() {
 
 }
 
-function processDataObject(data) {
-    dataobject = data;
-    nodeTexts = dataobject.nodeData;
-    nodeTypes = dataobject.nodeTypeData;
-    edgeTexts = dataobject.segmentData;
-    nodeSelection = new Uint8Array(nodeTexts.length);
-    for (var i = 0; i < nodeTexts.length; i++) {
+function isActorNode(index) {
+    if(actorNodeIndices !== null) {
+        for (var i = 0; i < actorNodeIndices.length; i++) {
+            if(actorNodeIndices[i] === index)
+                return true;
+        }
+    }
+    return false;
+}
+
+function isEventNode(index) {
+    if(eventNodeIndices !== null) {
+        for (var i = 0; i < eventNodeIndices.length; i++) {
+            if(eventNodeIndices[i] === index)
+                return true;
+        }
+    }
+    return false;
+}
+
+function processDataObject(inDataObject) {
+    dataobject = inDataObject;
+
+    coords = dataobject.coords;
+    nNodes = dataobject.nNodes;
+    actorNodeIndices = dataobject.actorNodeIndices;
+    eventNodeIndices = dataobject.eventNodeIndices;
+    nodeDataIDs = dataobject.nodeDataIDs;
+    segments = dataobject.segments;
+    actorSegmentIndices = dataobject.actorSegmentIndices;
+    eventSegmentIndices = dataobject.eventSegmentIndices;
+    participSegmentIndices = dataobject.participSegmentIndices;
+    segmentDataIDs = dataobject.segmentDataIDs;
+    quads = dataobject.quads;
+    quadDataIDs = dataobject.quadDataIDs;
+    data = dataobject.data;
+
+
+    nodeSizes = new Float32Array(nNodes);
+    for (var i = 0; i < nodeSizes.length; i++) {
+        nodeSizes[i] = 0;
+    }
+    if(actorNodeIndices !== null) {
+        for (var i = 0; i < actorNodeIndices.length; i++) {
+            nodeSizes[actorNodeIndices[i]] = 1;
+        }
+    }   
+    if(eventNodeIndices !== null) {
+        for (var i = 0; i < eventNodeIndices.length; i++) {
+            nodeSizes[eventNodeIndices[i]] = 1;
+        }
+    }     
+    
+    //create colors of nodes (we'll modify them on selection and hover)
+    nodeColors = new Float32Array(nNodes * 3);
+    if(actorNodeIndices !== null) {
+        for (var i = 0; i < actorNodeIndices.length; i++) {
+            cActorDefaultColor.toArray(nodeColors, actorNodeIndices[i]*3);
+        }
+    }   
+    if(eventNodeIndices !== null) {
+        for (var i = 0; i < eventNodeIndices.length; i++) {
+            cEventDefaultColor.toArray(nodeColors, eventNodeIndices[i]*3);
+        }
+    } 
+    
+    nodeSelection = new Uint8Array(nNodes);
+    for (var i = 0; i < nNodes; i++) {
         nodeSelection[i] = 0;
     }
 
     updateCharts();
     draw3D();
-    render();   
+    render();
+}
+
+function setupColors() {
+    cActorDefaultColor = new THREE.Color(0xaaaaaa);
+    cActorHoverColor = new THREE.Color(0xff0000);
+    cActorSelectedColor = new THREE.Color(0x00ff00);
+
+    cEventDefaultColor = new THREE.Color(0xaaaaff);
+    cEventHoverColor = new THREE.Color(0xff0000);
+    cEventSelectedColor = new THREE.Color(0x0000ff);
+    
+    cParticipDefaultColor = new THREE.Color(0xaaaaff);
+    cParticipHoverColor = new THREE.Color(0xff0000);
+    cParticipSelectedColor = new THREE.Color(0x0000ff);
 }
 
 app.controller('RetrieveMyObjectController', ['$scope', '$http', '$q', '$location', function ($scope, $http, $q, $location) {
@@ -605,7 +1126,7 @@ app.controller('RetrieveMyObjectController', ['$scope', '$http', '$q', '$locatio
             var url = $location.host()
             var server = "";
             if (url === "") {
-            	server = "http://localhost:8080/"
+                server = "http://localhost:8080/"
             }
             $http.get(server + 'dataobject?id=' + ID + '&text=' + text).
                     then(function (response) {
@@ -620,7 +1141,7 @@ app.controller('RetrieveMyObjectController', ['$scope', '$http', '$q', '$locatio
                         //showSEQ.innerHTML = ";  Text: " + $scope.dataobject.text;
 
                         processDataObject($scope.dataobject);
-                        
+
                     });
         };
 
@@ -633,7 +1154,7 @@ app.controller('RetrieveMyObjectController', ['$scope', '$http', '$q', '$locatio
             var url = $location.host()
             var server = "";
             if (url === "") {
-            	server = "http://localhost:8080/"
+                server = "http://localhost:8080/"
             }
             $http.get(server + 'retrieveBibsonomyQuery?login=' + login + '&text=' + text + '&apikey=' + apikey + '&refUsername=' + refUsername + '&tags=' + tags).
                     then(function (response) {

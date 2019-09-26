@@ -5,12 +5,12 @@
 <http://desir.icm.edu.pl/actorID#3><http://desir.icm.edu.pl/hasName>"George Someone" .
 
 <http://desir.icm.edu.pl/eventID#1> <http://desir.icm.edu.pl/hasTitle>"Very Interesting Article A on the Exemplary RDF Format" .
-<http://desir.icm.edu.pl/eventID#1><http://desir.icm.edu.pl/occurred>"2001" .
+<http://desir.icm.edu.pl/eventID#1><http://desir.icm.edu.pl/occurs>"2001" .
 
 <http://desir.icm.edu.pl/eventID#2><http://desir.icm.edu.pl/hasTitle>"Very Interesting Article B on the Exemplary RDF Format" .
-<http://desir.icm.edu.pl/eventID#2><http://desir.icm.edu.pl/occurred>"2003" .
+<http://desir.icm.edu.pl/eventID#2><http://desir.icm.edu.pl/occurs>"2003" .
 <http://desir.icm.edu.pl/eventID#3><http://desir.icm.edu.pl/hasTitle>"Not So Interesting Article C on Something Else" .
-<http://desir.icm.edu.pl/eventID#3><http://desir.icm.edu.pl/occurred>"2007" .
+<http://desir.icm.edu.pl/eventID#3><http://desir.icm.edu.pl/occurs>"2007" .
 
 <http://desir.icm.edu.pl/actorID#1><http://desir.icm.edu.pl/participatesIn><http://desir.icm.edu.pl/eventID#1> .
 <http://desir.icm.edu.pl/actorID#2><http://desir.icm.edu.pl/participatesIn><http://desir.icm.edu.pl/eventID#1> .

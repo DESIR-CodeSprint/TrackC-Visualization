@@ -6,9 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.springframework.util.comparator.ComparableComparator;
-
 import pl.edu.icm.desir.data.model.ScaledTime.Scale;
 import pl.edu.icm.desir.data.model.utility.TrajectoryHelper;
 import pl.edu.icm.jscic.dataarrays.DataObjectInterface;

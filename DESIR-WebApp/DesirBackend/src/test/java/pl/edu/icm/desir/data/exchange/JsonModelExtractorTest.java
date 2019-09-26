@@ -24,7 +24,7 @@ public class JsonModelExtractorTest {
 		extractor.parseInputData(new FileInputStream(file));
 		
 		assertNotNull("Actors list is empty", extractor.getActors());
-		assertTrue("The number of actors is wrong: " + extractor.getActors().size() + " sh0uld be 35" , extractor.getActors().size() == 35);
+		assertTrue("The number of actors is wrong: " + extractor.getActors().size() + " should be 34" , extractor.getActors().size() == 34);
 		assertNotNull("Events list is null", extractor.getEvents());
 		assertTrue("Events list is empty", extractor.getEvents().size() > 0);
 		
