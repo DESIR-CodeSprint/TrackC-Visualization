@@ -95,7 +95,7 @@ public class RdfModelExtractor implements ModelBuilder {
 				Resource subject = stmt.getSubject();
 				Resource predicate = stmt.getPredicate();
 				RDFNode object = stmt.getObject();
-				Resource objectResource = (Resource)object;
+//				Resource objectResource = (Resource)object;
 
 				switch (predicate.getURI()) {
 					case HAS_NAME:

@@ -34,7 +34,10 @@ public class RdfModelExtractorTest {
         Assert.assertEquals("dep1", actors.get(4).getId());
         Assert.assertEquals("Department of Something", actors.get(4).getName());
         Assert.assertEquals(2, actors.get(4).getRelations().size());
-        //Assert.assertEquals("univ1", actors.get(4).getRelations().get(0).getTargetObject().getId());
+        Assert.assertEquals("a1", actors.get(4).getRelations().get(0).getSubject().getId());
+        Assert.assertEquals("dep1", actors.get(4).getRelations().get(0).getTargetObject().getId());
+        Assert.assertEquals("dep1", actors.get(4).getRelations().get(1).getSubject().getId());
+        Assert.assertEquals("univ1", actors.get(4).getRelations().get(1).getTargetObject().getId());
 
         Assert.assertEquals("a1", actors.get(0).getId());
         Assert.assertEquals("John Doe", actors.get(0).getName());
@@ -49,8 +52,6 @@ public class RdfModelExtractorTest {
 
         Assert.assertEquals("e1", actors.get(0).getRelations().get(1).getTargetObject().getId());
         Assert.assertEquals("e2", actors.get(0).getRelations().get(2).getTargetObject().getId());
-        //Assert.assertEquals("e1", actors.get(0).getRelations().get(3).getTargetObject().getId());
-        //Assert.assertEquals("dep1", actors.get(0).getRelations().get(4).getTargetObject().getId());
 
         Assert.assertEquals("a2", actors.get(2).getId());
         Assert.assertEquals("Anthony Monster", actors.get(2).getName());
@@ -73,7 +74,8 @@ public class RdfModelExtractorTest {
         Assert.assertEquals("Very Interesting Article B on the Exemplary RDF Format", events.get(1).getName());
         Assert.assertEquals(2003, events.get(1).getStartPoint().getCalendarTime().getLocalDate().getYear());
         Assert.assertEquals(4, events.get(1).getRelations().size());
-        //Assert.assertEquals("e1", events.get(1).getRelations().get(0).getTargetObject().getId());
+        Assert.assertEquals("e3", events.get(1).getRelations().get(0).getSubject().getId());
+        Assert.assertEquals("e2", events.get(1).getRelations().get(0).getTargetObject().getId());
 
         Assert.assertEquals("e1", events.get(2).getId());
         Assert.assertEquals("Very Interesting Article A on the Exemplary RDF Format", events.get(2).getName());

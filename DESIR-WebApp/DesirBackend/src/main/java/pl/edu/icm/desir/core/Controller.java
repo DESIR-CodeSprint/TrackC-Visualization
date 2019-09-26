@@ -2,7 +2,6 @@ package pl.edu.icm.desir.core;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bibsonomy.common.enums.GroupingEntity;
@@ -25,7 +24,7 @@ import pl.edu.icm.desir.data.model.Actor;
 import pl.edu.icm.jlargearrays.ObjectLargeArray;
 import pl.edu.icm.jscic.IrregularField;
 import pl.edu.icm.jscic.cells.CellType;
-import org.json.JSONObject;
+//import org.json.JSONObject;
 
 @RestController
 public class Controller
