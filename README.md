@@ -24,10 +24,14 @@ Within this Code Sprint we will focus on the extension of our tool both towards 
 1) Create your own test data directly in data model (hardcoded)
 2) Create your own data source (API or file) and map it to data model
 3) Translate your own data source (API or file) to RDF format
+- Done on Code Sprint 2019
 4) Advance RDF parsing to understand new commands
+- Done on Code Sprint 2019 (but it can always be more complex)
 5) Create data model export to RDF
 6) Work on automated translation of data model to DataObject (*)
+- Done on Code Sprint 2019
 7) Enhance BibSonomy query
+- Done on Code Sprint 2019
 
 For new data sources consider one of our three usage scenarios:
 1) Bibliographical data
