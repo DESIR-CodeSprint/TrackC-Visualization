@@ -1151,12 +1151,13 @@ app.controller('RetrieveMyObjectController', ['$scope', '$http', '$q', '$locatio
             var refUsername = $scope.dataobject.refUsername;
             var tags = $scope.dataobject.tags;
             var text = $scope.dataobject.text;
+            var query = $scope.dataobject.query;
             var url = $location.host()
             var server = "";
             if (url === "") {
-                server = "http://localhost:8080/"
+            	server = "http://localhost:8080/"
             }
-            $http.get(server + 'retrieveBibsonomyQuery?login=' + login + '&text=' + text + '&apikey=' + apikey + '&refUsername=' + refUsername + '&tags=' + tags).
+            $http.get(server + 'retrieveBibsonomyQuery?login=' + login + '&text=' + text + '&apikey=' + apikey + '&refUsername=' + refUsername + '&tags=' + tags + '&query=' + query).
                     then(function (response) {
                         $scope.dataobject = response.data;
                         if ($scope.dataobject.text === "undefined")
