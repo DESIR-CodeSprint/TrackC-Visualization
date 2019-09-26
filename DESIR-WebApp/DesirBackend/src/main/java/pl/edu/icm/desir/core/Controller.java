@@ -63,7 +63,7 @@ public class Controller
         */
       
     	try {
-    		ModelBuilder builder = new BibsonomyApiModelExtractor(login, apikey, GroupingEntity.USER, refUsername, Arrays.asList(tags.split(",")), "", query, null, null, Order.ADDED, null, null, 0, 1000);
+    		ModelBuilder builder = new BibsonomyApiModelExtractor(login, apikey, GroupingEntity.USER, refUsername, Arrays.asList(tags.split(",")), "", (query != null && (query.isEmpty() || query.contentEquals("undefined")))?null:query, null, null, Order.ADDED, null, null, 0, 1000);
             builder.parseInputData(null);
     		return processModel(builder, true);
         } catch (IOException ex) {
