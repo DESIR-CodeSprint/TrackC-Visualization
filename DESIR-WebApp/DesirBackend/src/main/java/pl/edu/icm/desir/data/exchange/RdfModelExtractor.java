@@ -11,13 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.RDFReader;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.util.FileUtils;
 
 import org.apache.log4j.Logger;
@@ -81,6 +75,18 @@ public class RdfModelExtractor implements ModelBuilder {
 		r.read(model, in, BASE_URI);
 		in.close();
 
+		//Tests to query the model
+//		Resource vcard = model.getResource("http://desir.icm.edu.pl/actor#univ1");
+//		LOG.info(vcard.getLocalName());
+//		LOG.info(vcard.getNameSpace());
+//		LOG.info(vcard.getURI());
+//		Property isPartOfProperty = model.getProperty("http://desir.icm.edu.pl/", "isPartOf");
+//		Statement statement = vcard.getProperty(isPartOfProperty);
+//		LOG.info(statement);
+//		Property hasNameProperty = model.getProperty("http://desir.icm.edu.pl/", "hasName");
+//		statement = vcard.getProperty(hasNameProperty);
+//		LOG.info(statement);
+
 		StmtIterator iter = model.listStatements();
 		try {
 			while (iter.hasNext()) {
@@ -89,6 +95,7 @@ public class RdfModelExtractor implements ModelBuilder {
 				Resource subject = stmt.getSubject();
 				Resource predicate = stmt.getPredicate();
 				RDFNode object = stmt.getObject();
+				Resource objectResource = (Resource)object;
 
 				switch (predicate.getURI()) {
 					case HAS_NAME:
@@ -365,3 +372,11 @@ public class RdfModelExtractor implements ModelBuilder {
 		return participations;
 	}
 }
+
+/**
+ * Only could visualize the co-authorship graph, not the timeline. (Only in test was it possible)
+ * Modification of frontend
+ * Improvement of model
+ * I did RDF to model mapping and extension
+ * Mapping the new model to frontend
+ **/
